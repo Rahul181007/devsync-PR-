@@ -1,11 +1,10 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet  from 'helmet';
 import compression from 'compression';
-import router from './router.js'
-
-dotenv.config();
+import router from './router'
+import { env } from './config/env';
+import { connectDB } from './infrastructure/db/mongo';
 
 const app=express()
 
@@ -16,10 +15,12 @@ app.use(compression());
 
 app.use('/api',router);
 
-const PORT = process.env.PORT || 4000;
 
 
-app.listen(PORT, () => {
-  console.log(` Server running on port ${PORT}`);
-});
+
+connectDB().then(()=>{
+  app.listen(env.PORT,()=>{
+    console.log(`Server running on port ${env.PORT}`)
+  })
+})
 
