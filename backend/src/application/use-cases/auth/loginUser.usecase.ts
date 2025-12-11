@@ -8,9 +8,9 @@ export class LoginUserUseCase{
     constructor(private userRepo:IUserRepository){}
    
     async execute(data:LoginDTO):Promise<LoginResponseDTO>{
-        console.log('email',data.email)
+
         const user=await this.userRepo.findByEmail(data.email);
-        console.log( 'hwllo',user)
+       
         if(!user){
             throw new Error('Invalid email or password');
         }
