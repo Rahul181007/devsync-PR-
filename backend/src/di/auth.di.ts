@@ -5,6 +5,6 @@ import { RefreshTokenUseCase } from "../application/use-cases/auth/refreshToken.
 
 const superAdminRepo=new SuperAdminRepository();
 const loginUseCase= new LoginSuperAdminUseCase(superAdminRepo);
-const refreshTokenUseCase=new RefreshTokenUseCase()
+const refreshTokenUseCase=new RefreshTokenUseCase(superAdminRepo)
 
 export const authController=new AuthController(loginUseCase,refreshTokenUseCase)

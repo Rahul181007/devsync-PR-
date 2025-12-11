@@ -35,7 +35,7 @@ export class LoginSuperAdminUseCase{
 
            // generate tokens
            const accessToken=generateAccessToken(payload);
-           const refreshToken=generateRefreshToken(payload)
+           const refreshToken=generateRefreshToken(superAdmin.id)
 
            // return clean data not whole entity
            return {

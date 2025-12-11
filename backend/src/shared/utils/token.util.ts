@@ -11,9 +11,9 @@ export const generateAccessToken = (payload: Record<string, any>) => {
   );
 };
 
-export const generateRefreshToken = (payload: Record<string, any>) => {
+export const generateRefreshToken = (id:string) => {
   return jwt.sign(
-    payload,
+    {id},
     env.JWT_REFRESH_SECRET as Secret,
     {
       expiresIn: env.REFRESH_TOKEN_EXPIRES_IN as string,

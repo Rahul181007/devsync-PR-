@@ -27,4 +27,21 @@ export class SuperAdminRepository implements ISuperAdminRepository{
     async updateLastLogin(id: string, date: Date): Promise<void> {
         await SuperAdminModel.findByIdAndUpdate(id,{lastLoginAt:date})
     }
+
+    async findById(id: string): Promise<SuperAdmin | null> {
+        const doc = await SuperAdminModel.findById(id);
+        if(!doc) return null
+        return new SuperAdmin(
+            doc._id.toString(),
+            doc.name,
+            doc.email,
+            doc.passwordHash,
+            'SUPER_ADMIN',
+            doc.avatarUrl ?? null,
+            doc.status as SuperAdminStatus,
+            doc.createdAt,
+            doc.updatedAt,
+            doc.lastLoginAt??null
+        )        
+    }
 }
