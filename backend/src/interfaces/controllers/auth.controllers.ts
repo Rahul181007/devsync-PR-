@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import { loginSchema } from "../../application/validators/auth/login.validator";
 import { LoginSuperAdminUseCase } from "../../application/use-cases/auth/loginSuperAdmin.usecase";
 import { RefreshTokenUseCase } from "../../application/use-cases/auth/refreshToken.usecase";
+import { superAdminCookieOptions } from "../../config/superAdminCookieOption";
 
 export class AuthController{
     constructor(private loginSuperAdminUseCase:LoginSuperAdminUseCase,
@@ -14,6 +15,14 @@ export class AuthController{
 
             const result =await this.loginSuperAdminUseCase.execute(parsed);
 
+            // store RefreshToken inside cookie
+            res.cookie(
+                'refresh_superAdmin',
+                result.refreshToken,
+                superAdminCookieOptions
+            )
+
+
 
             return res.json({
                 message:'Login successful',
@@ -24,7 +33,6 @@ export class AuthController{
                     role:result.role,
                 },
                 accessToken:result.accessToken,
-                refreshToken:result.refreshToken
             })
         } catch (error:any) {
             return res.status(400).json({error:error.message})
@@ -34,7 +42,7 @@ export class AuthController{
     // refresh token
     refreshToken=async (req:Request,res:Response)=>{
         try {
-            const {refreshToken}=req.body;
+            const refreshToken=req.cookies.refresh_superAdmin;
 
             if(!refreshToken){
                 return res.status(400).json({ error: "Refresh token is required" });

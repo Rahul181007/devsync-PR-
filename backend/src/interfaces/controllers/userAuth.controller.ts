@@ -2,6 +2,8 @@ import { Request,Response } from "express";
 import { loginSchema } from "../../application/validators/auth/login.validator";
 import { LoginUserUseCase } from "../../application/use-cases/auth/loginUser.usecase";
 import { RefreshTokenUseCase } from "../../application/use-cases/auth/refreshUserToken.usecase";
+import { userCookieOptions } from "../../config/userCookieOptions";
+
 
 export class UseAuthController{
     constructor(private loginUserUseCase:LoginUserUseCase, private refreshTokenUseCase:RefreshTokenUseCase){}
@@ -11,10 +13,20 @@ export class UseAuthController{
             const parsed=loginSchema.parse(req.body);
 
             const result =await this.loginUserUseCase.execute(parsed);
-
+             res.cookie(
+                'refresh_user',
+                result.refreshToken,
+                userCookieOptions
+             )
             return res.json({
                 message:'Login successful',
-                data:result
+                data:{
+                    id:result.id,
+                    name:result.name,
+                    email:result.email,
+                    role:result.role,
+                },
+                accessToken:result.accessToken
             })
         } catch (error:any) {
             return res.status(400).json({ error: error.message });
@@ -23,7 +35,7 @@ export class UseAuthController{
 
     refresh=async(req:Request,res:Response)=>{
         try {
-           const {refreshToken}=req.body;
+           const refreshToken=req.cookies.refresh_user;
            
            if(!refreshToken){
             return res.status(400).json({ error: "Refresh token is required" });
@@ -33,7 +45,7 @@ export class UseAuthController{
 
            return res.json({
             message:'Token refreshed successfully',
-            data:token
+            accessToken:token.accessToken
            })
 
         } catch (error:any) {
