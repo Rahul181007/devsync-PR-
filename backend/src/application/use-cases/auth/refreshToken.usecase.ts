@@ -5,6 +5,7 @@ import { ISuperAdminRepository } from '../../../domain/repositories/superAdmin.r
 
 
 
+
 export class RefreshTokenUseCase{
     constructor(private superAdminRepo:ISuperAdminRepository){}
     async execute(refreshToken:string){
@@ -31,7 +32,13 @@ export class RefreshTokenUseCase{
                
             return {
                 accessToken:newAccessToken,
-                refreshToken
+                user:{
+                    id:superadmin.id,
+                    name:superadmin.name,
+                    email:superadmin.email,
+                    role:superadmin.role
+
+                }
             }
         } catch (error) {
             throw new Error("Invalid or expired refresh token");

@@ -1,9 +1,17 @@
-export default function App() {
-  return (
-<div className="p-6 bg-gray-200 rounded-xl">
-  Tailwind Padding + Rounded Test
-</div>
+import { useEffect } from "react";
+import { useAppDispatch } from "./store/hook";
+import { superAdminRefresh } from "./modules/auth/auth.slice";
+import AppRouter from "./router/AppRouter";
 
-  );
-}
+const App = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(superAdminRefresh());
+  }, [dispatch]);
+
+  return <AppRouter />;
+};
+
+export default App;
 

@@ -53,6 +53,7 @@ export class AuthController{
     return res.json({
         message: "New access token generated",
         accessToken: result.accessToken,
+        user:result.user
       });
 
         } catch (error:any) {

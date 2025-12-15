@@ -1,4 +1,4 @@
-export interface LoginDTO {
-    email:string;
-    password:string;
-}
+import {z}  from 'zod';
+import { loginSchema } from '../../validators/auth/login.validator';
+
+export type LoginDTO=z.infer<typeof loginSchema>
