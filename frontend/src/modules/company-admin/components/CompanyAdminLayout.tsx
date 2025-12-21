@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "./SideBar";
 import TopBar from "./TopBar";
 
-const SuperAdminLayout = () => {
+const CompanyAdminLayout = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -18,4 +18,4 @@ const SuperAdminLayout = () => {
   );
 };
 
-export default SuperAdminLayout;
+export default CompanyAdminLayout;

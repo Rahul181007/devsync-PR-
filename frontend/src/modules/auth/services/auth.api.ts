@@ -1,4 +1,7 @@
 import { http } from "../../../core/api/http";
+import type { AuthUser } from "../auth.slice";
+
+
 
 export interface LoginRequest{
     email:string;
@@ -22,18 +25,13 @@ export const authApi={
         return http.post<LoginResponse>('/auth/superadmin/login',data)
        },
 
-       superAdminRefresh(){
-        return http.post ('/auth/superadmin/refresh')
-       },
-
        // company admin & developer login
 
        userLogin(data:LoginRequest){
         return http.post<LoginResponse>('/auth/login',data)
        },
-
-       userRefresh(){
-        return http.post('/auth/refresh');
+       getMe(){
+            return http.get<{user:AuthUser}>('/auth/me')
        },
 
        //password reset
@@ -51,6 +49,10 @@ export const authApi={
         newPassword:string;
        }){
         return http.post('/auth/reset-password',data)
-       }
+       },
 
+       logout(){
+        return http.post('/auth/logout')
+       }
+        
 }

@@ -1,6 +1,15 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../../store/hook";
+import { logout } from "../../auth/auth.slice";
 
 const Sidebar = () => {
+    const dispatch=useAppDispatch();
+    const navigate=useNavigate()
+
+    const handleLogout=async()=>{
+        await dispatch(logout());
+        navigate('/super-admin/login')
+    }
   return (
     <aside className="w-64 bg-slate-900 text-white min-h-screen p-4">
       <h2 className="text-xl font-bold mb-8">DevSync</h2>
@@ -27,11 +36,14 @@ const Sidebar = () => {
         >
           Companies
         </NavLink>
-      </nav>
+        <button
+          onClick={handleLogout}
+          className="w-full text-left px-3 py-2 rounded hover:bg-slate-800 text-red-400"
+        >
+          Logout
+        </button>
 
-      <div className="mt-auto pt-10 text-sm text-gray-400">
-        © DevSync
-      </div>
+      </nav>
     </aside>
   );
 };

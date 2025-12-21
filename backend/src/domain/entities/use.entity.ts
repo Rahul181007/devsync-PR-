@@ -1,7 +1,6 @@
 export type UserRole='COMPANY_ADMIN'|'DEVELOPER';
 export type UserStatus='ACTIVE'|'INACTIVE'|'SUSPENDED';
 
-
 export class User{
     constructor(
         public readonly id:string,
@@ -14,7 +13,7 @@ export class User{
         public status :UserStatus,
         public setting:{
             theme?:string;
-            notificationPreferences?:Record<string,any>;
+            notificationPreferences?:Record<string,boolean>;
         }|null,
         public createdAt:Date,
         public updatedAt:Date,

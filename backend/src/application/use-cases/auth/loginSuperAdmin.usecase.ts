@@ -2,8 +2,7 @@ import { ISuperAdminRepository } from "../../../domain/repositories/superAdmin.r
 import { LoginDTO } from "../../dto/auth/login.dto";
 import bcrypt from 'bcrypt';
 import { LoginResponseDTO } from "../../dto/auth/login.response.dto";
-import { generateAccessToken,generateRefreshToken } from "../../../shared/utils/token.util";
-
+ import { Tokenutilits } from "../../../shared/utils/token.util";
 export class LoginSuperAdminUseCase{
     constructor(private superAdminRepo:ISuperAdminRepository){}
 
@@ -28,15 +27,13 @@ export class LoginSuperAdminUseCase{
 
            // prepare jwt payload
            const payload={
-            id:superAdmin.id,
-            email:superAdmin.email,
+            sub:superAdmin.id,
             role:superAdmin.role
            }
 
            // generate tokens
-           const accessToken=generateAccessToken(payload);
-           const refreshToken=generateRefreshToken(superAdmin.id)
-
+           const accessToken=Tokenutilits.generateAccessToken(payload);
+           const refreshToken=Tokenutilits.generateRefreshToken({sub:superAdmin.id,role:superAdmin.role})
            // return clean data not whole entity
            return {
             id:superAdmin.id,

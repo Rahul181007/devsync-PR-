@@ -1,22 +1,38 @@
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { env } from "../../config/env";
 
-export const generateAccessToken = (payload: Record<string, any>) => {
-  return jwt.sign(
-    payload,
-    env.JWT_ACCESS_SECRET as Secret,
-    {
-      expiresIn: env.ACCESS_TOKEN_EXPIRES_IN as string,
-    } as SignOptions
-  );
-};
+export type UserRole='SUPER_ADMIN'|'COMPANY_ADMIN'|'DEVELOPER'
 
-export const generateRefreshToken = (id:string) => {
-  return jwt.sign(
-    {id},
-    env.JWT_REFRESH_SECRET as Secret,
-    {
-      expiresIn: env.REFRESH_TOKEN_EXPIRES_IN as string,
-    } as SignOptions
-  );
-};
+export interface AcceessTokenPayload{
+  sub:string;
+  role:UserRole;
+  companyId?:string|null
+}
+
+export interface RefreshTokenPayload{
+  sub:string;
+  role:UserRole
+}
+
+export class Tokenutilits{
+  static generateAccessToken(payload:AcceessTokenPayload):string{
+    return jwt.sign(
+      payload,
+      env.JWT_ACCESS_SECRET as Secret,
+      {
+        expiresIn:env.ACCESS_TOKEN_EXPIRES_IN as string
+      }as SignOptions
+    )
+  }
+  
+  static generateRefreshToken (payload:RefreshTokenPayload):string{
+    return jwt.sign(
+      payload,
+      env.JWT_REFRESH_SECRET as Secret,
+      {
+        expiresIn:env.REFRESH_TOKEN_EXPIRES_IN as string
+      }as SignOptions
+    )
+  }
+
+ }

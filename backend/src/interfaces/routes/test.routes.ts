@@ -5,7 +5,7 @@ import { requireRole } from "../middleware/role.middleware";
 
 const router=Router();
 
-router.get('/protected',verifyAccessToken,requireRole('SUPER_ADMIN'),(req,res)=>{
+router.get('/protected',verifyAccessToken,requireRole('COMPANY_ADMIN'),(req,res)=>{
     return res.json({
         message:'You accessed a Protected route',
         user:(req as any).user

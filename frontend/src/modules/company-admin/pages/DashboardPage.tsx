@@ -1,15 +1,15 @@
-const  CompanyDashboardPage = () => {
+const DashboardPage = () => {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">
-        Super Admin Dashboard
+        Company Admin Dashboard
       </h2>
 
       <p className="text-gray-600">
-        Welcome to the Super Admin workspace.
+        Welcome to the Company Admin workspace.
       </p>
     </div>
   );
 };
 
-export default CompanyDashboardPage;
+export default DashboardPage;

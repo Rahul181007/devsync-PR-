@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { IUserRepository } from '../../../domain/repositories/user.repository'
 import { LoginDTO } from '../../dto/auth/login.dto'
 import { LoginResponseDTO } from '../../dto/auth/login.response.dto'
-import { generateAccessToken,generateRefreshToken } from '../../../shared/utils/token.util';
+import { Tokenutilits } from '../../../shared/utils/token.util';
 
 export class LoginUserUseCase{
     constructor(private userRepo:IUserRepository){}
@@ -36,13 +36,13 @@ export class LoginUserUseCase{
         
         // create token payload 
         const payload={
-            id:user.id,
-            email:user.email,
-            role:user.role
+            sub:user.id,
+            role:user.role,
+            companyId:user.companyId
         }
 
-        const accessToken=generateAccessToken(payload);
-        const refreshToken=generateRefreshToken(user.id);
+        const accessToken=Tokenutilits.generateAccessToken(payload);
+        const refreshToken=Tokenutilits.generateRefreshToken({sub:user.id,role:user.role});
 
 
         return {

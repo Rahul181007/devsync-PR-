@@ -1,27 +1,32 @@
 import { Request,Response,NextFunction } from "express";
 import jwt from 'jsonwebtoken';
 import { env } from "../../config/env";
+import { handleError } from "../../shared/utils/handleError";
+import { AcceessTokenPayload } from "../../shared/utils/token.util";
 
-export interface AuthRequest extends Request{
-    user?:any
-}
+export const verifyAccessToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token =
+      req.cookies?.accessToken ||
+      req.headers.authorization?.split(" ")[1];
 
-export const verifyAccessToken=(
-    req:AuthRequest,
-    res:Response,
-    next:NextFunction
-)=>{
-    try {
-        const authHeader = req.headers.authorization as string;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({error:'Unauthorized No token Provided'})
-        }
-        const token =authHeader.split(' ')[1];
-        const decoded=jwt.verify(token,env.JWT_ACCESS_SECRET)
-
-        req.user=decoded
-        next()
-    } catch (error) {
-        return res.status(401).json({ error: "Invalid or expired token" });
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token" });
     }
-}
+
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET)as jwt.JwtPayload &AcceessTokenPayload;
+    req.user = {
+        id:decoded.sub,
+        role:decoded.role,
+        companyId:decoded.companyId
+    };
+    next();
+  } catch (error:unknown) {
+    // return res.status(401).json({ error: "Invalid or expired token" });
+    return handleError(error,res,401,"Invalid or expired token")
+  }
+};
