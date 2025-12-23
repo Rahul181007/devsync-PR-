@@ -7,6 +7,8 @@ export interface IUserRepository {
     create(data:Partial<User>):Promise <User|null>;
     
     findById(id:string):Promise<User|null>;
+    
+    assignCompany(userId:string,companyId:string):Promise<void>;
 
     updatePassword(userId:string,passwordHash:string):Promise<void>;
 

@@ -10,6 +10,8 @@ import ProtectedRoute from "./ProtectedRoutes";
 import UserLoginPage from "../modules/auth/pages/UserLoginPAge";
 import CompanyAdminLayout from "../modules/company-admin/components/CompanyAdminLayout";
 import CompanyDashboardPage from "../modules/company-admin/pages/DashboardPage";
+import DeveloperLayout from "../modules/developer/components/DeveloperLAyout";
+import DevDashboard from "../modules/developer/pages/DevDashboard";
 
 const AppRouter = () => {
   return (
@@ -22,26 +24,37 @@ const AppRouter = () => {
         />
 
         {/* Super Admin Workspace */}
-        <Route element={<ProtectedRoute  allowedRoles="SUPER_ADMIN" loginPath="/super-admin/login"/>}>
+        <Route element={<ProtectedRoute  allowedRoles={["SUPER_ADMIN"]} loginPath="/super-admin/login"/>}>
          <Route path="/super-admin" element={<SuperAdminLayout />}>
           <Route path="dashboard" element={<DashboardPage />} />
         </Route>
         </Route>
         
 
-
+    {/* Company Admin*/}
         <Route 
         path="/company/login"
         element={<UserLoginPage/>}
         />
         {/* Company Admin Workspace */}
-        <Route  element={<ProtectedRoute allowedRoles="COMPANY_ADMIN" loginPath="/company/login"/>}>
+        <Route  element={<ProtectedRoute allowedRoles={["COMPANY_ADMIN"]} loginPath="/company/login"/>}>
         <Route path="/company" element={<CompanyAdminLayout/>}>
          <Route path='dashboard' element={<CompanyDashboardPage/>}/>
         </Route>
         
         </Route>
-
+       
+    {/* Developer*/}
+        <Route 
+        path="/developer/login"
+        element={<UserLoginPage/>}
+        />
+    {/* Developer Workspace */}
+    <Route element={<ProtectedRoute  allowedRoles={['DEVELOPER']} loginPath="/developer/login"/>}>
+    <Route path="/developer" element={<DeveloperLayout />}>
+    <Route path="dashboard" element={<DevDashboard/>}/>
+    </Route>
+    </Route>
 
       </Routes>
     </BrowserRouter>

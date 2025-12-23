@@ -120,10 +120,11 @@ const authSlice = createSlice({
                 state.user = action.payload
                 state.isAuthChecked = true;
             })
-            .addCase(userLogin.rejected,(state)=>{
+            .addCase(userLogin.rejected,(state,action)=>{
                 state.loading=false;
                 state.user=null;
                 state.isAuthenticated=false
+                state.error = action.payload as string
             })
 
             .addCase(logout.fulfilled, (state) => {

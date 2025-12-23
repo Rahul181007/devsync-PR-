@@ -33,12 +33,6 @@ export class AuthController {
                 result.refreshToken,
                 superAdminCookieOptions
             );
-            // store RefreshToken inside cookie
-            res.cookie(
-                'refresh_token',
-                result.refreshToken,
-                superAdminCookieOptions
-            )
             return res.json({
                 message: 'Login successful',
                 data: {

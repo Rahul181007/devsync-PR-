@@ -17,13 +17,16 @@ const UserLoginPage=()=>{
         dispatch(userLogin(data))
     }
 
-    useEffect(()=>{
-        if(user?.role==='COMPANY_ADMIN'){
-            navigate('/company/dashboard')
-        }else if( user?.role==='DEVELOPER'){
-            navigate('/developer/dashboard')
-        }
-    },[isAuthenticated,user,navigate])
+useEffect(() => {
+  if (!isAuthenticated || !user) return;
+
+  if (user.role === 'COMPANY_ADMIN') {
+    navigate('/company/dashboard');
+  } else if (user.role === 'DEVELOPER') {
+    navigate('/developer/dashboard');
+  }
+}, [isAuthenticated, user, navigate]);
+
 
 
     return(

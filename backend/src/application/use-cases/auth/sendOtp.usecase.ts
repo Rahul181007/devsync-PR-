@@ -1,11 +1,13 @@
 import crypto from 'crypto';
 import { IUserRepository } from '../../../domain/repositories/user.repository';
 import { IPasswordResetRepository } from '../../../domain/repositories/passwordReset.repository';
+import { IMailService } from '../../../domain/service/mail.service';
 
 export class SendOtpUseCase{
     constructor(
         private useRepo:IUserRepository,
-        private passwordRepo:IPasswordResetRepository
+        private passwordRepo:IPasswordResetRepository,
+        private mailService:IMailService
     ){}
 
     async execute(email:string){
@@ -30,7 +32,7 @@ export class SendOtpUseCase{
             otp,
             expiresAt
         })
-
+        await this.mailService.sendOtp(email,otp)
         console.log(`OTP for ${email}: ${otp}`); // Later replace with email service
 
          return { message: "OTP sent successfully" };

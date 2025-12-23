@@ -2,7 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../store/hook";
 
 interface ProtectedRouteProps {
-  allowedRoles: "SUPER_ADMIN" | "COMPANY_ADMIN" | "DEVELOPER";
+  allowedRoles: ("SUPER_ADMIN" | "COMPANY_ADMIN" | "DEVELOPER")[];
   loginPath: string;
 }
 
@@ -24,7 +24,7 @@ const ProtectedRoute = ({
     return <Navigate to={loginPath} replace />;
   }
 
-  if (user.role !== allowedRoles) {
+  if (!allowedRoles.includes(user.role)) {
     return <Navigate to={loginPath} replace />;
   }
 
