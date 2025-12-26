@@ -32,6 +32,7 @@ const companySchema=new Schema<ICompanyDocument>(
         domain:{
             type:String,
             unique:true,
+            sparse:true,
             default:null
         },
         createdBy:{

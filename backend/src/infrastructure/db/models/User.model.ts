@@ -26,7 +26,7 @@ const UserSchema= new Schema<IUserDocument>(
         },
         name:{
             type:String,
-            required:true
+            default:''
         },
         email:{
             type:String,

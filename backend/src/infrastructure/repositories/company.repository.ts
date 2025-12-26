@@ -4,18 +4,15 @@ import { Company, CompanyStatus } from "../../domain/entities/company.entity";
 import { CompanyModel } from "../db/models/Company.models";
 import { ICompanyDocument } from "../db/models/Company.models";
 
-
-
-
 export class CompanyRepository implements ICompanyRepository{
    private toEntity(companyDoc:ICompanyDocument):Company{ // mapper
     return new Company(
         companyDoc._id.toString(),
         companyDoc.name,
         companyDoc.slug,
-        companyDoc.ownerAdminId?.toString()??"",
         companyDoc.status,
         companyDoc.createdBy,
+        companyDoc.ownerAdminId?.toString()??undefined,
         companyDoc.domain??undefined,
         companyDoc.approvedBy?.toString()??undefined,
         companyDoc.themeColor??undefined,
@@ -75,5 +72,9 @@ export class CompanyRepository implements ICompanyRepository{
        }else{
         return this.toEntity(company)
        }
+   }
+
+    async assignOwnerAdmin(companyId: string, userId: string): Promise<void> {
+       await CompanyModel.findByIdAndUpdate(companyId,{ownerAdminId:userId})
    }
 }

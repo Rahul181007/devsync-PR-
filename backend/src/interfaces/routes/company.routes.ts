@@ -7,6 +7,7 @@ const router=Router();
 
 router.post('/superadmin/companies',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.createCompany);
 router.get('/superadmin/companies',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.listCompanies);
-router.patch('/superadmin/companies/:id/approve',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.approveCompany)
-router.patch('/superadmin/companies/:id/suspend',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.suspendCompany)
+router.patch('/superadmin/companies/:id/approve',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.approveCompany);
+router.patch('/superadmin/companies/:id/suspend',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.suspendCompany);
+
 export default router
