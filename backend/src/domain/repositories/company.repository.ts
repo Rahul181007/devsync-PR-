@@ -1,5 +1,5 @@
 
-import { Company, CompanyStatus } from "../entities/company.entity";
+import { Company, CompanyStatus,CompanyCreatedBy } from "../entities/company.entity";
 
 export interface ListCompaniesQuery{
     page:number;
@@ -11,10 +11,9 @@ export interface CreateCompanyData{
     name:string;
     slug:string;
     domain?:string;
-    ownerAdminId:string;
-    createdBy:'superadmin';
-    approvedBy:string;
-    status:'APPROVED'
+    createdBy:CompanyCreatedBy;
+    approvedBy?:string;
+    status:CompanyStatus
 }
 export interface ICompanyRepository{
     findByName(name:string):Promise<Company|null>
@@ -26,4 +25,6 @@ export interface ICompanyRepository{
     updateStatus(companyId:string,status:CompanyStatus,approvedBy?:string):Promise<void>
 
     findById(companyId:string):Promise<Company|null>
+
+    assignOwnerAdmin(companyId:string,userId:string):Promise<void>
 }
