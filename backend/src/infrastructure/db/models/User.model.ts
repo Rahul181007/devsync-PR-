@@ -7,7 +7,7 @@ export interface IUserDocument extends Document{
     passwordHash:string;
     role:'COMPANY_ADMIN'|'DEVELOPER';
     avatarUrl:string|null;
-    status:"ACTIVE" | "INACTIVE" | "SUSPENDED";
+    status:"ACTIVE" |'BLOCKED';
     settings:{
       theme?: string;
       notificationPreferences?: Record<string, any>;
