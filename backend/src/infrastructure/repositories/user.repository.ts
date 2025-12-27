@@ -1,5 +1,5 @@
 import { IUserRepository } from "../../domain/repositories/user.repository";
-import { User } from "../../domain/entities/use.entity";
+import { User } from "../../domain/entities/user.entity";
 import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
 
@@ -47,7 +47,15 @@ export class UserRepository implements IUserRepository {
         await UserModel.findByIdAndUpdate(userId, { lastLoginAt: date })
     }
 
-    async updateStatus(userId: string, status: "ACTIVE" | "INACTIVE" | "SUSPENDED"): Promise<void> {
+    async updateStatus(userId: string, status:'ACTIVE'|'BLOCKED' ): Promise<void> {
         await UserModel.findByIdAndUpdate(userId, { status })
+    }
+
+    async blockUser(userId: string): Promise<void> {
+        await UserModel.findByIdAndUpdate(userId,{status:'BLOCKED'})
+    }
+
+    async unBlockUser(userId: string): Promise<void> {
+        await UserModel.findByIdAndUpdate(userId,{status:'ACTIVE'})
     }
 }
