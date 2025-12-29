@@ -1,5 +1,4 @@
 import { SuperAdmin } from "../entities/superAdmin.entity";
-// import { IBaseRepository } from "./BaseRepository.repository";
 
 export interface ISuperAdminRepository {
     findByEmail(email:string):Promise<SuperAdmin|null>

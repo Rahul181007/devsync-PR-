@@ -1,5 +1,5 @@
-import { User } from "../entities/use.entity";
-
+import { User } from "../entities/user.entity";
+import { UserStatus } from "../entities/user.entity";
 
 export interface IUserRepository {
     findByEmail(email:string):Promise<User|null>;
@@ -16,6 +16,11 @@ export interface IUserRepository {
 
     updateStatus(
         userId:string,
-        status:"ACTIVE" | "INACTIVE" | "SUSPENDED"
+        status:UserStatus
     ):Promise<void>
+    
+    blockUser(userId:string):Promise<void>;
+    unBlockUser(userId:string):Promise<void>;
+    
+
 }
