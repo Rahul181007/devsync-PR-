@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "./services/auth.api";
 import { getErrorMessage } from "../../shared/utiils/getErrorMessage";
 
+
 export type AuthRole = 'SUPER_ADMIN' | 'COMPANY_ADMIN' | "DEVELOPER";
 
 export interface AuthUser {
@@ -18,6 +19,12 @@ interface AuthState {
     error: string | null;
     isAuthenticated: boolean;
     isAuthChecked: boolean;
+
+    otpSent:boolean;
+    otpVerified:boolean;
+    passwordResetSuccess: boolean;
+    resetRole: "COMPANY_ADMIN" | "DEVELOPER" | null;
+    
 }
 
 // intial state
@@ -27,7 +34,11 @@ const initialState: AuthState = {
     loading: false,
     error: null,
     isAuthenticated: false,
-     isAuthChecked: false
+     isAuthChecked: false,
+     otpSent:false,
+     otpVerified:false,
+     passwordResetSuccess: false,
+     resetRole: null,
 }
 
 // async thunks
@@ -61,6 +72,45 @@ export const userLogin = createAsyncThunk(
     }
 )
 
+export const sendForgotPasswordOtp=createAsyncThunk(
+    'auth/sendForgotPasswordOtp',
+    async(email:string,{rejectWithValue})=>{
+        try {
+            const res=await authApi.forgotPassword(email);
+            return res.data.message;
+        } catch (error:unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
+export const verifyForgotPasswordOtp=createAsyncThunk(
+     "auth/verifyForgotPasswordOtp",
+     async(
+        data:{email:string;otp:string},{rejectWithValue}
+     )=>{
+        try {
+            const res=await authApi.verifyOtp(data);
+            return res.data.message
+        } catch (error:unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+     }
+)
+
+export const resetPassword=createAsyncThunk(
+    "auth/resetPassword",
+    async(
+        data:{email:string;otp:string;newPassword:string},{rejectWithValue}
+    )=>{
+        try {
+            const res=await authApi.resetPassword(data);
+            return res.data.message
+        } catch (error:unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
 
 
 export const logout = createAsyncThunk(
@@ -89,7 +139,23 @@ const authSlice = createSlice({
   },
   setLoading(state, action) {
     state.loading = action.payload;
-  }
+  },
+
+    setResetRole(state, action) {
+    state.resetRole = action.payload;
+  },
+
+  clearResetFlow(state) {
+    state.resetRole = null;
+    state.otpSent = false;
+    state.otpVerified = false;
+    state.passwordResetSuccess = false;
+  },
+    resetOtpState(state) {
+    state.otpSent = false;
+    state.otpVerified = false;
+    state.error = null;
+  },
     },
     extraReducers: (builder) => {
         builder
@@ -134,9 +200,54 @@ const authSlice = createSlice({
                 state.error = null
             })
 
+            // forgot password
+            .addCase(sendForgotPasswordOtp.pending,(state)=>{
+                state.loading=true;
+                state.error=null;
+                state.otpSent=false
+            })
+            .addCase(sendForgotPasswordOtp.fulfilled,(state)=>{
+                state.loading=false;
+                state.otpSent=true
+            })
+            .addCase(sendForgotPasswordOtp.rejected,(state,action)=>{
+                state.loading=false;
+                state.error=action.payload as string
+            })
+
+            //verify otp
+            .addCase(verifyForgotPasswordOtp.pending,(state)=>{
+                state.loading=true;
+                state.error=null
+            })
+            .addCase(verifyForgotPasswordOtp.fulfilled,(state)=>{
+                state.loading=false;
+                state.otpVerified=true;
+            })
+            .addCase(verifyForgotPasswordOtp.rejected,(state,action)=>{
+                state.loading=false;
+                state.error=action.payload as string;
+            })
+           // Reset password
+            .addCase(resetPassword.pending,(state)=>{
+                state.loading=true;
+                state.error=null;
+            })
+            .addCase(resetPassword.fulfilled,(state)=>{
+                state.loading=false;
+                state.otpSent=false;
+                state.otpVerified=false
+                state.passwordResetSuccess = true;
+            })
+            .addCase(resetPassword.rejected,(state,action)=>{
+                state.loading=false;
+                state.error=action.payload as string
+            })
+
     }
 })
 
 
-export const { setUser, setLoading,clearAuth  } = authSlice.actions;
+export const { setUser, setLoading,clearAuth,  setResetRole,
+  clearResetFlow, resetOtpState } = authSlice.actions;
 export default authSlice.reducer

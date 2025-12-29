@@ -9,6 +9,9 @@ interface LoginFormProps {
     loading: boolean;
     error?: string | null;
     onSubmit: (data: { email: string; password: string }) => void;
+
+    showForgotPassword?:boolean;
+    onForgotPassword?:()=>void
 }
 
 const LoginForm = ({
@@ -17,6 +20,8 @@ const LoginForm = ({
     loading,
     error,
     onSubmit,
+    showForgotPassword,
+    onForgotPassword
 }: LoginFormProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -35,6 +40,7 @@ const LoginForm = ({
     };
 
     return (
+
         <form
             onSubmit={handleSubmit}
             className="w-full max-w-sm p-8 shadow rounded"
@@ -73,6 +79,18 @@ const LoginForm = ({
                 placeholder="••••••••"
                 onChange={setPassword}
             />
+            {showForgotPassword && (
+  <div className="text-right mb-4">
+    <button
+      type="button"
+      onClick={onForgotPassword}
+      className="text-sm text-blue-600 hover:underline"
+    >
+      Forgot password?
+    </button>
+  </div>
+)}
+
 
             <AuthButton label="Login" loading={loading} />
         </form>
