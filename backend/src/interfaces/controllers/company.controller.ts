@@ -6,6 +6,8 @@ import { ListCompaniesUseCase } from "../../application/use-cases/company/listCo
 import { ApproveCompanyUseCase } from "../../application/use-cases/company/approveCompany.usecase";
 import { SuspendCompanyUseCase } from "../../application/use-cases/company/suspendCompany.usecase";
 import { logger } from "../../shared/logger/logger";
+import { GetCompanyIdUseCase } from "../../application/use-cases/company/getCompanyById.usecase";
+
 
 
 
@@ -14,7 +16,8 @@ export class CompanyController {
         private createCompanyUseCase: CreateCompanyUseCase,
         private listCompaniesUseCase: ListCompaniesUseCase,
         private approveCompanyUseCase: ApproveCompanyUseCase,
-        private suspendCompanyUseCase: SuspendCompanyUseCase
+        private suspendCompanyUseCase: SuspendCompanyUseCase,
+        private getCompanyByIdUseCase:GetCompanyIdUseCase
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {
@@ -117,6 +120,24 @@ export class CompanyController {
         } catch (error: unknown) {
             logger.error(`SuspendCompany failed companyId=${req.params.id}`, error);
             return handleError(error, res, 500, 'Company suspend failed')
+        }
+    }
+
+    getCompanyById=async(req:Request,res:Response)=>{
+        try {
+            const {companyId}=req.params;
+            if(!companyId){
+                return res.status(400).json({message:'Company id is required'})
+            }
+
+            const company=await this.getCompanyByIdUseCase.execute(companyId);
+
+            return res.status(200).json({
+                success:true,
+                data:company
+            })
+        } catch (error:unknown) {
+            return handleError(error,res)
         }
     }
 }
