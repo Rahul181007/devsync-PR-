@@ -25,7 +25,9 @@ export const RESPONSE_MESSAGES = {
         USER_BLOCKED:'User isblocked',
         COMPANY_NOT_FOUND:'Company not found',
         WAITING_FOR_APPROVAL:'Waiting for approval',
-        ONBOARDING_REQUIRED:'Onboarding required'
+        ONBOARDING_REQUIRED:'Onboarding required',
+        WORKSPACE_CREATION_NOT_ALLOWED:'Workspace creation is not allowed',
+        WORKSPACE_ALREADY_EXISTS:'Workspace is already exist'
     },
 
     COMPANY: {
@@ -39,7 +41,8 @@ export const RESPONSE_MESSAGES = {
         ADMIN_EMAIL_ALREADY_EXISTS: 'Admin email already exists',
         COMPANY_NOT_SUSPENDED: 'Company cannot be suspended',
         NOT_APPROVED: 'Company is not approved',
-        COMPANY_ID: 'Company id is required'
+        COMPANY_ID: 'Company id is required',
+        WORKSPACE_CREATED:'Workspace created'
 
     },
 

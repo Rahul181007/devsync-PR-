@@ -26,6 +26,14 @@ export class UserAuthController {
             logger.info(`user login successful ${result.email}`)
 
             if (result.requiresOnboarding) {
+
+                res.cookie("accessToken", result.accessToken, {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: false,
+                    path: "/",
+                })
+
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
                     requiresOnboarding: true,

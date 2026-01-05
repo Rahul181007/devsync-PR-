@@ -14,7 +14,8 @@ export interface CreateCompanyData{
     createdBy:CompanyCreatedBy;
     approvedBy?:string;
     status:CompanyStatus;
-    adminEmail?:string|null
+    adminEmail?:string|null;
+     ownerAdminId?: string;
 }
 export interface ICompanyRepository{
     findByName(name:string):Promise<Company|null>

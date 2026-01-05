@@ -7,6 +7,7 @@ import { SuspendCompanyUseCase } from "../application/use-cases/company/suspendC
 import { GetCompanyIdUseCase } from "../application/use-cases/company/getCompanyById.usecase";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { InviteRepository } from "../infrastructure/repositories/invite.repository";
+import { CreateWorkspaceUseCase } from "../application/use-cases/company/createWorkspace.usecase";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
@@ -16,12 +17,14 @@ const createCompanyUseCase=new CreateCompanyUseCase(companyRepository);
 const listCompaniesUseCase=new ListCompaniesUseCase(companyRepository);
 const approveCompanyUseCase=new ApproveCompanyUseCase(companyRepository);
 const suspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository);
-
+const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository)
 const getCompanyByIdUseCase=new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
+
 export const companyController=new CompanyController(
     createCompanyUseCase,
     listCompaniesUseCase,
     approveCompanyUseCase,
     suspendCompanyUseCase,
-    getCompanyByIdUseCase
+    getCompanyByIdUseCase,
+    createWorkspaceUseCase
 );

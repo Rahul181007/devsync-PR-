@@ -39,12 +39,20 @@ export class LoginUserUseCase{
         
         // Onboarding not completed
         if(user.status==='PENDING_ONBOARDING'){
+            const accessToken=Tokenutilits.generateAccessToken({
+                sub:user.id,
+                role:user.role,
+                companyId:null,
+                onboarding:true
+            })
+
             return {
                 id:user.id,
                 name:user.name,
                 email:user.email,
                 role:user.role,
-                requiresOnboarding:true
+                requiresOnboarding:true,
+                accessToken
             }
         }
 
