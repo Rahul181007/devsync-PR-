@@ -6,12 +6,13 @@ import { IPasswordHasher } from '../../../domain/service/password-hasher';
 import { AppError } from '../../../shared/errors/AppError';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
+import { ICompanyRepository } from '../../../domain/repositories/company.repository';
 
 export class LoginUserUseCase{
     constructor(
         private userRepo:IUserRepository,
-        private passwordHasher:IPasswordHasher
-
+        private passwordHasher:IPasswordHasher,
+        private companyRepo:ICompanyRepository
     ){}
    
     async execute(data:LoginDTO):Promise<LoginResponseDTO>{
@@ -27,16 +28,52 @@ export class LoginUserUseCase{
         if(!isValid){
             throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED);
         }
-
-        // check status
-        if (user.status!=='ACTIVE'){
-          throw new AppError(RESPONSE_MESSAGES.AUTH.USER_NOT_ACTIVE,HttpStatus.FORBIDDEN);
-        }
-
         // only allowed roles like company admin and developer
-        if(user.role!=='COMPANY_ADMIN' && user.role!=='DEVELOPER'){
+         if(user.role!=='COMPANY_ADMIN' && user.role!=='DEVELOPER'){
             throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_ROLE,HttpStatus.FORBIDDEN);
         }
+
+        if (user.status==='BLOCKED'){
+          throw new AppError(RESPONSE_MESSAGES.AUTH.USER_BLOCKED,HttpStatus.FORBIDDEN);
+        }
+        
+        // Onboarding not completed
+        if(user.status==='PENDING_ONBOARDING'){
+            return {
+                id:user.id,
+                name:user.name,
+                email:user.email,
+                role:user.role,
+                requiresOnboarding:true
+            }
+        }
+
+        if(user.role==='COMPANY_ADMIN'){
+           if(!user.companyId){
+            throw new AppError(
+                RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
+                HttpStatus.FORBIDDEN
+            )
+           }
+           const company=await this.companyRepo.findById(user.companyId);
+
+           if(!company){
+            throw new AppError(RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,HttpStatus.FORBIDDEN)
+           }
+
+           if(company.status!=='APPROVED'){
+            return {
+                id:user.id,
+                name:user.name,
+                email:user.email,
+                role:user.role,
+                waitingForApproval:true
+            }
+           }
+        }
+       
+
+       
 
         // update last login
          await this.userRepo.updateLastLogin(user.id, new Date());

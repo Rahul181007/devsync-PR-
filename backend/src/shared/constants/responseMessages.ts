@@ -19,7 +19,13 @@ export const RESPONSE_MESSAGES = {
         LOGIN_SUCCESS: "Login Successful",
         TOKEN_REFRESHED: 'New token generated',
         LOGOUT_SUCCESS: 'Logged out successfully',
-        USER_ID: 'User id is required'
+        USER_ID: 'User id is required',
+        USER_ALREADY_EXISTS:'User Already exist',
+        USER_CREATED:'User created successfully',
+        USER_BLOCKED:'User isblocked',
+        COMPANY_NOT_FOUND:'Company not found',
+        WAITING_FOR_APPROVAL:'Waiting for approval',
+        ONBOARDING_REQUIRED:'Onboarding required'
     },
 
     COMPANY: {
