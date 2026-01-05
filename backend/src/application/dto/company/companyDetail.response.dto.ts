@@ -10,5 +10,7 @@ export interface CompanyDetailResponseDTO{
     domain?:string;
     status:'PENDING'|'APPROVED'|'SUSPENDED';
     ownerAdminId?:string;
-    admin?:CompanyAdminDTO
+    admin?:CompanyAdminDTO;
+    adminEmail:string
+    hasPendingInvite: boolean;
 }

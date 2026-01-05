@@ -21,7 +21,7 @@ export const companyService={
     approveCompany:(companyId:string)=>{
         return http.patch(`/superadmin/companies/${companyId}/approve`)
     },
-    createCompany:(data:{name:string;domain?:string})=>{
+    createCompany:(data:{name:string;domain?:string;adminEmail:string})=>{
         return http.post('/superadmin/companies',data)
     },
     suspendCompany:(companyId:string)=>{

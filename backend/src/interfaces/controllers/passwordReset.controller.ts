@@ -4,6 +4,7 @@ import { VerifyOtpUseCase } from "../../application/use-cases/auth/verifyOtp.use
 import { ResetPasswordUSeCase } from "../../application/use-cases/auth/resetPassword.usecase";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
+import { HttpStatus } from "../../shared/constants/httpStatus";
 
 export class PasswordResetController{
     constructor(
@@ -19,10 +20,10 @@ export class PasswordResetController{
 
             const response=await this.sendOtpUseCase.execute(email);
             logger.info('otp sendede successfully')
-            return res.json(response)
+            return res.status(HttpStatus.OK).json(response)
             
         } catch (error:unknown) {
-            return handleError(error,res,400,'Send otp failed')
+            return handleError(error,res)
         }
     }
 
@@ -32,9 +33,9 @@ export class PasswordResetController{
 
             const response=await this.verifyOtpUseCase.execute(email,otp);
             logger.info('otp verification is successful')
-            return res.json(response)
+            return res.status(HttpStatus.OK).json(response)
         } catch (error:unknown) {
-            return handleError(error,res,400,'verify otp failed')
+            return handleError(error,res)
         }
         
     }
@@ -45,10 +46,10 @@ export class PasswordResetController{
    
             const response=await this.resetPasswordUseCase.excute(email,newPassword);
             logger.info('reser password was successful')
-            return res.json(response)
+            return res.status(HttpStatus.OK).json(response)
         } catch (error:unknown) {
             logger.error('reset password was failed',error)
-            return handleError(error,res,400,'Reset password failed')
+            return handleError(error,res)
         }
     }
 }

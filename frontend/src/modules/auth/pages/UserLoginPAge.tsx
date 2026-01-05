@@ -1,11 +1,13 @@
 import AuthLayout from "../components/AuthLayout";
 import LoginForm from "../components/LoginForm";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
-import { userLogin } from "../auth.slice";
+import { clearAuthError, userLogin } from "../auth.slice";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { setResetRole } from "../auth.slice";
+import { ROLE_ROUTES } from "../../../shared/constants/roleRoutes";
+import { ROUTES } from "../../../shared/constants/routes";
 
 const UserLoginPage = () => {
   const dispatch = useAppDispatch();
@@ -20,26 +22,24 @@ const UserLoginPage = () => {
   };
 
   const handleForgotPassword = () => {
-
-    if (location.pathname.startsWith("/company")) {
+     dispatch(clearAuthError());
+    if (location.pathname.startsWith(ROUTES.COMPANY_ADMIN.BASE)) {
       dispatch(setResetRole("COMPANY_ADMIN"));
-      navigate("/company/forgot-password");
+      navigate(ROUTES.AUTH.COMPANY_FORGOT_PASSWORD);
     }
 
-    if (location.pathname.startsWith("/developer")) {
+    if (location.pathname.startsWith(ROUTES.DEVELOPER.BASE)) {
       dispatch(setResetRole("DEVELOPER"));
-      navigate("/developer/forgot-password");
+      navigate(ROUTES.AUTH.DEVELOPER_FORGOT_PASSWORD);
     }
   };
 
   useEffect(() => {
+    dispatch(clearAuthError());
+  }, [dispatch]);
+  useEffect(() => {
     if (!isAuthenticated || !user) return;
-
-    if (user.role === "COMPANY_ADMIN") {
-      navigate("/company/dashboard");
-    } else if (user.role === "DEVELOPER") {
-      navigate("/developer/dashboard");
-    }
+     navigate(ROLE_ROUTES[user.role].dashboard,{replace:true})
   }, [isAuthenticated, user, navigate]);
 
   return (

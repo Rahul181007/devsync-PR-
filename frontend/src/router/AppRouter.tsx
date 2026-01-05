@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ROUTES } from '../shared/constants/routes'
 // auth
 import SuperAdminLoginPage from "../modules/auth/pages/SuperAdminLoginPage";
 import UserLoginPage from "../modules/auth/pages/UserLoginPAge";
@@ -24,36 +24,41 @@ import DevDashboard from "../modules/developer/pages/DevDashboard";
 
 // guards
 import ProtectedRoute from "./ProtectedRoutes";
+import LandingPage from "../modules/landing/pages/LandingPage";
+import NotFoundPage from "../modules/landing/pages/error/NotFoundPage";
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path={ROUTES.ROOT} element={<LandingPage />} />
+
         {/* ================= AUTH ================= */}
-        <Route path="/super-admin/login" element={<SuperAdminLoginPage />} />
+        <Route path={ROUTES.AUTH.SUPER_ADMIN_LOGIN} element={<SuperAdminLoginPage />} />
 
-        <Route path="/company/login" element={<UserLoginPage />} />
-        <Route path="/company/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path={ROUTES.AUTH.COMPANY_LOGIN} element={<UserLoginPage />} />
+        <Route path={ROUTES.AUTH.COMPANY_FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
 
-        <Route path="/developer/login" element={<UserLoginPage />} />
-        <Route path="/developer/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path={ROUTES.AUTH.DEVELOPER_LOGIN} element={<UserLoginPage />} />
+        <Route path={ROUTES.AUTH.DEVELOPER_FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
 
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path={ROUTES.AUTH.VERIFY_OTP} element={<VerifyOtpPage />} />
+        <Route path={ROUTES.AUTH.RESET_PASSWORD} element={<ResetPasswordPage />} />
 
         {/* Invite */}
-        <Route path="/invite/accept" element={<AcceptInvitePage />} />
+        <Route path={ROUTES.AUTH.ACCEPT_INVITE} element={<AcceptInvitePage />} />
 
         {/* ================= SUPER ADMIN ================= */}
         <Route
           element={
             <ProtectedRoute
               allowedRoles={["SUPER_ADMIN"]}
-              loginPath="/super-admin/login"
+              loginPath={ROUTES.AUTH.SUPER_ADMIN_LOGIN}
             />
           }
         >
-          <Route path="/super-admin" element={<SuperAdminLayout />}>
+          <Route path={ROUTES.SUPER_ADMIN.BASE} element={<SuperAdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="companies/:companyId" element={<CompanyDetailPage />} />
@@ -65,11 +70,12 @@ const AppRouter = () => {
           element={
             <ProtectedRoute
               allowedRoles={["COMPANY_ADMIN"]}
-              loginPath="/company/login"
+              loginPath={ROUTES.AUTH.COMPANY_LOGIN}
             />
           }
         >
-          <Route path="/company" element={<CompanyAdminLayout />}>
+          <Route path={ROUTES.COMPANY_ADMIN.BASE} element={<CompanyAdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CompanyDashboardPage />} />
           </Route>
         </Route>
@@ -79,14 +85,18 @@ const AppRouter = () => {
           element={
             <ProtectedRoute
               allowedRoles={["DEVELOPER"]}
-              loginPath="/developer/login"
+              loginPath={ROUTES.AUTH.DEVELOPER_LOGIN}
             />
           }
         >
-          <Route path="/developer" element={<DeveloperLayout />}>
+          <Route path={ROUTES.DEVELOPER.BASE} element={<DeveloperLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DevDashboard />} />
           </Route>
         </Route>
+        {/* ================= Error================= */}
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

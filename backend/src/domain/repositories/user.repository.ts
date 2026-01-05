@@ -18,9 +18,4 @@ export interface IUserRepository {
         userId:string,
         status:UserStatus
     ):Promise<void>
-    
-    blockUser(userId:string):Promise<void>;
-    unBlockUser(userId:string):Promise<void>;
-    
-
 }

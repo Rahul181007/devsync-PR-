@@ -6,6 +6,8 @@ import { verifyInviteQuerySchema } from "../../application/validators/invite/ver
 import { VerifyInviteUseCase } from "../../application/use-cases/invite/verifyInvite.usecase";
 import { acceptInviteQuerySchema } from "../../application/validators/invite/acceptInvite.validator";
 import { AcceptInviteUseCase } from "../../application/use-cases/invite/acceptInvite.usecase";
+import { HttpStatus } from "../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 
 
 
@@ -21,7 +23,7 @@ export class InviteController {
             const input = inviteSchema.parse(req.body);
 
             if (!req.user || req.user.role !== 'SUPER_ADMIN') {
-                return res.status(403).json({ message: "Forbidden" });
+                return res.status(HttpStatus.FORBIDDEN).json({ message: RESPONSE_MESSAGES.AUTH.FORBIDDEN});
 
             }
 
@@ -33,14 +35,14 @@ export class InviteController {
             const { companyId } = req.params
 
             if (!companyId) {
-                return res.status(400).json({ message: 'CompanyId is required' })
+                return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID })
             }
 
             const result = await this.createInviteUseCase.execute(input, inviter, companyId)
 
 
-            return res.status(201).json({
-                message: 'Company admin invited successfully',
+            return res.status(HttpStatus.CREATED).json({
+                message: RESPONSE_MESSAGES.INVITE.SENT,
                 data: {
                     id: result.id,
                     email: result.email,
@@ -56,12 +58,12 @@ export class InviteController {
         const {token}=req.query
         const parsed=verifyInviteQuerySchema.parse({token});
         const result =await this.verifyInviteUseCase.execute(parsed.token)
-        res.status(200).json({
-            message:'Verification was successful',
+        res.status(HttpStatus.OK).json({
+            message:RESPONSE_MESSAGES.INVITE.VERIFICATION,
             data:result
         })
         } catch (error:unknown) {
-            return handleError(error,res,500,'verification failed')
+            return handleError(error,res)
         }
 
     }
@@ -70,12 +72,12 @@ export class InviteController {
             const parsed=acceptInviteQuerySchema.parse(req.body)
             const result =await this.acceptInviteUseCase.execute(parsed)
 
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 success:true,
                 data:result
             })
         } catch (error:unknown) {
-            return handleError(error,res,500,'Accept invite failed')
+            return handleError(error,res)
         }
     }
 }

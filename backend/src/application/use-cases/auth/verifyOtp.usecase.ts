@@ -1,4 +1,7 @@
 import { IPasswordResetRepository } from "../../../domain/repositories/passwordReset.repository";
+import { HttpStatus } from "../../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { AppError } from "../../../shared/errors/AppError";
 
 export class VerifyOtpUseCase{
     constructor(private passwordResetRepo:IPasswordResetRepository){}
@@ -7,9 +10,9 @@ export class VerifyOtpUseCase{
         console.log(email,otp)
         const record=await this.passwordResetRepo.findValidOtp(email,otp)
         if(!record){
-            throw new Error(' Invalid or expired Otp')
+            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_OTP,HttpStatus.BAD_REQUEST)
         }
 
-        return {message:'OTP verified'}
+        return {message:RESPONSE_MESSAGES.AUTH.OTP_VERIFIED}
     }
 }

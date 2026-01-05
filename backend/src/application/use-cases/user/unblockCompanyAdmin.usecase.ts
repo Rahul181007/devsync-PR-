@@ -1,4 +1,6 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { HttpStatus } from "../../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 
 export class UnblockCompanyAdminUseCase{
@@ -9,14 +11,14 @@ export class UnblockCompanyAdminUseCase{
     async execute(targetUserId:string){
         const user=await this.userRepo.findById(targetUserId);
         if(!user){
-            throw new AppError('user not found',404);
+            throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
         }
         if(user.role!=='COMPANY_ADMIN'){
-            throw new AppError('Target user is not a company admin', 400);
+            throw new AppError(RESPONSE_MESSAGES.AUTH.TARGET_NOT_COMPANY_ADMIN,HttpStatus.BAD_REQUEST);
         }
         if(user.status==='ACTIVE'){
-            throw new AppError('user is already active',400)
+            throw new AppError(RESPONSE_MESSAGES.AUTH.ALREADY_ACTIVE,HttpStatus.BAD_REQUEST)
         }
-        await this.userRepo.unBlockUser(targetUserId)
+        await this.userRepo.updateStatus(targetUserId,'ACTIVE')
     }
 }

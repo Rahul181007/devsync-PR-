@@ -3,8 +3,12 @@ import { CreateCompanyData } from "../../domain/repositories/company.repository"
 import { Company, CompanyStatus } from "../../domain/entities/company.entity";
 import { CompanyModel } from "../db/models/Company.models";
 import { ICompanyDocument } from "../db/models/Company.models";
+import { BaseRepository } from "./base.repository";
 
-export class CompanyRepository implements ICompanyRepository{
+export class CompanyRepository extends BaseRepository<ICompanyDocument> implements ICompanyRepository{
+    constructor(){
+        super(CompanyModel)
+    }
    private toEntity(companyDoc:ICompanyDocument):Company{ // mapper
     return new Company(
         companyDoc._id.toString(),
@@ -17,7 +21,8 @@ export class CompanyRepository implements ICompanyRepository{
         companyDoc.approvedBy?.toString()??undefined,
         companyDoc.themeColor??undefined,
         companyDoc.currentPlanId?.toString()??undefined,
-        companyDoc.subscriptionId?.toString()??undefined
+        companyDoc.subscriptionId?.toString()??undefined,
+        companyDoc.adminEmail ?? undefined
     )
    }
    async findByName(name: string): Promise<Company | null> {
@@ -35,7 +40,7 @@ export class CompanyRepository implements ICompanyRepository{
    }
 
    async create(data: CreateCompanyData): Promise<Company> {
-       const doc=await CompanyModel.create(data)
+       const doc=await this.model.create(data)
        return this.toEntity(doc)
    }
 
@@ -48,8 +53,8 @@ export class CompanyRepository implements ICompanyRepository{
        if(search){
         filter.$or=[{name:{$regex:search,$options:'i'}},{domain:{$regex:search,$options:'i'}}]
        }
-       const items=await CompanyModel.find(filter).skip((page-1)*limit).limit(limit).sort({createdAt:-1})
-       const total=await CompanyModel.countDocuments(filter)
+       const items=await this.model.find(filter).skip((page-1)*limit).limit(limit).sort({createdAt:-1})
+       const total=await this.count(filter)
        
        return{
         items:items.map(val=>this.toEntity(val)),
@@ -62,11 +67,11 @@ export class CompanyRepository implements ICompanyRepository{
        if(approvedBy){
         update.approvedBy=approvedBy
        } 
-       await CompanyModel.findByIdAndUpdate(companyId,update)
+       await this.updateById(companyId,update)
    }
 
    async findById(companyId: string): Promise<Company | null> {
-       const company =await CompanyModel.findById(companyId);
+       const company =await this.model.findById(companyId);
        if(!company){
         return null
        }else{
@@ -75,6 +80,15 @@ export class CompanyRepository implements ICompanyRepository{
    }
 
     async assignOwnerAdmin(companyId: string, userId: string): Promise<void> {
-       await CompanyModel.findByIdAndUpdate(companyId,{ownerAdminId:userId})
+       await this.updateById(companyId,{ownerAdminId:userId})
    }
+
+async findByEmail(email: string): Promise<Company | null> {
+  const doc = await this.model.findOne({ adminEmail: email });
+
+  if (!doc) return null;
+
+  return this.toEntity(doc);
+}
+
 }

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
-import { verifyForgotPasswordOtp, sendForgotPasswordOtp, resetOtpState } from "../auth.slice";
-
+import { verifyForgotPasswordOtp, sendForgotPasswordOtp, resetOtpState, clearAuthError } from "../auth.slice";
+import { ROUTES } from "../../../shared/constants/routes";
 interface LocationState {
     email: string
 }
@@ -17,16 +17,21 @@ const VerifyOtpPage = () => {
 
     const { email } = (location.state || {}) as LocationState;
 
-    const { loading, error, otpVerified } = useAppSelector((state) => state.auth)
+    const { loading, error, otpVerified, resetRole } = useAppSelector((state) => state.auth)
 
     const [otp, setOtp] = useState('');
     const [timer, setTimer] = useState(30);
 
     useEffect(() => {
-        if (!email) {
-            navigate('/forgot-password', { replace: true })
+        dispatch(clearAuthError());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!email || !resetRole) {
+            navigate(ROUTES.ROOT, { replace: true });
         }
-    }, [email, navigate])
+    }, [email, resetRole, navigate]);
+
 
     useEffect(() => {
         if (timer === 0) return;
@@ -54,11 +59,23 @@ const VerifyOtpPage = () => {
 
     useEffect(() => {
         if (otpVerified) {
-            navigate('/reset-password', {
-                state: { email, otp }
+            navigate(ROUTES.AUTH.RESET_PASSWORD, {
+                state: { email, otp },
+                replace: true
             })
         }
     }, [otpVerified, navigate, email, otp])
+
+
+
+    const handleChangeEmail = () => {
+        navigate(
+            resetRole === "COMPANY_ADMIN"
+                ? ROUTES.AUTH.COMPANY_FORGOT_PASSWORD
+                : ROUTES.AUTH.DEVELOPER_FORGOT_PASSWORD,
+            { replace: true }
+        );
+    };
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="w-full max-w-md bg-white rounded-xl shadow p-6">
@@ -116,7 +133,7 @@ const VerifyOtpPage = () => {
                     )}
 
                     <button
-                        onClick={() => navigate("/forgot-password")}
+                        onClick={handleChangeEmail}
                         className="block mx-auto text-sm text-gray-600 hover:underline"
                     >
                         Change email

@@ -1,8 +1,8 @@
 import { useEffect,useState } from "react";
 import { useAppDispatch,useAppSelector } from "../../../store/hook";
 import { useLocation,useNavigate } from "react-router-dom";
-import { resetPassword } from "../auth.slice";
-
+import { clearAuthError, resetPassword } from "../auth.slice";
+import {ROUTES} from '../../../shared/constants/routes'
 
 interface LocationState {
   email: string;
@@ -24,12 +24,15 @@ const ResetPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
- 
+ useEffect(() => {
+  dispatch(clearAuthError());
+}, [dispatch]);
+
   useEffect(() => {
-    if (!email || !otp) {
-      navigate("/forgot-password", { replace: true });
+    if (!email || !otp || !resetRole) {
+      navigate(ROUTES.ROOT, { replace: true });
     }
-  }, [email, otp, navigate]);
+  }, [email, otp, navigate,resetRole]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +63,9 @@ const ResetPasswordPage = () => {
   if (!passwordResetSuccess || !resetRole) return;
 
   if (resetRole === "COMPANY_ADMIN") {
-    navigate("/company/login", { replace: true });
+    navigate(ROUTES.AUTH.COMPANY_LOGIN, { replace: true });
   } else {
-    navigate("/developer/login", { replace: true });
+    navigate(ROUTES.AUTH.DEVELOPER_LOGIN, { replace: true });
   }
   }, [passwordResetSuccess, navigate,resetRole]);
 
@@ -84,7 +87,7 @@ const ResetPasswordPage = () => {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {setPassword(e.target.value); setLocalError(null);}}
               placeholder="Enter new password"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
@@ -98,7 +101,7 @@ const ResetPasswordPage = () => {
             <input
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {setConfirmPassword(e.target.value);setLocalError(null);}}
               placeholder="Confirm new password"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required

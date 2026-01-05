@@ -1,4 +1,6 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { HttpStatus } from "../../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 
 export class ApproveCompanyUseCase {
@@ -9,10 +11,10 @@ export class ApproveCompanyUseCase {
     async execute(companyId: string, superAdminId: string): Promise<void> {
         const company = await this.companyRepo.findById(companyId);
         if (!company) {
-            throw new AppError('company not found', 404)
+            throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
         if (company.status !== 'PENDING') {
-            throw new AppError('Company is not in pending state', 400)
+            throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_PENDING,HttpStatus.BAD_REQUEST)
         }
 
         await this.companyRepo.updateStatus(company.id, 'APPROVED', superAdminId)

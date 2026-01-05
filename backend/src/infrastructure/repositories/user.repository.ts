@@ -2,8 +2,12 @@ import { IUserRepository } from "../../domain/repositories/user.repository";
 import { User } from "../../domain/entities/user.entity";
 import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
+import { BaseRepository } from "./base.repository";
 
-export class UserRepository implements IUserRepository {
+export class UserRepository extends BaseRepository<IUserDocument> implements IUserRepository {
+    constructor(){
+        super(UserModel)
+    }
     private toDomain(doc: IUserDocument): User { //mapper
         return new User(
             doc._id.toString(),
@@ -22,40 +26,34 @@ export class UserRepository implements IUserRepository {
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const doc = await UserModel.findOne({ email });
+        const doc = await this.model.findOne({ email });
         return doc ? this.toDomain(doc) : null;
     }
     async findById(id: string): Promise<User | null> {
-        const doc = await UserModel.findById(id);
+        const doc = await this.model.findById(id);
         return doc ? this.toDomain(doc) : null;
     }
 
     async create(data: Partial<User>): Promise<User> {
-        const doc = await UserModel.create(data);
+        const doc = await this.model.create(data);
         return this.toDomain(doc)
     }
 
     async assignCompany(userId: string, companyId: string): Promise<void> {
-        await UserModel.findByIdAndUpdate(userId, { companyId })
+        await this.updateById(userId, { companyId })
     }
 
     async updatePassword(userId: string, passwordHash: string): Promise<void> {
-        await UserModel.findByIdAndUpdate(userId, { passwordHash });
+        await this.updateById(userId, { passwordHash });
     }
 
     async updateLastLogin(userId: string, date: Date): Promise<void> {
         await UserModel.findByIdAndUpdate(userId, { lastLoginAt: date })
     }
 
-    async updateStatus(userId: string, status:'ACTIVE'|'BLOCKED' ): Promise<void> {
-        await UserModel.findByIdAndUpdate(userId, { status })
+    async updateStatus(userId: string, status: 'ACTIVE' | 'BLOCKED'): Promise<void> {
+        await this.updateById(userId, { status })
     }
 
-    async blockUser(userId: string): Promise<void> {
-        await UserModel.findByIdAndUpdate(userId,{status:'BLOCKED'})
-    }
-
-    async unBlockUser(userId: string): Promise<void> {
-        await UserModel.findByIdAndUpdate(userId,{status:'ACTIVE'})
-    }
+    
 }

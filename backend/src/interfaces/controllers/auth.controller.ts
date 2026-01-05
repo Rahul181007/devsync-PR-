@@ -6,6 +6,8 @@ import { superAdminCookieOptions } from "../../config/superAdminCookieOption";
 import { userCookieOptions } from "../../config/userCookieOptions";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
+import { HttpStatus } from "../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 
 export class AuthController {
     constructor(private loginSuperAdminUseCase: LoginSuperAdminUseCase,
@@ -33,8 +35,8 @@ export class AuthController {
                 result.refreshToken,
                 superAdminCookieOptions
             );
-            return res.json({
-                message: 'Login successful',
+            return res.status(HttpStatus.OK).json({
+                message:RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
                 data: {
                     id: result.id,
                     name: result.name,
@@ -44,7 +46,7 @@ export class AuthController {
                 accessToken: result.accessToken,
             })
         } catch (error: unknown) {
-            return handleError(error, res, 400, 'SuperAdmin login failed')
+            return handleError(error, res)
         }
     }
 
@@ -57,28 +59,28 @@ export class AuthController {
             logger.info(`${refreshToken}`)
             if (!refreshToken) {
                 logger.warn('Refresh token is  missing')
-                return res.status(400).json({ error: "Refresh token is required" });
+                return res.status(HttpStatus.BAD_REQUEST).json({ error:RESPONSE_MESSAGES.AUTH.INVALID_REFRESH_TOKEN});
             }
 
             const result = await this.refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
 
-            return res.json({
-                message: "New access token generated",
+            return res.status(HttpStatus.OK).json({
+                message:RESPONSE_MESSAGES.AUTH.TOKEN_REFRESHED,
                 accessToken: result.accessToken,
                 user: result.user
             });
 
         } catch (error: unknown) {
-            return handleError(error, res, 401, 'Refresh token failed (superadmin)')
+            return handleError(error, res)
 
         }
     }
 
     me = async (req: Request, res: Response) => {
         res.setHeader("Cache-Control", "no-store"); //Cache-Control: no-store ensures auth state is never cached, preventing users from being accidentally logged in after logout
-        return res.json({
+        return res.status(HttpStatus.OK).json({
             user: req.user
         })
     }
@@ -95,6 +97,6 @@ export class AuthController {
         res.clearCookie('refresh_token', userCookieOptions);
 
         logger.info('user logged out successfully')
-        return res.json({ message: 'Logged Out successfully' })
+        return res.status(HttpStatus.OK).json({ message: RESPONSE_MESSAGES.AUTH.LOGOUT_SUCCESS })
     }
 }

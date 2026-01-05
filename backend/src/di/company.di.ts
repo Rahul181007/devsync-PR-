@@ -6,16 +6,18 @@ import { ApproveCompanyUseCase } from "../application/use-cases/company/approveC
 import { SuspendCompanyUseCase } from "../application/use-cases/company/suspendCompany.usecase";
 import { GetCompanyIdUseCase } from "../application/use-cases/company/getCompanyById.usecase";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
+import { InviteRepository } from "../infrastructure/repositories/invite.repository";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
+const inviteRepository=new InviteRepository()
 
 const createCompanyUseCase=new CreateCompanyUseCase(companyRepository);
 const listCompaniesUseCase=new ListCompaniesUseCase(companyRepository);
 const approveCompanyUseCase=new ApproveCompanyUseCase(companyRepository);
 const suspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository);
 
-const getCompanyByIdUseCase=new GetCompanyIdUseCase(companyRepository,userRepository)
+const getCompanyByIdUseCase=new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
 export const companyController=new CompanyController(
     createCompanyUseCase,
     listCompaniesUseCase,
