@@ -13,6 +13,7 @@ export class Company {
     public approvedBy?: string,
     public themeColor?: string,
     public currentPlanId?: string,
-    public subscriptionId?: string
+    public subscriptionId?: string,
+    public adminEmail?:string
   ) {}
 }

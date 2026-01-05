@@ -1,7 +1,9 @@
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { sendForgotPasswordOtp } from "../auth.slice";
+import { clearAuthError, sendForgotPasswordOtp } from "../auth.slice";
+import { ROUTES } from "../../../shared/constants/routes";
+
 const ForgotPasswordPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -10,6 +12,9 @@ const ForgotPasswordPage = () => {
 
     const [email, setEmail] = useState("");
 
+    useEffect(() => {
+        dispatch(clearAuthError());
+    }, [dispatch]);
 
 
 
@@ -20,12 +25,27 @@ const ForgotPasswordPage = () => {
 
         dispatch(sendForgotPasswordOtp(email));
     };
+    const handleBackToLogin = () => {
+        if (resetRole === "COMPANY_ADMIN") {
+            navigate(ROUTES.AUTH.COMPANY_LOGIN, { replace: true });
+            return;
+        }
+
+        if (resetRole === "DEVELOPER") {
+            navigate(ROUTES.AUTH.DEVELOPER_LOGIN, { replace: true });
+            return;
+        }
+
+
+        navigate(ROUTES.ROOT, { replace: true });
+    };
 
 
     useEffect(() => {
         if (otpSent) {
-            navigate("/verify-otp", {
+            navigate(ROUTES.AUTH.VERIFY_OTP, {
                 state: { email },
+                replace: true
             });
         }
     }, [otpSent, navigate, email]);
@@ -72,13 +92,7 @@ const ForgotPasswordPage = () => {
 
                 <div className="mt-4 text-center">
                     <button
-                        onClick={() => {
-                            if (resetRole === "COMPANY_ADMIN") {
-                                navigate("/company/login");
-                            } else {
-                                navigate("/developer/login");
-                            }
-                        }}
+                        onClick={handleBackToLogin }
                         className="text-sm text-blue-600 hover:underline"
                     >
                         Back to login

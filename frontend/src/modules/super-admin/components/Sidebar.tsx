@@ -8,7 +8,7 @@ const Sidebar = () => {
 
     const handleLogout=async()=>{
         await dispatch(logout());
-        navigate('/super-admin/login')
+        navigate('/super-admin/login',{replace:true})
     }
   return (
     <aside className="w-64 bg-slate-900 text-white min-h-screen p-4">

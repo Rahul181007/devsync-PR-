@@ -2,6 +2,8 @@ import { BlockCompanyAdminUseCase } from "../../application/use-cases/user/block
 import { UnblockCompanyAdminUseCase } from "../../application/use-cases/user/unblockCompanyAdmin.usecase";
 import { Request, Response } from "express";
 import { handleError } from "../../shared/utils/handleError";
+import { HttpStatus } from "../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 
 export class UserController {
     constructor(
@@ -12,12 +14,12 @@ export class UserController {
         try {
             const { userId } = req.params;
             if (!userId) {
-                return res.status(400).json({ message: 'userId is required' })
+                return res.status(HttpStatus.BAD_REQUEST).json({ message:RESPONSE_MESSAGES.USER.USER_ID_REQUIRED})
             }
             await this.blockCompanyAdminUseCase.execute(userId);
-            return res.status(200).json({
+            return res.status(HttpStatus.OK).json({
                 success: true,
-                message: 'Company admin was blocked successfully'
+                message: RESPONSE_MESSAGES.USER.COMPANY_ADMIN_BLOCKED
             })
         } catch (error: unknown) {
             return handleError(error, res)
@@ -28,12 +30,12 @@ export class UserController {
         try {
             const { userId } = req.params;
             if (!userId) {
-                 return res.status(400).json({ message: 'userid is required' })
+                 return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.USER.USER_ID_REQUIRED })
             }
             await this.unblockCompanyAdminUseCase.execute(userId);
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 success: true,
-                message: 'Company admin was unblocked'
+                message: RESPONSE_MESSAGES.USER.COMPANY_ADMIN_UNBLOCKED
             })
         } catch (error: unknown) {
             return handleError(error, res)

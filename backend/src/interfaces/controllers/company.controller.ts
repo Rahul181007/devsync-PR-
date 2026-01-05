@@ -7,6 +7,8 @@ import { ApproveCompanyUseCase } from "../../application/use-cases/company/appro
 import { SuspendCompanyUseCase } from "../../application/use-cases/company/suspendCompany.usecase";
 import { logger } from "../../shared/logger/logger";
 import { GetCompanyIdUseCase } from "../../application/use-cases/company/getCompanyById.usecase";
+import { HttpStatus } from "../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 
 
 
@@ -25,9 +27,11 @@ export class CompanyController {
             logger.info('CreateCompany request recieved by superadmin');
 
             const parsed = companySchema.parse(req.body);
+
+            
             if (!req.user || !req.user.id) {
                 logger.warn("CreateCompany unauthorized access attempt");
-                return res.status(401).json({ message: "Unauthorized" })
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED })
             }
             const superAdminId = req.user.id
             const company = await this.createCompanyUseCase.execute({
@@ -35,13 +39,13 @@ export class CompanyController {
                 createdBySuperAdminId: superAdminId
             })
             logger.info(`Company created successfully companyId=${company.id}`);
-            res.status(201).json({
+            res.status(HttpStatus.CREATED).json({
                 success: true,
                 data: company
             })
         } catch (error: unknown) {
             logger.error("CreateCompany failed", error);
-            return handleError(error, res, 500, 'Company creatioin failed')
+            return handleError(error, res)
         }
     }
     listCompanies = async (req: Request, res: Response) => {
@@ -59,7 +63,7 @@ export class CompanyController {
                 status,
                 search
             })
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 success: true,
                 data: result
             })
@@ -67,7 +71,7 @@ export class CompanyController {
 
         } catch (error: unknown) {
             logger.error("ListCompanies failed", error);
-            return handleError(error, res, 500, 'loading of company failed')
+            return handleError(error, res)
         }
     }
     approveCompany = async (req: Request, res: Response) => {
@@ -75,12 +79,12 @@ export class CompanyController {
             const companyId = req.params.id;
             if (!companyId) {
                 logger.warn("ApproveCompany called without companyId");
-                return res.status(400).json({ message: "Company ID is required" });
+                return res.status(HttpStatus.BAD_REQUEST).json({ message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
             }
             if (!req.user || !req.user.id) {
                 logger.warn(`ApproveCompany unauthorized attempt companyId=${companyId}`);
 
-                return res.status(401).json({ message: 'Unauthorized' })
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED})
             }
 
             logger.info(`ApproveCompany started companyId=${companyId} by superAdmin=${req.user.id}`);
@@ -88,14 +92,14 @@ export class CompanyController {
 
             await this.approveCompanyUseCase.execute(companyId, superAdminId)
             logger.info(`ApproveCompany success companyId=${companyId}`);
-            return res.status(200).json({
+            return res.status(HttpStatus.OK).json({
                 success: true,
-                message: 'Company approved successfully'
+                message: RESPONSE_MESSAGES.COMPANY.APPROVED
             })
 
         } catch (error: unknown) {
             logger.error(`ApproveCompany failed companyId=${req.params.id}`, error);
-            return handleError(error, res, 500, 'Company Approval failed')
+            return handleError(error, res)
         }
 
     }
@@ -104,22 +108,22 @@ export class CompanyController {
             const companyId = req.params.id
             if (!companyId) {
                 logger.warn("SuspendCompany called without companyId");
-                return res.status(400).json({ message: "Company ID is required" });
+                return res.status(HttpStatus.BAD_REQUEST).json({ message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
             }
             if (!req.user || !req.user.id) {
                 logger.warn(`SuspendCompany unauthorized attempt companyId=${companyId}`);
-                return res.status(401).json({ message: 'Unauthorized' })
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED})
             }
             await this.suspendCompanyUseCase.execute(companyId);
 
             logger.info(`SuspendCompany success companyId=${companyId}`);
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 success: true,
-                message: 'Company suspended successfully'
+                message:RESPONSE_MESSAGES.COMPANY.SUSPENDED
             })
         } catch (error: unknown) {
             logger.error(`SuspendCompany failed companyId=${req.params.id}`, error);
-            return handleError(error, res, 500, 'Company suspend failed')
+            return handleError(error, res)
         }
     }
 
@@ -127,12 +131,12 @@ export class CompanyController {
         try {
             const {companyId}=req.params;
             if(!companyId){
-                return res.status(400).json({message:'Company id is required'})
+                return res.status(HttpStatus.BAD_REQUEST).json({message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID})
             }
 
             const company=await this.getCompanyByIdUseCase.execute(companyId);
 
-            return res.status(200).json({
+            return res.status(HttpStatus.OK).json({
                 success:true,
                 data:company
             })

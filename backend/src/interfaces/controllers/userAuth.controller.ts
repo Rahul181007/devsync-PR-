@@ -4,10 +4,12 @@ import { LoginUserUseCase } from "../../application/use-cases/auth/loginUser.use
 import { RefreshTokenUseCase } from "../../application/use-cases/auth/refreshToken.usecase";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
-import { superAdminCookieOptions } from "../../config/superAdminCookieOption";
+import { HttpStatus } from "../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
+import { userCookieOptions } from "../../config/userCookieOptions";
 
 
-export class UseAuthController {
+export class UserAuthController {
     constructor(private loginUserUseCase: LoginUserUseCase, private refreshTokenUseCase: RefreshTokenUseCase) { }
 
     login = async (req: Request, res: Response) => {
@@ -30,10 +32,10 @@ export class UseAuthController {
             res.cookie(
                 'refresh_token',
                 result.refreshToken,
-                superAdminCookieOptions
+                userCookieOptions
             )
-            return res.json({
-                message: 'Login successful',
+            return res.status(HttpStatus.OK).json({
+                message:RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
                 data: {
                     id: result.id,
                     name: result.name,
@@ -43,7 +45,7 @@ export class UseAuthController {
                 accessToken: result.accessToken
             })
         } catch (error: unknown) {
-            return handleError(error, res, 400, 'user login failed')
+            return handleError(error, res)
         }
     }
 

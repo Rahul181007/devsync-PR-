@@ -14,7 +14,7 @@ export interface ICompanyDocument extends Document{
     subscriptionId:mongoose.Types.ObjectId|null;
     createdAt:Date;
     updatedAt:Date;
-
+    adminEmail:string|null;
 }
 
 const companySchema=new Schema<ICompanyDocument>(
@@ -74,7 +74,10 @@ const companySchema=new Schema<ICompanyDocument>(
             default:null
         },
 
-
+      adminEmail:{
+        type:String,
+        default :null
+      }
 
     },
     {timestamps:true}

@@ -2,6 +2,8 @@ import { env } from "../../../config/env";
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
 import { IInviteRepository } from "../../../domain/repositories/invites.repository";
 import { IMailService } from "../../../domain/service/mail.service";
+import { HttpStatus } from "../../../shared/constants/httpStatus";
+import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { InviteTokenUtil } from "../../../shared/utils/inviteToken.util";
 import { CreateInviteInput } from "../../dto/invite/createInvite.dto";
@@ -19,21 +21,40 @@ export class CreateInviteUseCase{
 
     async execute(input:CreateInviteInput,inviter:InviterContext,companyId:string){
       if(inviter.role!=='SUPER_ADMIN'){
-        throw new AppError('Only super admin can invite company admin',403)
+        throw new AppError(RESPONSE_MESSAGES.INVITE.ONLY_SUPER_ADMIN,HttpStatus.FORBIDDEN)
       }
       if(input.role!=='COMPANY_ADMIN'){
-        throw new AppError('Invalid role for invite')
+        throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_ROLE,HttpStatus.BAD_REQUEST)
       }
       const company=await this.companyRepo.findById(companyId);
       if(!company){
-        throw new AppError('Company not found',404)
+        throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
       }
       if(company.ownerAdminId){
-        throw new AppError('Company admin is already assigned',409)
+        throw new AppError(RESPONSE_MESSAGES.INVITE.ALREADY_ASSIGNED,HttpStatus.CONFLICT)
       }
-      const existingInvite=await this.inviteRepository.findPendingByEmail(input.email)
+      const existingInvite=await this.inviteRepository.findPendingByEmailAndCompany(input.email,companyId)
       if(existingInvite){
-        throw new AppError('An invite is already pending for this email',409)
+       const newToken=InviteTokenUtil.generateToken();
+       const newExipry=InviteTokenUtil.generateExpiry(24);
+
+       const updateInvite=await this.inviteRepository.updateInvite(existingInvite.id,newToken,newExipry) ;
+       if(!updateInvite){
+        throw new AppError(RESPONSE_MESSAGES.INVITE.CREATE_FAILED,HttpStatus.INTERNAL_SERVER_ERROR)
+       }
+        const inviteLink=`${env.FRONTEND_URL}/accept-invite?token=${newToken}`;
+
+        await this.mailService.sendCompanyAdminInviteEmail({
+          to:existingInvite.email,
+          inviteLink
+        })
+
+        return {
+          id:updateInvite.id,
+          email:updateInvite.email,
+          expiresAt:updateInvite.expiresAt,
+          token:updateInvite.token
+        }
       }
 
       const token =InviteTokenUtil.generateToken();
@@ -48,7 +69,7 @@ export class CreateInviteUseCase{
         expiresAt
       })
       if(!invite){
-        throw new AppError('Failed to create invite')
+        throw new AppError(RESPONSE_MESSAGES.INVITE.CREATE_FAILED,HttpStatus.INTERNAL_SERVER_ERROR)
       }
       const inviteLink=`${env.FRONTEND_URL}/accept-invite?token=${token}`
       await this.mailService.sendCompanyAdminInviteEmail({

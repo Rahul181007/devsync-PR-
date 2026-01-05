@@ -1,14 +1,18 @@
 import { ISuperAdminRepository } from "../../domain/repositories/superAdmin.repository";
-import { SuperAdminModel } from "../db/models/superAdmin.model";
+import { SuperAdminModel,SuperAdminDocument } from "../db/models/superAdmin.model";
 import { SuperAdmin } from "../../domain/entities/superAdmin.entity";
+import { BaseRepository } from "./base.repository";
 
 export type SuperAdminStatus = "ACTIVE" | "INACTIVE" ;
 
 
-export class SuperAdminRepository implements ISuperAdminRepository{
+export class SuperAdminRepository extends BaseRepository<SuperAdminDocument> implements ISuperAdminRepository{
+    constructor(){
+        super(SuperAdminModel)
+    }
     
     async findByEmail(email: string): Promise<SuperAdmin | null> {
-        const doc= await SuperAdminModel.findOne({email})
+        const doc= await this.model.findOne({email})
         if(!doc) return null
         return new SuperAdmin(
             doc._id.toString(),
@@ -25,11 +29,11 @@ export class SuperAdminRepository implements ISuperAdminRepository{
     }
 
     async updateLastLogin(id: string, date: Date): Promise<void> {
-        await SuperAdminModel.findByIdAndUpdate(id,{lastLoginAt:date})
+        await this.updateById(id,{lastLoginAt:date})
     }
 
     async findById(id: string): Promise<SuperAdmin | null> {
-        const doc = await SuperAdminModel.findById(id);
+        const doc = await this.model.findById(id);
         if(!doc) return null
         return new SuperAdmin(
             doc._id.toString(),

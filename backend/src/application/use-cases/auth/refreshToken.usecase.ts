@@ -5,6 +5,8 @@ import { AppError } from '../../../shared/errors/AppError';
 import { ISuperAdminRepository } from '../../../domain/repositories/superAdmin.repository';
 import { IUserRepository } from '../../../domain/repositories/user.repository';
 import { RequestUser } from '../../../shared/types/AuthUser';
+import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
+import { HttpStatus } from '../../../shared/constants/httpStatus';
 interface RefreshTokenPayload{
     sub:string;
     role:'SUPER_ADMIN'|'COMPANY_ADMIN'|'DEVELOPER'
@@ -21,7 +23,7 @@ export class RefreshTokenUseCase{
     )as RefreshTokenPayload
 
     if(!decoded.sub){
-        throw new AppError('Invalid refresh token',401)
+        throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_REFRESH_TOKEN,HttpStatus.UNAUTHORIZED)
     }
 
     let user:RequestUser|null=null;
@@ -48,11 +50,11 @@ export class RefreshTokenUseCase{
             break;
         }
         default:
-            throw new AppError('Unauthorized Role',401)
+            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_ROLE,HttpStatus.UNAUTHORIZED)
     }
 
     if(!user){
-        throw new AppError('Account not found',404)
+        throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND)
     }
 
 

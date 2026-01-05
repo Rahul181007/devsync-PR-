@@ -13,7 +13,8 @@ export interface CreateCompanyData{
     domain?:string;
     createdBy:CompanyCreatedBy;
     approvedBy?:string;
-    status:CompanyStatus
+    status:CompanyStatus;
+    adminEmail?:string|null
 }
 export interface ICompanyRepository{
     findByName(name:string):Promise<Company|null>
@@ -27,4 +28,6 @@ export interface ICompanyRepository{
     findById(companyId:string):Promise<Company|null>
 
     assignOwnerAdmin(companyId:string,userId:string):Promise<void>
+
+    findByEmail(email:string):Promise<Company|null>
 }

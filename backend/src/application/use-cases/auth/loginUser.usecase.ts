@@ -4,6 +4,8 @@ import { LoginResponseDTO } from '../../dto/auth/login.response.dto'
 import { Tokenutilits } from '../../../shared/utils/token.util';
 import { IPasswordHasher } from '../../../domain/service/password-hasher';
 import { AppError } from '../../../shared/errors/AppError';
+import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
+import { HttpStatus } from '../../../shared/constants/httpStatus';
 
 export class LoginUserUseCase{
     constructor(
@@ -17,23 +19,23 @@ export class LoginUserUseCase{
         const user=await this.userRepo.findByEmail(data.email);
        
         if(!user){
-            throw new AppError('Invalid email or password');
+            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED);
         }
 
         // check password
         const isValid=await this.passwordHasher.compare(data.password,user.passwordHash);
         if(!isValid){
-            throw new AppError('Invalid email or password', 400);
+            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED);
         }
 
         // check status
         if (user.status!=='ACTIVE'){
-          throw new AppError('User is not active', 403);
+          throw new AppError(RESPONSE_MESSAGES.AUTH.USER_NOT_ACTIVE,HttpStatus.FORBIDDEN);
         }
 
         // only allowed roles like company admin and developer
         if(user.role!=='COMPANY_ADMIN' && user.role!=='DEVELOPER'){
-            throw new AppError('Invalid role for this login', 403);
+            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_ROLE,HttpStatus.FORBIDDEN);
         }
 
         // update last login

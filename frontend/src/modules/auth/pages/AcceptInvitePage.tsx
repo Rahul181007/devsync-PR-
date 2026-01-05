@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { inviteService } from "../services/invite.service";
-
+import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
+import {ROUTES} from '../../../shared/constants/routes';
 const AcceptInvitePage = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -29,8 +30,8 @@ const AcceptInvitePage = () => {
                 setEmail(response.data.data.email);
                 setCompanyName(response.data.data.companyName);
                 setVerified(true);
-            } catch {
-                setError("Invite is invalid or has expired");
+            } catch(error:unknown) {
+                setError(getErrorMessage(error));
             } finally {
                 setLoading(false);
             }
@@ -63,11 +64,11 @@ const AcceptInvitePage = () => {
                 password,
             });
 
-            navigate("/company/login", {
+            navigate(ROUTES.AUTH.COMPANY_LOGIN, {
                 state: { message: "Account created successfully. Please login." },
             });
-        } catch {
-            setError("Failed to accept invite. Please try again.");
+        } catch(error:unknown) {
+            setError(getErrorMessage(error));
         }
     };
 
