@@ -11,6 +11,9 @@ import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { CreateWorkspaceUseCase } from "../../application/use-cases/company/createWorkspace.usecase";
 import { createWorkspaceSchema } from "../../application/validators/company/createWorkspace.validator";
+import { GetMyCompanyUseCase } from "../../application/use-cases/company/getMyCompany.usecase";
+import { updateCompanyBrandingSchema } from "../../application/validators/company/updateBranding.validator";
+import { UpdateCompanyBrandingUseCase } from "../../application/use-cases/company/updateCompanyBranding.usecase";
 
 
 
@@ -22,7 +25,9 @@ export class CompanyController {
         private approveCompanyUseCase: ApproveCompanyUseCase,
         private suspendCompanyUseCase: SuspendCompanyUseCase,
         private getCompanyByIdUseCase: GetCompanyIdUseCase,
-        private createWorkspaceUseCase: CreateWorkspaceUseCase
+        private createWorkspaceUseCase: CreateWorkspaceUseCase,
+        private getMyCompanyUseCase:GetMyCompanyUseCase,
+        private updateCompanyBrandingUseCase:UpdateCompanyBrandingUseCase
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {
@@ -171,6 +176,51 @@ export class CompanyController {
 
         } catch (error: unknown) {
             return handleError(error, res)
+        }
+    }
+
+    getMyCompany=async(req:Request,res:Response)=>{
+        try {
+            const companyId=req.user?.companyId
+             
+            if(!companyId){
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message:RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                })
+            }
+
+            const company =await this.getMyCompanyUseCase.execute(companyId);
+
+            return res.status(HttpStatus.OK).json({
+                data:company
+            })
+
+        } catch (error:unknown) {
+            return handleError(error,res)
+        }
+    }
+
+    updateBranding=async(req:Request,res:Response)=>{
+        try {
+            const companyId=req.user?.companyId
+            if(!companyId){
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message:RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                })
+            }
+            const parsed=updateCompanyBrandingSchema.parse(req.body);
+
+            await this.updateCompanyBrandingUseCase.execute(companyId,{
+                ...parsed,
+                logoFile:req.file?.buffer,
+                logoMimeType: req.file?.mimetype,
+            })
+
+            return res.status(HttpStatus.OK).json({
+                message:RESPONSE_MESSAGES.COMPANY.BRANDING_UPDATED
+            })
+        } catch (error:unknown) {
+            return handleError(error,res)
         }
     }
 }

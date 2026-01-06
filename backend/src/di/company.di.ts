@@ -8,10 +8,14 @@ import { GetCompanyIdUseCase } from "../application/use-cases/company/getCompany
 import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { InviteRepository } from "../infrastructure/repositories/invite.repository";
 import { CreateWorkspaceUseCase } from "../application/use-cases/company/createWorkspace.usecase";
+import { GetMyCompanyUseCase } from "../application/use-cases/company/getMyCompany.usecase";
+import { UpdateCompanyBrandingUseCase } from "../application/use-cases/company/updateCompanyBranding.usecase";
+import { S3FileStorage } from "../infrastructure/services/S3/s3FileStorage.service";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
 const inviteRepository=new InviteRepository()
+const fileStorage=new S3FileStorage()
 
 const createCompanyUseCase=new CreateCompanyUseCase(companyRepository);
 const listCompaniesUseCase=new ListCompaniesUseCase(companyRepository);
@@ -19,6 +23,9 @@ const approveCompanyUseCase=new ApproveCompanyUseCase(companyRepository);
 const suspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository);
 const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository)
 const getCompanyByIdUseCase=new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
+const getMyCompanyUseCase=new GetMyCompanyUseCase(companyRepository)
+const updateCompanyBrandingUseCase=new UpdateCompanyBrandingUseCase(companyRepository,fileStorage);
+
 
 export const companyController=new CompanyController(
     createCompanyUseCase,
@@ -26,5 +33,7 @@ export const companyController=new CompanyController(
     approveCompanyUseCase,
     suspendCompanyUseCase,
     getCompanyByIdUseCase,
-    createWorkspaceUseCase
+    createWorkspaceUseCase,
+    getMyCompanyUseCase,
+    updateCompanyBrandingUseCase
 );

@@ -31,4 +31,6 @@ export interface ICompanyRepository{
     assignOwnerAdmin(companyId:string,userId:string):Promise<void>
 
     findByEmail(email:string):Promise<Company|null>
+
+    updateBranding(companyId:string,data:{logoUrl?:string,themeColor?:string}):Promise<void>
 }

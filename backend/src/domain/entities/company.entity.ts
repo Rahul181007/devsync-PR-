@@ -11,6 +11,7 @@ export class Company {
     public ownerAdminId?: string,
     public domain?: string,
     public approvedBy?: string,
+    public logoUrl?:string,
     public themeColor?: string,
     public currentPlanId?: string,
     public subscriptionId?: string,

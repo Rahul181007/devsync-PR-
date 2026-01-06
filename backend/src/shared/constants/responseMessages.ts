@@ -42,7 +42,8 @@ export const RESPONSE_MESSAGES = {
         COMPANY_NOT_SUSPENDED: 'Company cannot be suspended',
         NOT_APPROVED: 'Company is not approved',
         COMPANY_ID: 'Company id is required',
-        WORKSPACE_CREATED:'Workspace created'
+        WORKSPACE_CREATED:'Workspace created',
+        BRANDING_UPDATED:'Branding updated'
 
     },
 
