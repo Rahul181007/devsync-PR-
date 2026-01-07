@@ -66,8 +66,13 @@ export const RESPONSE_MESSAGES = {
         COMPANY_ADMIN_UNBLOCKED: "Company admin unblocked successfully",
         USER_ID_REQUIRED: "User id is required",
     },
+    PROJECT:{
+        ALREADY_EXISTS:'Project already exist',
+        CREATED:'Project created'
+    },
 
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",
+
     },
 } as const;
