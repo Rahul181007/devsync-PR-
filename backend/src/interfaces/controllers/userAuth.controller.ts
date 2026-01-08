@@ -36,26 +36,35 @@ export class UserAuthController {
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
-                    requiresOnboarding: true,
                     data: {
                         id: result.id,
+                        name: result.name,
                         email: result.email,
-                        role: result.role
+                        role: result.role,
+
+                        requiresOnboarding: true,
+                        waitingForApproval: false
                     }
-                })
+                });
+
             }
 
 
             if (result.waitingForApproval) {
                 return res.status(HttpStatus.OK).json({
-                    message: RESPONSE_MESSAGES.AUTH.WAITING_FOR_APPROVAL,
-                    waitingForApproval: true,
+                    message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
                     data: {
                         id: result.id,
+                        name: result.name,
                         email: result.email,
-                        role: result.role
+                        role: result.role,
+
+
+                        requiresOnboarding: false,
+                        waitingForApproval: true
                     }
-                })
+                });
+
             }
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
@@ -77,9 +86,13 @@ export class UserAuthController {
                     name: result.name,
                     email: result.email,
                     role: result.role,
-                },
-                accessToken: result.accessToken
-            })
+
+
+                    requiresOnboarding: false,
+                    waitingForApproval: false
+                }
+            });
+
         } catch (error: unknown) {
             return handleError(error, res)
         }

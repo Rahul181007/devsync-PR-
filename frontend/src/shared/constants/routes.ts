@@ -14,6 +14,7 @@ export const ROUTES={
     RESET_PASSWORD: "/reset-password",
 
     ACCEPT_INVITE: "/accept-invite",
+    COMPANY_SIGNUP: "/company/signup",
   },
 
     SUPER_ADMIN: {
@@ -27,6 +28,9 @@ export const ROUTES={
     COMPANY_ADMIN: {
     BASE: "/company",
     DASHBOARD: "/company/dashboard",
+    COMPANY_ONBOARDING_BRANDING:"/company/onboarding/branding",
+    COMPANY_ONBOARDING_PROJECt:"/company/onboarding/project",
+    COMPANY_PENDING_APPROVAL:"/company/pending-approval"
   },
 
   DEVELOPER: {

@@ -21,6 +21,7 @@ export class SignupUseCase{
         const passwordHash=await this.passwordHasher.hash(data.password);
 
        await this.userRepo.create({
+        name:data.name,
         email:data.email,
         passwordHash:passwordHash,
         role:'COMPANY_ADMIN',

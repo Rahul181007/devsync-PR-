@@ -36,8 +36,8 @@ export class CreateFirstProjectUseCase {
 
     const company=await this.companyRepo.findById(companyId);
 
-    if(!company || company.status!=='APPROVED'){
-        throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_APPROVED,HttpStatus.FORBIDDEN)
+    if(!company){
+        throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
     }
 
     const existing=await this.projectRepo.findByNameInCompany(companyId,data.name)

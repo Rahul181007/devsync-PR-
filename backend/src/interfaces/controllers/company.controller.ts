@@ -14,6 +14,7 @@ import { createWorkspaceSchema } from "../../application/validators/company/crea
 import { GetMyCompanyUseCase } from "../../application/use-cases/company/getMyCompany.usecase";
 import { updateCompanyBrandingSchema } from "../../application/validators/company/updateBranding.validator";
 import { UpdateCompanyBrandingUseCase } from "../../application/use-cases/company/updateCompanyBranding.usecase";
+import { Tokenutilits } from "../../shared/utils/token.util";
 
 
 
@@ -26,8 +27,8 @@ export class CompanyController {
         private suspendCompanyUseCase: SuspendCompanyUseCase,
         private getCompanyByIdUseCase: GetCompanyIdUseCase,
         private createWorkspaceUseCase: CreateWorkspaceUseCase,
-        private getMyCompanyUseCase:GetMyCompanyUseCase,
-        private updateCompanyBrandingUseCase:UpdateCompanyBrandingUseCase
+        private getMyCompanyUseCase: GetMyCompanyUseCase,
+        private updateCompanyBrandingUseCase: UpdateCompanyBrandingUseCase
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {
@@ -166,12 +167,27 @@ export class CompanyController {
 
             logger.info(`Create workspace attempted by user ${userId}`)
 
-            await this.createWorkspaceUseCase.execute(userId, parsed);
+            const result = await this.createWorkspaceUseCase.execute(userId, parsed);
 
             logger.info(`Workspace created successfully by user ${userId}`);
+            const newAccessToken = Tokenutilits.generateAccessToken({
+                sub: result.userId,
+                role: result.role,
+                companyId: result.companyId
+            })
 
+            res.cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false,
+                path: "/",
+            });
             return res.status(HttpStatus.CREATED).json({
-                message: RESPONSE_MESSAGES.COMPANY.WORKSPACE_CREATED
+                message: RESPONSE_MESSAGES.COMPANY.WORKSPACE_CREATED,
+                data:{
+                    companyId:result.companyId
+                }
+
             })
 
         } catch (error: unknown) {
@@ -179,48 +195,48 @@ export class CompanyController {
         }
     }
 
-    getMyCompany=async(req:Request,res:Response)=>{
+    getMyCompany = async (req: Request, res: Response) => {
         try {
-            const companyId=req.user?.companyId
-             
-            if(!companyId){
+            const companyId = req.user?.companyId
+
+            if (!companyId) {
                 return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                    message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
                 })
             }
 
-            const company =await this.getMyCompanyUseCase.execute(companyId);
+            const company = await this.getMyCompanyUseCase.execute(companyId);
 
             return res.status(HttpStatus.OK).json({
-                data:company
+                data: company
             })
 
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 
-    updateBranding=async(req:Request,res:Response)=>{
+    updateBranding = async (req: Request, res: Response) => {
         try {
-            const companyId=req.user?.companyId
-            if(!companyId){
-                return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+            const companyId = req.user?.companyId
+            if (!companyId) {
+                return res.status(HttpStatus.UNAUTHORIZED).json({
+                    message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
                 })
             }
-            const parsed=updateCompanyBrandingSchema.parse(req.body);
+            const parsed = updateCompanyBrandingSchema.parse(req.body);
 
-            await this.updateCompanyBrandingUseCase.execute(companyId,{
+            await this.updateCompanyBrandingUseCase.execute(companyId, {
                 ...parsed,
-                logoFile:req.file?.buffer,
+                logoFile: req.file?.buffer,
                 logoMimeType: req.file?.mimetype,
             })
 
             return res.status(HttpStatus.OK).json({
-                message:RESPONSE_MESSAGES.COMPANY.BRANDING_UPDATED
+                message: RESPONSE_MESSAGES.COMPANY.BRANDING_UPDATED
             })
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 }

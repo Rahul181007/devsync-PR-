@@ -54,5 +54,11 @@ export class CreateWorkspaceUseCase {
         })
         await this.userRepo.assignCompany(user.id, newCompany.id)
         await this.userRepo.updateStatus(user.id,"ACTIVE")
+
+        return {
+            userId:user.id,
+            companyId:newCompany.id,
+            role:user.role
+        }
     }
 }

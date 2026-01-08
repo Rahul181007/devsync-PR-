@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "./services/auth.api";
 import { getErrorMessage } from "../../shared/utiils/getErrorMessage";
+import type { LoginResponse } from "./types/auth-response.type";
 
 
 export type AuthRole = 'SUPER_ADMIN' | 'COMPANY_ADMIN' | "DEVELOPER";
@@ -19,7 +20,9 @@ interface AuthState {
     error: string | null;
     isAuthenticated: boolean;
     isAuthChecked: boolean;
-
+    
+    requiresOnboarding:boolean;
+    waitingForApproval:boolean;
     otpSent:boolean;
     otpVerified:boolean;
     passwordResetSuccess: boolean;
@@ -35,6 +38,8 @@ const initialState: AuthState = {
     error: null,
     isAuthenticated: false,
      isAuthChecked: false,
+     requiresOnboarding:false,
+     waitingForApproval:false,
      otpSent:false,
      otpVerified:false,
      passwordResetSuccess: false,
@@ -58,7 +63,7 @@ export const superAdminLogin = createAsyncThunk(
 
 // company admin & developer Login
 
-export const userLogin = createAsyncThunk(
+export const userLogin = createAsyncThunk<LoginResponse,{email:string;password:string},{rejectValue:string}>(
     'auth/userLogin',
     async (
         data: { email: string; password: string }, { rejectWithValue }
@@ -67,6 +72,17 @@ export const userLogin = createAsyncThunk(
             const res = await authApi.userLogin(data);
             return res.data.data;
         } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
+export const companySignup=createAsyncThunk<void,{name:string,email:string,password:string},{rejectValue:string}>(
+    "auth/companySignup",
+    async(data,{rejectWithValue})=>{
+        try {
+            await authApi.signup(data)
+        } catch (error:unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
     }
@@ -185,9 +201,40 @@ const authSlice = createSlice({
             })
             .addCase(userLogin.fulfilled, (state, action) => {
                 state.loading = false;
-                state.isAuthenticated = true;
-                state.user = action.payload
                 state.isAuthChecked = true;
+                const payload=action.payload;
+
+                const user={
+                    id:payload.id,
+                    name:payload.name??'',
+                    email:payload.email,
+                    role:payload.role,
+                    companyId:payload.companyId
+                }
+
+                if(payload.requiresOnboarding){
+                    state.user=user;
+                    state.isAuthenticated=true;
+                    state.requiresOnboarding=true;
+                    state.waitingForApproval=false;
+                    return
+                }
+
+                if(payload.waitingForApproval){
+                    state.user=user;
+                    state.isAuthenticated=false;
+                    state.requiresOnboarding=false;
+                    state.waitingForApproval=true;
+                    return 
+                }
+
+
+              
+
+                state.user=user;
+                state.isAuthenticated=true;
+                state.requiresOnboarding=false;
+                state.waitingForApproval=false
             })
             .addCase(userLogin.rejected,(state,action)=>{
                 state.loading=false;
@@ -196,11 +243,8 @@ const authSlice = createSlice({
                 state.error = action.payload as string
             })
 
-            .addCase(logout.fulfilled, (state) => {
-                state.user = null;
-                state.isAuthenticated = false;
-                state.loading = false;
-                state.error = null
+            .addCase(logout.fulfilled, () => {
+               return initialState
             })
 
             // forgot password
@@ -243,6 +287,18 @@ const authSlice = createSlice({
                 state.passwordResetSuccess = true;
             })
             .addCase(resetPassword.rejected,(state,action)=>{
+                state.loading=false;
+                state.error=action.payload as string
+            })
+
+            .addCase(companySignup.pending,(state)=>{
+                state.loading=true;
+                state.error=null;
+            })
+            .addCase(companySignup.fulfilled,(state)=>{
+                state.loading=false
+            })
+            .addCase(companySignup.rejected,(state,action)=>{
                 state.loading=false;
                 state.error=action.payload as string
             })

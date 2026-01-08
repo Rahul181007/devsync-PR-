@@ -21,12 +21,6 @@ export class UpdateCompanyBrandingUseCase{
             )
         }
 
-        if(company.status!=='APPROVED'){
-            throw new AppError(
-                RESPONSE_MESSAGES.COMPANY.NOT_APPROVED,
-                HttpStatus.FORBIDDEN
-            )
-        }
 
         let logoUrl=company.logoUrl
         let uploadedLogoUrl:string|undefined;

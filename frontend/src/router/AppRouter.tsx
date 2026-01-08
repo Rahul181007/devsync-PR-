@@ -23,9 +23,15 @@ import DeveloperLayout from "../modules/developer/components/DeveloperLAyout";
 import DevDashboard from "../modules/developer/pages/DevDashboard";
 
 // guards
-import ProtectedRoute from "./ProtectedRoutes";
+import AppRoute from "./ProtectedRoutes";
+import OnboardingRoute from "./OnboardingRoute";
 import LandingPage from "../modules/landing/pages/LandingPage";
 import NotFoundPage from "../modules/landing/pages/error/NotFoundPage";
+import CompanySignupPage from "../modules/auth/pages/CompanySignupPage";
+import WorkspacePage from "../modules/company-admin/pages/Onboarding/WorkspacePage";
+import BrandingPage from "../modules/company-admin/pages/Onboarding/BrandingPage";
+import CreateProjectPage from "../modules/company-admin/pages/Onboarding/CreateProjectPage";
+import PendingApprovalPage from "../modules/company-admin/pages/PendingApprovalPage";
 
 const AppRouter = () => {
   return (
@@ -47,11 +53,12 @@ const AppRouter = () => {
 
         {/* Invite */}
         <Route path={ROUTES.AUTH.ACCEPT_INVITE} element={<AcceptInvitePage />} />
+        <Route path={ROUTES.AUTH.COMPANY_SIGNUP} element={<CompanySignupPage />} />
 
         {/* ================= SUPER ADMIN ================= */}
         <Route
           element={
-            <ProtectedRoute
+            <AppRoute
               allowedRoles={["SUPER_ADMIN"]}
               loginPath={ROUTES.AUTH.SUPER_ADMIN_LOGIN}
             />
@@ -66,9 +73,22 @@ const AppRouter = () => {
         </Route>
 
         {/* ================= COMPANY ADMIN ================= */}
+        <Route element={<OnboardingRoute />}>
+          <Route path="/company/onboarding/workspace" element={<WorkspacePage />} />
+          <Route path="/company/onboarding/branding" element={<BrandingPage />} />
+          <Route path="/company/onboarding/project" element={<CreateProjectPage />} />
+        </Route>
+
+        <Route
+          path="/company/pending-approval"
+          element={<PendingApprovalPage />}
+        />
+
+
+
         <Route
           element={
-            <ProtectedRoute
+            <AppRoute
               allowedRoles={["COMPANY_ADMIN"]}
               loginPath={ROUTES.AUTH.COMPANY_LOGIN}
             />
@@ -83,7 +103,7 @@ const AppRouter = () => {
         {/* ================= DEVELOPER ================= */}
         <Route
           element={
-            <ProtectedRoute
+            <AppRoute
               allowedRoles={["DEVELOPER"]}
               loginPath={ROUTES.AUTH.DEVELOPER_LOGIN}
             />

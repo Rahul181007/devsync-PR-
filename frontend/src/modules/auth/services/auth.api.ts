@@ -53,6 +53,9 @@ export const authApi={
 
        logout(){
         return http.post('/auth/logout')
+       },
+       signup(data:{email:string;password:string}){
+        return http.post('/auth/signup',data)
        }
         
 }
