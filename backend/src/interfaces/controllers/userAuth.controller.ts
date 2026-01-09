@@ -7,20 +7,55 @@ import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { userCookieOptions } from "../../config/userCookieOptions";
+import { signupSchema } from "../../application/validators/auth/signup.validator";
+import { SignupUseCase } from "../../application/use-cases/auth/signup.usecase";
 
 
 export class UserAuthController {
-    constructor(private loginUserUseCase: LoginUserUseCase, private refreshTokenUseCase: RefreshTokenUseCase) { }
+    constructor(private loginUserUseCase: LoginUserUseCase, private refreshTokenUseCase: RefreshTokenUseCase,
+        private signupUseCase: SignupUseCase
+    ) { }
 
     login = async (req: Request, res: Response) => {
         try {
-            logger.info(`User login attempted ${req.body.email}`)
-            const parsed = loginSchema.parse(req.body);
 
+            const parsed = loginSchema.parse(req.body);
+            logger.info(`User login attempted ${parsed.email}`);
             const result = await this.loginUserUseCase.execute(parsed);
 
             logger.info(`user login successful ${result.email}`)
-            
+
+            if (result.requiresOnboarding) {
+
+                res.cookie("accessToken", result.accessToken, {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: false,
+                    path: "/",
+                })
+
+                return res.status(HttpStatus.OK).json({
+                    message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
+                    data: result
+                });
+
+            }
+
+
+            if (result.waitingForApproval) {
+                res.cookie('accessToken', result.accessToken, {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: false,
+                    path: "/",
+                })
+
+                return res.status(HttpStatus.OK).json({
+                    message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
+                    data:result
+                });
+
+            }
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
                 sameSite: "lax",
@@ -35,14 +70,26 @@ export class UserAuthController {
                 userCookieOptions
             )
             return res.status(HttpStatus.OK).json({
-                message:RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
-                data: {
-                    id: result.id,
-                    name: result.name,
-                    email: result.email,
-                    role: result.role,
-                },
-                accessToken: result.accessToken
+                message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
+                data: result
+            });
+
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    signup = async (req: Request, res: Response) => {
+        try {
+            logger.info(`User signup attempted ${req.body.email}`);
+
+            const parsed = signupSchema.parse(req.body);
+            await this.signupUseCase.execute(parsed);
+
+            logger.info(`User signup successful ${parsed.email}`);
+
+            return res.status(HttpStatus.CREATED).json({
+                message: RESPONSE_MESSAGES.AUTH.USER_CREATED
             })
         } catch (error: unknown) {
             return handleError(error, res)

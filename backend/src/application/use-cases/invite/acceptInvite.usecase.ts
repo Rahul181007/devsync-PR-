@@ -41,12 +41,13 @@ export class AcceptInviteUseCase {
         const user = await this.userRepo.create({
             email: invite.email,
             passwordHash: hashPassword,
-            role: invite.role
+            role: invite.role,
+            status:'PENDING_ONBOARDING',
+            companyId:invite.companyId
         })
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        await this.userRepo.assignCompany(user.id, invite.companyId)
         await this.companyRepo.assignOwnerAdmin(invite.companyId, user.id)
         await this.inviteRepo.markAsAccepted(invite.id)
         return {

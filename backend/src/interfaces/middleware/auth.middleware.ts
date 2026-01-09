@@ -22,7 +22,8 @@ export const verifyAccessToken = (
     req.user = {
         id:decoded.sub,
         role:decoded.role,
-        companyId:decoded.companyId
+        companyId:decoded.companyId,
+        onboarding: decoded.onboarding??false
     };
     next();
   } catch (error:unknown) {

@@ -1,5 +1,5 @@
 
-import { Company, CompanyStatus,CompanyCreatedBy } from "../entities/company.entity";
+import { Company, CompanyStatus,CompanyCreatedBy, OnboardingStep } from "../entities/company.entity";
 
 export interface ListCompaniesQuery{
     page:number;
@@ -14,7 +14,9 @@ export interface CreateCompanyData{
     createdBy:CompanyCreatedBy;
     approvedBy?:string;
     status:CompanyStatus;
-    adminEmail?:string|null
+    adminEmail?:string|null;
+    onboardingStep: OnboardingStep;
+     ownerAdminId?: string;
 }
 export interface ICompanyRepository{
     findByName(name:string):Promise<Company|null>
@@ -30,4 +32,8 @@ export interface ICompanyRepository{
     assignOwnerAdmin(companyId:string,userId:string):Promise<void>
 
     findByEmail(email:string):Promise<Company|null>
+
+    updateBranding(companyId:string,data:{logoUrl?:string,themeColor?:string}):Promise<void>
+
+    updateOnboardingStep(companyId:string,step:OnboardingStep):Promise<void>
 }

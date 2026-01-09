@@ -9,6 +9,12 @@ import { logger } from "../../shared/logger/logger";
 import { GetCompanyIdUseCase } from "../../application/use-cases/company/getCompanyById.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
+import { CreateWorkspaceUseCase } from "../../application/use-cases/company/createWorkspace.usecase";
+import { createWorkspaceSchema } from "../../application/validators/company/createWorkspace.validator";
+import { GetMyCompanyUseCase } from "../../application/use-cases/company/getMyCompany.usecase";
+import { updateCompanyBrandingSchema } from "../../application/validators/company/updateBranding.validator";
+import { UpdateCompanyBrandingUseCase } from "../../application/use-cases/company/updateCompanyBranding.usecase";
+import { Tokenutilits } from "../../shared/utils/token.util";
 
 
 
@@ -19,7 +25,10 @@ export class CompanyController {
         private listCompaniesUseCase: ListCompaniesUseCase,
         private approveCompanyUseCase: ApproveCompanyUseCase,
         private suspendCompanyUseCase: SuspendCompanyUseCase,
-        private getCompanyByIdUseCase:GetCompanyIdUseCase
+        private getCompanyByIdUseCase: GetCompanyIdUseCase,
+        private createWorkspaceUseCase: CreateWorkspaceUseCase,
+        private getMyCompanyUseCase: GetMyCompanyUseCase,
+        private updateCompanyBrandingUseCase: UpdateCompanyBrandingUseCase
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {
@@ -28,7 +37,7 @@ export class CompanyController {
 
             const parsed = companySchema.parse(req.body);
 
-            
+
             if (!req.user || !req.user.id) {
                 logger.warn("CreateCompany unauthorized access attempt");
                 return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED })
@@ -79,12 +88,12 @@ export class CompanyController {
             const companyId = req.params.id;
             if (!companyId) {
                 logger.warn("ApproveCompany called without companyId");
-                return res.status(HttpStatus.BAD_REQUEST).json({ message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
+                return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
             }
             if (!req.user || !req.user.id) {
                 logger.warn(`ApproveCompany unauthorized attempt companyId=${companyId}`);
 
-                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED})
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED })
             }
 
             logger.info(`ApproveCompany started companyId=${companyId} by superAdmin=${req.user.id}`);
@@ -108,18 +117,18 @@ export class CompanyController {
             const companyId = req.params.id
             if (!companyId) {
                 logger.warn("SuspendCompany called without companyId");
-                return res.status(HttpStatus.BAD_REQUEST).json({ message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
+                return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
             }
             if (!req.user || !req.user.id) {
                 logger.warn(`SuspendCompany unauthorized attempt companyId=${companyId}`);
-                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED})
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED })
             }
             await this.suspendCompanyUseCase.execute(companyId);
 
             logger.info(`SuspendCompany success companyId=${companyId}`);
             res.status(HttpStatus.OK).json({
                 success: true,
-                message:RESPONSE_MESSAGES.COMPANY.SUSPENDED
+                message: RESPONSE_MESSAGES.COMPANY.SUSPENDED
             })
         } catch (error: unknown) {
             logger.error(`SuspendCompany failed companyId=${req.params.id}`, error);
@@ -127,21 +136,107 @@ export class CompanyController {
         }
     }
 
-    getCompanyById=async(req:Request,res:Response)=>{
+    getCompanyById = async (req: Request, res: Response) => {
         try {
-            const {companyId}=req.params;
-            if(!companyId){
-                return res.status(HttpStatus.BAD_REQUEST).json({message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID})
+            const { companyId } = req.params;
+            if (!companyId) {
+                return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID })
             }
 
-            const company=await this.getCompanyByIdUseCase.execute(companyId);
+            const company = await this.getCompanyByIdUseCase.execute(companyId);
+            console.log(company)
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                data: company
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    createWorkspace = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id
+            if (!userId) {
+                return res.status(HttpStatus.UNAUTHORIZED).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                })
+            }
+
+            const parsed = createWorkspaceSchema.parse(req.body);
+
+            logger.info(`Create workspace attempted by user ${userId}`)
+
+            const result = await this.createWorkspaceUseCase.execute(userId, parsed);
+
+            logger.info(`Workspace created successfully by user ${userId}`);
+            const newAccessToken = Tokenutilits.generateAccessToken({
+                sub: result.userId,
+                role: result.role,
+                companyId: result.companyId
+            })
+
+            res.cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false,
+                path: "/",
+            });
+            return res.status(HttpStatus.CREATED).json({
+                message: RESPONSE_MESSAGES.COMPANY.WORKSPACE_CREATED,
+                data:{
+                    companyId:result.companyId
+                }
+
+            })
+
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    getMyCompany = async (req: Request, res: Response) => {
+        try {
+            const companyId = req.user?.companyId
+
+            if (!companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                })
+            }
+
+            const company = await this.getMyCompanyUseCase.execute(companyId);
 
             return res.status(HttpStatus.OK).json({
-                success:true,
-                data:company
+                data: company
             })
-        } catch (error:unknown) {
-            return handleError(error,res)
+
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    updateBranding = async (req: Request, res: Response) => {
+        try {
+            const companyId = req.user?.companyId
+            if (!companyId) {
+                return res.status(HttpStatus.UNAUTHORIZED).json({
+                    message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                })
+            }
+            const parsed = updateCompanyBrandingSchema.parse(req.body);
+
+            await this.updateCompanyBrandingUseCase.execute(companyId, {
+                ...parsed,
+                logoFile: req.file?.buffer,
+                logoMimeType: req.file?.mimetype,
+            })
+
+            return res.status(HttpStatus.OK).json({
+                message: RESPONSE_MESSAGES.COMPANY.BRANDING_UPDATED
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 }

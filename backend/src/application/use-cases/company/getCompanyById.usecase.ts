@@ -14,6 +14,7 @@ export class GetCompanyIdUseCase {
 
     async execute(companyId: string) {
         const company = await this.companyRepo.findById(companyId);
+        console.log(company)
         if (!company) {
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND);
         }

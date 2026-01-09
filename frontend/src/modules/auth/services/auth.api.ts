@@ -1,7 +1,12 @@
 import { http } from "../../../core/api/http";
-import type { AuthUser } from "../auth.slice";
+import type { AuthUser, OnboardingStep } from "../auth.slice";
 
-
+export interface MeResponse{
+    user:AuthUser;
+    requiresOnboarding: boolean;
+    waitingForApproval: boolean;
+    onboardingStep:OnboardingStep;
+}
 
 export interface LoginRequest{
     email:string;
@@ -31,7 +36,7 @@ export const authApi={
         return http.post<LoginResponse>('/auth/login',data)
        },
        getMe(){
-            return http.get<{user:AuthUser}>('/auth/me')
+            return http.get<{data:MeResponse}>('/auth/me')
        },
 
        //password reset
@@ -53,6 +58,9 @@ export const authApi={
 
        logout(){
         return http.post('/auth/logout')
+       },
+       signup(data:{email:string;password:string}){
+        return http.post('/auth/signup',data)
        }
         
 }

@@ -7,7 +7,7 @@ export interface IUserDocument extends Document{
     passwordHash:string;
     role:'COMPANY_ADMIN'|'DEVELOPER';
     avatarUrl:string|null;
-    status:"ACTIVE" |'BLOCKED';
+    status:"PENDING_ONBOARDING"|"ACTIVE" |'BLOCKED';
     settings:{
       theme?: string;
       notificationPreferences?: Record<string, any>;
@@ -48,8 +48,8 @@ const UserSchema= new Schema<IUserDocument>(
         },
         status:{
             type:String,
-            enum:["ACTIVE",'INACTIVE','SUSPENDED'],
-            default :'ACTIVE'
+            enum:["PENDING_ONBOARDING","ACTIVE",'BLOCKED'],
+            default :"PENDING_ONBOARDING"
         },
         settings:{
           theme: { type: String, default: "light" },

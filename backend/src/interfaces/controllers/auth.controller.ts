@@ -8,10 +8,12 @@ import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
+import { GetAuthMeUseCase } from "../../application/use-cases/auth/getAuthMe.usecase";
 
 export class AuthController {
     constructor(private loginSuperAdminUseCase: LoginSuperAdminUseCase,
-        private refreshTokenUseCase: RefreshTokenUseCase
+        private refreshTokenUseCase: RefreshTokenUseCase,
+        private getAuthMeUseCase:GetAuthMeUseCase
     ) { }
 
     loginSuperAdmin = async (req: Request, res: Response) => {
@@ -79,10 +81,22 @@ export class AuthController {
     }
 
     me = async (req: Request, res: Response) => {
-        res.setHeader("Cache-Control", "no-store"); //Cache-Control: no-store ensures auth state is never cached, preventing users from being accidentally logged in after logout
-        return res.status(HttpStatus.OK).json({
-            user: req.user
-        })
+         try {
+    const user=req.user
+    if (!user?.id||!user?.role) {
+      return res.status(HttpStatus.UNAUTHORIZED).json({
+        message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+      });
+    }
+
+    const result = await this.getAuthMeUseCase.execute(user.id,user.role);
+
+    return res.status(HttpStatus.OK).json({
+      data: result
+    });
+         } catch (error:unknown) {
+            return handleError(error,res)
+         }
     }
 
     logout = async (req: Request, res: Response) => {

@@ -1,5 +1,5 @@
 export type UserRole='COMPANY_ADMIN'|'DEVELOPER';
-export type UserStatus='ACTIVE'|'BLOCKED';
+export type UserStatus="PENDING_ONBOARDING"|'ACTIVE'|'BLOCKED';
 
 export class User{
     constructor(

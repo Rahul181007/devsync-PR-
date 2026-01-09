@@ -7,6 +7,8 @@ export interface AcceessTokenPayload{
   sub:string;
   role:UserRole;
   companyId?:string|null
+
+  onboarding?:boolean
 }
 
 export interface RefreshTokenPayload{

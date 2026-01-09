@@ -10,12 +10,19 @@ export const env = {
 
   ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
   REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
-  FRONTEND_URL:process.env.FRONTEND_URL || "http://localhost:5173",
+  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
 
-  Mail_HOST:process.env.MAIL_HOST,
-  MAIL_PORT:process.env.MAIL_PORT,
-  MAIL_USER:process.env.MAIL_USER,
-  MAIL_PASS:process.env.MAIL_PASS,
-  MAIL_FROM:process.env.MAIL_FROM,
+  Mail_HOST: process.env.MAIL_HOST,
+  MAIL_PORT: process.env.MAIL_PORT,
+  MAIL_USER: process.env.MAIL_USER,
+  MAIL_PASS: process.env.MAIL_PASS,
+  MAIL_FROM: process.env.MAIL_FROM,
+
+  //s3 bucket
+  AWS_REGION: process.env.AWS_REGION as string,
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string
+
 };
 
