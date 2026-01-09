@@ -14,7 +14,8 @@ const AppRoute = ({
      user, 
      isAuthChecked,
      requiresOnboarding,
-     waitingForApproval 
+     waitingForApproval,
+     onboardingStep
 
   } = useAppSelector(
     (state) => state.auth
@@ -28,10 +29,10 @@ const AppRoute = ({
     return <Navigate to={loginPath} replace />;
   }
   if(requiresOnboarding){
-    return <Navigate to='/company/onboarding/workspace' replace/>;
+    return <Navigate to='/company/onboarding' replace/>;
   }
 
-  if(waitingForApproval){
+  if(waitingForApproval && onboardingStep==='DONE'){
     return <Navigate to='/company/pending-approval' replace />
   }
 

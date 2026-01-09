@@ -50,6 +50,7 @@ export class CreateWorkspaceUseCase {
             createdBy: 'self',
             adminEmail: user.email,
             status: 'PENDING',
+             onboardingStep: 'BRANDING',
             ownerAdminId: user.id,
         })
         await this.userRepo.assignCompany(user.id, newCompany.id)

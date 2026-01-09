@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { companyApi } from "../services/company.api";
 import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
+import { bootstrapAuth } from "../../auth/auth.slice";
 
 export interface CompanyState{
     loading:boolean;
@@ -24,9 +25,10 @@ const initialState:CompanyState={
 
 export const createWorkspace=createAsyncThunk<{companyId:string},{name:string;domain?:string}>(
     'company/createWorkspace',
-    async(data,{rejectWithValue})=>{
+    async(data,{rejectWithValue,dispatch})=>{
         try {
             const res=await companyApi.createWorkspace(data)
+            dispatch(bootstrapAuth())
             return res.data.data
         } catch (error:unknown) {
             return rejectWithValue(getErrorMessage(error))
@@ -39,6 +41,7 @@ export const getMyCompany=createAsyncThunk<CompanyState['company'],void,{rejectV
     async(_,{rejectWithValue})=>{
         try {
             const res=await companyApi.getMyCompany();
+            
             return res.data.data;
         } catch (error:unknown) {
             return rejectWithValue(getErrorMessage(error))
@@ -48,7 +51,7 @@ export const getMyCompany=createAsyncThunk<CompanyState['company'],void,{rejectV
 
 export const updateBranding=createAsyncThunk<void,{logo?:File;themeColor:string},{rejectValue:string}>(
     "company/updateBranding",
-    async(data,{rejectWithValue})=>{
+    async(data,{rejectWithValue,dispatch})=>{
         try {
             const formData=new FormData();
             if(data.logo){
@@ -58,6 +61,7 @@ export const updateBranding=createAsyncThunk<void,{logo?:File;themeColor:string}
                 formData.append('themeColor',data.themeColor)
             }
             await companyApi.updateBranding(formData)
+            dispatch(bootstrapAuth())
         } catch (error:unknown) {
             return rejectWithValue(getErrorMessage(error))
         }

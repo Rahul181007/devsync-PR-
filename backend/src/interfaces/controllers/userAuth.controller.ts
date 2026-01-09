@@ -51,6 +51,13 @@ export class UserAuthController {
 
 
             if (result.waitingForApproval) {
+                res.cookie('accessToken', result.accessToken, {
+                    httpOnly: true,
+                    sameSite: "lax",
+                    secure: false,
+                    path: "/",
+                })
+
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
                     data: {

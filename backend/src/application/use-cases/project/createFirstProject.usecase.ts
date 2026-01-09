@@ -61,6 +61,10 @@ export class CreateFirstProjectUseCase {
         userId,
         role:'OWNER'
     })
+
+    if(company.onboardingStep==='PROJECT'){
+        await this.companyRepo.updateOnboardingStep(companyId,'DONE')
+    }
     return project
   } 
 }

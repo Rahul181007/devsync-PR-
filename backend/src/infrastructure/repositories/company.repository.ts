@@ -1,6 +1,6 @@
 import { ICompanyRepository, ListCompaniesQuery } from "../../domain/repositories/company.repository";
 import { CreateCompanyData } from "../../domain/repositories/company.repository";
-import { Company, CompanyStatus } from "../../domain/entities/company.entity";
+import { Company, CompanyStatus, OnboardingStep } from "../../domain/entities/company.entity";
 import { CompanyModel } from "../db/models/Company.models";
 import { ICompanyDocument } from "../db/models/Company.models";
 import { BaseRepository } from "./base.repository";
@@ -16,6 +16,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             companyDoc.slug,
             companyDoc.status,
             companyDoc.createdBy,
+            companyDoc.onboardingStep,
             companyDoc.ownerAdminId?.toString() ?? undefined,
             companyDoc.domain ?? undefined,
             companyDoc.approvedBy?.toString() ?? undefined,
@@ -101,5 +102,12 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
                 ...(data.themeColor !== undefined && { themeColor: data.themeColor }),
             },
         })
+    }
+    async updateOnboardingStep(companyId: string, step: OnboardingStep): Promise<void> {
+
+        await CompanyModel.updateOne(
+            { _id: companyId },
+            { $set: { onboardingStep: step } }
+        );
     }
 }

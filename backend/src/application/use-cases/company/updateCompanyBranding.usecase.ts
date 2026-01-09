@@ -39,6 +39,10 @@ export class UpdateCompanyBrandingUseCase{
                 ...(logoUrl!==undefined && {logoUrl}),
                 ...(data.themeColor!==undefined && {themeColor:data.themeColor})
             })
+             
+            if(company.onboardingStep==='BRANDING'){
+                await this.companyRepo.updateOnboardingStep(companyId,'PROJECT')
+            }
 
             if(data.logoFile && company.logoUrl){
                 await this.fileStorage.delete(company.logoUrl)

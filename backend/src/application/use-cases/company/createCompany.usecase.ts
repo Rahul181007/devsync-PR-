@@ -49,6 +49,7 @@ export class CreateCompanyUseCase{
         createdBy:'superadmin',
         approvedBy:input.createdBySuperAdminId,
         status:'APPROVED',
+        onboardingStep:'BRANDING',
         adminEmail:normalizedAdminEmail??null
        })
        return newCompany

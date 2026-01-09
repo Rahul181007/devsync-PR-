@@ -33,6 +33,7 @@ import BrandingPage from "../modules/company-admin/pages/Onboarding/BrandingPage
 import CreateProjectPage from "../modules/company-admin/pages/Onboarding/CreateProjectPage";
 import PendingApprovalPage from "../modules/company-admin/pages/PendingApprovalPage";
 
+
 const AppRouter = () => {
   return (
     <BrowserRouter>
@@ -73,7 +74,7 @@ const AppRouter = () => {
         </Route>
 
         {/* ================= COMPANY ADMIN ================= */}
-        <Route element={<OnboardingRoute />}>
+        <Route path="/company/onboarding" element={<OnboardingRoute />}>
           <Route path="/company/onboarding/workspace" element={<WorkspacePage />} />
           <Route path="/company/onboarding/branding" element={<BrandingPage />} />
           <Route path="/company/onboarding/project" element={<CreateProjectPage />} />

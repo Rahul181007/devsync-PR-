@@ -29,7 +29,7 @@ export const ROUTES={
     BASE: "/company",
     DASHBOARD: "/company/dashboard",
     COMPANY_ONBOARDING_BRANDING:"/company/onboarding/branding",
-    COMPANY_ONBOARDING_PROJECt:"/company/onboarding/project",
+    COMPANY_ONBOARDING_PROJECT:"/company/onboarding/project",
     COMPANY_PENDING_APPROVAL:"/company/pending-approval"
   },
 

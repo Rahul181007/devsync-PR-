@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { projectApi } from "../services/project.api";
 import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
+import { bootstrapAuth } from "../../auth/auth.slice";
 
 interface ProjectState {
     loading:boolean;
@@ -20,9 +21,10 @@ export const createFirstProject=createAsyncThunk<void,{
     endDate?:string
 },{rejectValue:string}>(
     "project/createFirstProject",
-    async(data,{rejectWithValue})=>{
+    async(data,{rejectWithValue,dispatch})=>{
         try {
             await projectApi.createProject(data)
+            dispatch(bootstrapAuth())
         } catch (error:unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
