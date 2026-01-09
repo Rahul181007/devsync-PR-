@@ -52,6 +52,7 @@ export class CreateCompanyUseCase{
         onboardingStep:'BRANDING',
         adminEmail:normalizedAdminEmail??null
        })
+       console.log(newCompany)
        return newCompany
     }
 }

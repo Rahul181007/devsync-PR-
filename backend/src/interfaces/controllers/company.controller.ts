@@ -144,7 +144,7 @@ export class CompanyController {
             }
 
             const company = await this.getCompanyByIdUseCase.execute(companyId);
-
+            console.log(company)
             return res.status(HttpStatus.OK).json({
                 success: true,
                 data: company

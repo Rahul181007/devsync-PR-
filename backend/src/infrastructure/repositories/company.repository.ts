@@ -11,6 +11,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
     }
     private toEntity(companyDoc: ICompanyDocument): Company { // mapper
         return new Company(
+
             companyDoc._id.toString(),
             companyDoc.name,
             companyDoc.slug,
@@ -20,11 +21,13 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             companyDoc.ownerAdminId?.toString() ?? undefined,
             companyDoc.domain ?? undefined,
             companyDoc.approvedBy?.toString() ?? undefined,
+            companyDoc.logoUrl ?? undefined,
             companyDoc.themeColor ?? undefined,
             companyDoc.currentPlanId?.toString() ?? undefined,
             companyDoc.subscriptionId?.toString() ?? undefined,
             companyDoc.adminEmail ?? undefined
-        )
+        );
+
     }
     async findByName(name: string): Promise<Company | null> {
         const companyDoc = await CompanyModel.findOne({ name })

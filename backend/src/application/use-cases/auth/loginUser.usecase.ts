@@ -9,164 +9,143 @@ import { HttpStatus } from '../../../shared/constants/httpStatus';
 import { ICompanyRepository } from '../../../domain/repositories/company.repository';
 
 export class LoginUserUseCase {
-    constructor(
-        private userRepo: IUserRepository,
-        private passwordHasher: IPasswordHasher,
-        private companyRepo: ICompanyRepository
-    ) { }
+  constructor(
+    private userRepo: IUserRepository,
+    private passwordHasher: IPasswordHasher,
+    private companyRepo: ICompanyRepository
+  ) {}
 
-    async execute(data: LoginDTO): Promise<LoginResponseDTO> {
+  async execute(data: LoginDTO): Promise<LoginResponseDTO> {
 
-        const user = await this.userRepo.findByEmail(data.email);
-
-        if (!user) {
-            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
-        }
-
-        // check password
-        const isValid = await this.passwordHasher.compare(data.password, user.passwordHash);
-        if (!isValid) {
-            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
-        }
-        // only allowed roles like company admin and developer
-        if (user.role !== 'COMPANY_ADMIN' && user.role !== 'DEVELOPER') {
-            throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_ROLE, HttpStatus.FORBIDDEN);
-        }
-
-        if (user.status === 'BLOCKED') {
-            throw new AppError(RESPONSE_MESSAGES.AUTH.USER_BLOCKED, HttpStatus.FORBIDDEN);
-        }
-
-        // Onboarding not completed
-        if (user.status === 'PENDING_ONBOARDING') {
-
-            // 🟢 SELF SIGNUP (no company yet)
-            if (!user.companyId) {
-                const accessToken = Tokenutilits.generateAccessToken({
-                    sub: user.id,
-                    role: user.role,
-                    companyId: null,
-                    onboarding: true
-                });
-
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    requiresOnboarding: true,
-                    onboardingStep: 'WORKSPACE',
-                    accessToken
-                };
-            }
-
-            // 🟢 INVITED USER (company already exists)
-            const company = await this.companyRepo.findById(user.companyId);
-
-            if (!company) {
-                throw new AppError(
-                    RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
-                    HttpStatus.FORBIDDEN
-                );
-            }
-
-            const accessToken = Tokenutilits.generateAccessToken({
-                sub: user.id,
-                role: user.role,
-                companyId: user.companyId,
-                onboarding: true
-            });
-
-            return {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                requiresOnboarding: true,
-                onboardingStep: company.onboardingStep,
-                accessToken
-            };
-        }
-
-
-        if (user.role === 'COMPANY_ADMIN') {
-            if (!user.companyId) {
-                throw new AppError(
-                    RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
-                    HttpStatus.FORBIDDEN
-                )
-            }
-            const company = await this.companyRepo.findById(user.companyId);
-
-            if (!company) {
-                throw new AppError(RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND, HttpStatus.FORBIDDEN)
-            }
-
-            if (company.onboardingStep !== 'DONE') {
-                const accessToken = Tokenutilits.generateAccessToken({
-                    sub: user.id,
-                    role: user.role,
-                    companyId: user.companyId,
-                    onboarding: true
-                })
-
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    requiresOnboarding: true,
-                    onboardingStep: company.onboardingStep,
-                    accessToken
-                }
-            }
-
-            if (company.status !== 'APPROVED') {
-
-                const accessToken = Tokenutilits.generateAccessToken({
-                    sub: user.id,
-                    role: user.role,
-                    companyId: user.companyId,
-                    onboarding: false
-                })
-                return {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    waitingForApproval: true,
-                    onboardingStep: 'DONE',
-                    accessToken
-                }
-            }
-        }
-
-
-
-
-        // update last login
-        await this.userRepo.updateLastLogin(user.id, new Date());
-
-        // create token payload 
-        const payload = {
-            sub: user.id,
-            role: user.role,
-            companyId: user.companyId
-        }
-
-        const accessToken = Tokenutilits.generateAccessToken(payload);
-        const refreshToken = Tokenutilits.generateRefreshToken({ sub: user.id, role: user.role });
-
-
-        return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            onboardingStep: 'DONE',
-            accessToken,
-            refreshToken
-        }
+    const user = await this.userRepo.findByEmail(data.email);
+    if (!user) {
+      throw new AppError(
+        RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,
+        HttpStatus.UNAUTHORIZED
+      );
     }
 
+    const isValid = await this.passwordHasher.compare(
+      data.password,
+      user.passwordHash
+    );
+    if (!isValid) {
+      throw new AppError(
+        RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,
+        HttpStatus.UNAUTHORIZED
+      );
+    }
+
+    if (user.role !== 'COMPANY_ADMIN' && user.role !== 'DEVELOPER') {
+      throw new AppError(
+        RESPONSE_MESSAGES.AUTH.INVALID_ROLE,
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    if (user.status === 'BLOCKED') {
+      throw new AppError(
+        RESPONSE_MESSAGES.AUTH.USER_BLOCKED,
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    // 🔑 1️⃣ SELF SIGNUP (no company yet)
+    if (!user.companyId) {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: null,
+        onboarding: true
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId:null,
+        requiresOnboarding: true,
+        onboardingStep: 'WORKSPACE',
+        accessToken
+      };
+    }
+
+    // 🔑 2️⃣ COMPANY EXISTS → COMPANY-DRIVEN ONBOARDING
+    const company = await this.companyRepo.findById(user.companyId);
+    if (!company) {
+      throw new AppError(
+        RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
+        HttpStatus.FORBIDDEN
+      );
+    }
+
+    // 🔑 3️⃣ COMPANY ONBOARDING NOT DONE
+    if (company.onboardingStep !== 'DONE') {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: user.companyId,
+        onboarding: true
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId:user.companyId,
+        requiresOnboarding: true,
+        onboardingStep: company.onboardingStep,
+        accessToken
+      };
+    }
+
+    // 🔑 4️⃣ WAITING FOR APPROVAL
+    if (company.status !== 'APPROVED') {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: user.companyId,
+        onboarding: false
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId:user.companyId,
+        waitingForApproval: true,
+        onboardingStep: 'DONE',
+        accessToken
+      };
+    }
+
+    // 🔑 5️⃣ NORMAL LOGIN
+    await this.userRepo.updateLastLogin(user.id, new Date());
+
+    const payload = {
+      sub: user.id,
+      role: user.role,
+      companyId: user.companyId
+    };
+
+    const accessToken = Tokenutilits.generateAccessToken(payload);
+    const refreshToken = Tokenutilits.generateRefreshToken({
+      sub: user.id,
+      role: user.role
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      companyId:user.companyId,
+      onboardingStep: 'DONE',
+      accessToken,
+      refreshToken
+    };
+  }
 }

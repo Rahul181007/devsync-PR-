@@ -36,15 +36,7 @@ export class UserAuthController {
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
-                    data: {
-                        id: result.id,
-                        name: result.name,
-                        email: result.email,
-                        role: result.role,
-
-                        requiresOnboarding: true,
-                        waitingForApproval: false
-                    }
+                    data: result
                 });
 
             }
@@ -60,16 +52,7 @@ export class UserAuthController {
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
-                    data: {
-                        id: result.id,
-                        name: result.name,
-                        email: result.email,
-                        role: result.role,
-
-
-                        requiresOnboarding: false,
-                        waitingForApproval: true
-                    }
+                    data:result
                 });
 
             }
@@ -88,16 +71,7 @@ export class UserAuthController {
             )
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
-                data: {
-                    id: result.id,
-                    name: result.name,
-                    email: result.email,
-                    role: result.role,
-
-
-                    requiresOnboarding: false,
-                    waitingForApproval: false
-                }
+                data: result
             });
 
         } catch (error: unknown) {

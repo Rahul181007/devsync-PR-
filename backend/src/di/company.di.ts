@@ -18,7 +18,7 @@ const inviteRepository=new InviteRepository()
 const fileStorage=new S3FileStorage()
 
 const createCompanyUseCase=new CreateCompanyUseCase(companyRepository);
-const listCompaniesUseCase=new ListCompaniesUseCase(companyRepository);
+const listCompaniesUseCase=new ListCompaniesUseCase(companyRepository,inviteRepository,userRepository);
 const approveCompanyUseCase=new ApproveCompanyUseCase(companyRepository);
 const suspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository);
 const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository)
