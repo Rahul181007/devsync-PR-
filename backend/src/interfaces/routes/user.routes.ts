@@ -8,5 +8,6 @@ const router=Router();
 router.post('/superadmin/users/:userId/block',verifyAccessToken,requireRole('SUPER_ADMIN'),userController.blockCompanyAdmin); 
 router.post('/superadmin/users/:userId/unblock',verifyAccessToken,requireRole('SUPER_ADMIN'),userController.unblockCompanyAdmin)
 router.get('/company/developers',verifyAccessToken,requireRole('COMPANY_ADMIN'),userController.listDevelopers)
-
+router.post('/company/developers/:userId/block',verifyAccessToken,requireRole('COMPANY_ADMIN'),userController.blockDevelopers);
+router.post('/company/developers/:userId/unblock',verifyAccessToken,requireRole("COMPANY_ADMIN"),userController.unblockDeveloper)
 export default router

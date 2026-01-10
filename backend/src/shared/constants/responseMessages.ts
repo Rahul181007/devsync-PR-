@@ -66,6 +66,9 @@ export const RESPONSE_MESSAGES = {
         COMPANY_ADMIN_BLOCKED: "Company admin blocked successfully",
         COMPANY_ADMIN_UNBLOCKED: "Company admin unblocked successfully",
         USER_ID_REQUIRED: "User id is required",
+        NOT_FOUND:'User not found',
+        DEVELOPER_BLOCKED:'Developer is blocked',
+        DEVELOPER_UNBLOCKED:'Developer is unblocked',
     },
     PROJECT:{
         ALREADY_EXISTS:'Project already exist',
