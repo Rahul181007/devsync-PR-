@@ -54,6 +54,14 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
     async updateStatus(userId: string, status:UserStatus): Promise<void> {
         await this.updateById(userId, { status })
     }
+async findDevelopersByCompany(companyId: string): Promise<User[]> {
+    const docs = await this.model.find({
+        companyId,
+        role: 'DEVELOPER'
+    });
+
+    return docs.map(doc => this.toDomain(doc));
+}
 
     
 }

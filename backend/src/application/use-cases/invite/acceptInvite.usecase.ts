@@ -42,17 +42,22 @@ export class AcceptInviteUseCase {
             email: invite.email,
             passwordHash: hashPassword,
             role: invite.role,
-            status:'PENDING_ONBOARDING',
+            status:'ACTIVE',
             companyId:invite.companyId
         })
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        await this.companyRepo.assignOwnerAdmin(invite.companyId, user.id)
+        if(invite.role==='COMPANY_ADMIN'){
+          await this.companyRepo.assignOwnerAdmin(invite.companyId, user.id)
+        }
+        
         await this.inviteRepo.markAsAccepted(invite.id)
         return {
             userId: user.id,
-            companyId: invite.companyId
+            companyId: invite.companyId,
+            role:invite.role,
+            redirectTo:invite.role==='COMPANY_ADMIN'?'ONBOARDING':'DASHBOARD'
         }
     }
 }

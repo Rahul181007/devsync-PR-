@@ -8,6 +8,8 @@ import { acceptInviteQuerySchema } from "../../application/validators/invite/acc
 import { AcceptInviteUseCase } from "../../application/use-cases/invite/acceptInvite.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
+import { inviteDeveloperSchema } from "../../application/validators/invite/inviteDeveloper.validator";
+import { InviteDeveloperUseCase } from "../../application/use-cases/invite/inviteDeveloper.usecase";
 
 
 
@@ -15,7 +17,8 @@ export class InviteController {
     constructor(
         private createInviteUseCase: CreateInviteUseCase,
         private verifyInviteUseCase: VerifyInviteUseCase,
-        private acceptInviteUseCase:AcceptInviteUseCase
+        private acceptInviteUseCase:AcceptInviteUseCase,
+        private inviteDeveloperUseCase:InviteDeveloperUseCase
     ) { }
 
     createCompanyAdminInvite = async (req: Request, res: Response) => {
@@ -79,5 +82,36 @@ export class InviteController {
         } catch (error:unknown) {
             return handleError(error,res)
         }
+    }
+
+     inviteDeveloper=async(req:Request,res:Response)=>{
+      try {
+                const parsed=inviteDeveloperSchema.parse(req.body);
+
+        if(!req.user || req.user.role!=='COMPANY_ADMIN'){
+            return res.status(HttpStatus.FORBIDDEN).json({
+                message:RESPONSE_MESSAGES.AUTH.FORBIDDEN
+            })
+        }
+
+        if(!req.user.companyId){
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                message:RESPONSE_MESSAGES.COMPANY.NOT_FOUND
+            })
+        }
+        const inviter={
+            id:req.user.id,
+            role:'COMPANY_ADMIN'as const,
+            companyId:req.user.companyId
+        }
+        const result=await this.inviteDeveloperUseCase.execute({email:parsed.email},inviter)
+
+        return res.status(HttpStatus.CREATED).json({
+            message:RESPONSE_MESSAGES.INVITE.SENT,
+            data:result
+        })
+      } catch (error:unknown) {
+        return handleError(error,res)
+      }
     }
 }

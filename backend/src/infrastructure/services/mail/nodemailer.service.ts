@@ -43,4 +43,21 @@ export class NodemailerService implements IMailService {
 
         })
     }
+
+   async sendDeveloperInviteEmail(data: { to: string; inviteLink: string; companyName: string; }): Promise<void> {
+            await this.transporter.sendMail({
+            from: env.MAIL_FROM,
+            to: data.to,
+            subject: `You have invited  to ${data.companyName} as Developer`,
+            html: `
+               <p>Hello,</p>
+               <p>You have been invited to join as a <b>Developer</b>.</p>
+               <p>Click the link below to accept the invite:</p>
+               <p><a href="${data.inviteLink}">Accept Invite</a></p>
+               <p>This link will expire in 24 hours.</p>
+                  `
+
+        })
+   }
+    
 }

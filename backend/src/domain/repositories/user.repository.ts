@@ -18,4 +18,6 @@ export interface IUserRepository {
         userId:string,
         status:UserStatus
     ):Promise<void>
+
+    findDevelopersByCompany(companyId:string):Promise<User[]>
 }

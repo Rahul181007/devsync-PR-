@@ -4,4 +4,10 @@ export interface IMailService{
         to:string,
         inviteLink:string
     }):Promise<void>
+
+    sendDeveloperInviteEmail(data:{
+        to:string,
+        inviteLink:string,
+        companyName:string,
+    }):Promise<void>
 }

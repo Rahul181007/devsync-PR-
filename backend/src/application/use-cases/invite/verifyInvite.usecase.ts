@@ -22,6 +22,7 @@ export class VerifyInviteUseCase{
             throw new AppError(RESPONSE_MESSAGES.INVITE.EXPIRED,HttpStatus.GONE)
         }
         return {
+            inviteId:inviteDoc.id,
             email:inviteDoc.email,
             role:inviteDoc.role,
             companyId:inviteDoc.companyId

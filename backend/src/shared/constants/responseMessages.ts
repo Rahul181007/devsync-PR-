@@ -59,7 +59,8 @@ export const RESPONSE_MESSAGES = {
         ALREADY_ASSIGNED: 'Company admin is already assigned',
         CREATE_FAILED: 'Failed to create invite',
         UPDATED: 'Invite updated successfully',
-        VERIFICATION: 'Verification was successsful'
+        VERIFICATION: 'Verification was successsful',
+        ONLY_COMPANY_ADMIN:'Only company admin can invite  developer'
     },
     USER: {
         COMPANY_ADMIN_BLOCKED: "Company admin blocked successfully",
