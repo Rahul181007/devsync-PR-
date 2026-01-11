@@ -39,7 +39,7 @@ const Sidebar=()=>{
         </NavLink>
 
         <NavLink
-          to="/company/companies"
+          to="/company/users"
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-md transition ${
               isActive

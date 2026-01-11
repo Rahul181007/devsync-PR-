@@ -14,8 +14,8 @@ export class UserController {
         private blockCompanyAdminUseCase: BlockCompanyAdminUseCase,
         private unblockCompanyAdminUseCase: UnblockCompanyAdminUseCase,
         private listDeveloperUseCase: ListDeveloperUsecase,
-        private blockDeveloperUseCase:BlockDeveloperUseCase,
-        private unblockDeveloperUseCase:UnblockDeveloperUseCase
+        private blockDeveloperUseCase: BlockDeveloperUseCase,
+        private unblockDeveloperUseCase: UnblockDeveloperUseCase
     ) { }
     blockCompanyAdmin = async (req: Request, res: Response) => {
         try {
@@ -62,14 +62,9 @@ export class UserController {
                 })
             }
 
-            const developers = await this.listDeveloperUseCase.execute({
-                id: req.user.id,
-                role: 'COMPANY_ADMIN',
-                companyId: req.user.companyId
-            })
-            const response = developers.map(dev => ({
+            const developers = await this.listDeveloperUseCase.execute(req.user.companyId, req.query)
+            const responseItems = developers.items.map(dev => ({
                 id: dev.id,
-                companyId: dev.companyId,
                 name: dev.name,
                 email: dev.email,
                 role: dev.role,
@@ -78,82 +73,86 @@ export class UserController {
                 createdAt: dev.createdAt,
                 updatedAt: dev.updatedAt,
                 lastLoginAt: dev.lastLoginAt
+
             }))
 
             return res.status(HttpStatus.OK).json({
                 success: true,
-                data: response
+                data: {
+                    items: responseItems,
+                    pagination: developers.pagination
+                }
             })
         } catch (error: unknown) {
             return handleError(error, res)
         }
     }
 
-    blockDevelopers=async(req:Request,res:Response)=>{
+    blockDevelopers = async (req: Request, res: Response) => {
         try {
-            if(!req.user || req.user.role!=='COMPANY_ADMIN'){
+            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
                 return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.FORBIDDEN
+                    message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
                 })
             }
-            if(!req.user.companyId){
+            if (!req.user.companyId) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
-                    message:RESPONSE_MESSAGES.COMPANY.NOT_FOUND
+                    message: RESPONSE_MESSAGES.COMPANY.NOT_FOUND
                 })
             }
 
-            const {userId}=req.params;
+            const { userId } = req.params;
             if (!userId) {
                 return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.USER.USER_ID_REQUIRED })
             }
 
-            await this.blockDeveloperUseCase.execute(userId,{
-                id:req.user.id,
-                role:'COMPANY_ADMIN',
-                companyId:req.user.companyId
+            await this.blockDeveloperUseCase.execute(userId, {
+                id: req.user.id,
+                role: 'COMPANY_ADMIN',
+                companyId: req.user.companyId
             })
 
             return res.status(HttpStatus.OK).json({
-                success:true,
-                message:RESPONSE_MESSAGES.USER.DEVELOPER_BLOCKED
+                success: true,
+                message: RESPONSE_MESSAGES.USER.DEVELOPER_BLOCKED
             })
 
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 
-    unblockDeveloper=async(req:Request,res:Response)=>{
+    unblockDeveloper = async (req: Request, res: Response) => {
         try {
-            if(!req.user || req.user.role!=='COMPANY_ADMIN'){
+            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
                 return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.FORBIDDEN
+                    message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
                 })
             }
-            if(!req.user.companyId){
+            if (!req.user.companyId) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
-                    message:RESPONSE_MESSAGES.COMPANY.NOT_FOUND
+                    message: RESPONSE_MESSAGES.COMPANY.NOT_FOUND
                 })
             }
 
-            const {userId}=req.params;
-             if (!userId) {
+            const { userId } = req.params;
+            if (!userId) {
                 return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.USER.USER_ID_REQUIRED })
             }
 
-            await this.unblockDeveloperUseCase.execute(userId,{
-                id:req.user.id,
-                role:'COMPANY_ADMIN',
-                companyId:req.user.companyId
+            await this.unblockDeveloperUseCase.execute(userId, {
+                id: req.user.id,
+                role: 'COMPANY_ADMIN',
+                companyId: req.user.companyId
             })
 
             return res.status(HttpStatus.OK).json({
-                success:true,
-                message:RESPONSE_MESSAGES.USER.DEVELOPER_UNBLOCKED
+                success: true,
+                message: RESPONSE_MESSAGES.USER.DEVELOPER_UNBLOCKED
             })
 
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 }

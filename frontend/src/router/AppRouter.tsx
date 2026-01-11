@@ -32,6 +32,7 @@ import WorkspacePage from "../modules/company-admin/pages/Onboarding/WorkspacePa
 import BrandingPage from "../modules/company-admin/pages/Onboarding/BrandingPage";
 import CreateProjectPage from "../modules/company-admin/pages/Onboarding/CreateProjectPage";
 import PendingApprovalPage from "../modules/company-admin/pages/PendingApprovalPage";
+import {DevelopersPage} from "../modules/company-admin/pages/DevelopersPage";
 
 
 const AppRouter = () => {
@@ -98,6 +99,7 @@ const AppRouter = () => {
           <Route path={ROUTES.COMPANY_ADMIN.BASE} element={<CompanyAdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CompanyDashboardPage />} />
+            <Route path="users" element={<DevelopersPage/>} />
           </Route>
         </Route>
 

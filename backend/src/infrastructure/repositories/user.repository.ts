@@ -4,8 +4,9 @@ import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
 import { BaseRepository } from "./base.repository";
 
+
 export class UserRepository extends BaseRepository<IUserDocument> implements IUserRepository {
-    constructor(){
+    constructor() {
         super(UserModel)
     }
     private toDomain(doc: IUserDocument): User { //mapper
@@ -51,17 +52,37 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         await UserModel.findByIdAndUpdate(userId, { lastLoginAt: date })
     }
 
-    async updateStatus(userId: string, status:UserStatus): Promise<void> {
+    async updateStatus(userId: string, status: UserStatus): Promise<void> {
         await this.updateById(userId, { status })
     }
-async findDevelopersByCompany(companyId: string): Promise<User[]> {
-    const docs = await this.model.find({
-        companyId,
-        role: 'DEVELOPER'
-    });
+    async findDevelopersByCompany(companyId: string, options: { page: number; limit: number; search?: string; status?: UserStatus; }): Promise<{ items: User[]; total: number; }> {
+        const { page, limit, status, search } = options;
+        const filter: Record<string, unknown> = {
+            companyId,
+            role: 'DEVELOPER'
+        }
+        if (status) {
+            filter.status = status
+        }
+        if (search) {
+            filter.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]
+        }
+        const [items, total] = await Promise.all([
+            this.model
+                .find(filter)
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .sort({ createdAt: -1 }),
+            this.model.countDocuments(filter)
+        ]);
 
-    return docs.map(doc => this.toDomain(doc));
-}
+        return {
+            items: items.map(val => this.toDomain(val)),
+            total
+        }
+    }
 
-    
+
+
+
 }
