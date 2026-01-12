@@ -14,6 +14,7 @@ const AcceptInvitePage = () => {
     const [verified, setVerified] = useState(false);
     const [email, setEmail] = useState<string | null>(null);
     const [companyName, setCompanyName] = useState<string | null>(null);
+    const [role,setRole]=useState<string|null>(null);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ const AcceptInvitePage = () => {
                 const response = await inviteService.verifyInvite(token);
                 setEmail(response.data.data.email);
                 setCompanyName(response.data.data.companyName);
+                setRole(response.data.data.role)
                 setVerified(true);
             } catch(error:unknown) {
                 setError(getErrorMessage(error));
@@ -63,10 +65,16 @@ const AcceptInvitePage = () => {
                 token,
                 password,
             });
-
+            if(role==='DEVELOPER'){
+                navigate(ROUTES.AUTH.DEVELOPER_LOGIN,{
+                    state:{message:'Account created successfully.Please login'}
+                })
+            }else{
             navigate(ROUTES.AUTH.COMPANY_LOGIN, {
                 state: { message: "Account created successfully. Please login." },
             });
+            }
+
         } catch(error:unknown) {
             setError(getErrorMessage(error));
         }

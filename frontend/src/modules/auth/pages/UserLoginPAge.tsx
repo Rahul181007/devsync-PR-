@@ -13,7 +13,7 @@ const UserLoginPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const isCompanyAdminLogin=location.pathname.startsWith(ROUTES.COMPANY_ADMIN.BASE)
   const { loading, error, isAuthenticated, user } =
     useAppSelector((state) => state.auth);
 
@@ -54,6 +54,7 @@ const UserLoginPage = () => {
           onSubmit={handleSubmit}
           showForgotPassword
           onForgotPassword={handleForgotPassword}
+          showSignup={isCompanyAdminLogin}
         />
       }
     />

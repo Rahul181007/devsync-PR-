@@ -50,7 +50,7 @@ export class LoginUserUseCase {
       );
     }
 
-    // 🔑 1️⃣ SELF SIGNUP (no company yet)
+  
     if (!user.companyId) {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -71,7 +71,7 @@ export class LoginUserUseCase {
       };
     }
 
-    // 🔑 2️⃣ COMPANY EXISTS → COMPANY-DRIVEN ONBOARDING
+
     const company = await this.companyRepo.findById(user.companyId);
     if (!company) {
       throw new AppError(
@@ -80,7 +80,7 @@ export class LoginUserUseCase {
       );
     }
 
-    // 🔑 3️⃣ COMPANY ONBOARDING NOT DONE
+
     if (company.onboardingStep !== 'DONE') {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -101,7 +101,7 @@ export class LoginUserUseCase {
       };
     }
 
-    // 🔑 4️⃣ WAITING FOR APPROVAL
+
     if (company.status !== 'APPROVED') {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -122,7 +122,7 @@ export class LoginUserUseCase {
       };
     }
 
-    // 🔑 5️⃣ NORMAL LOGIN
+
     await this.userRepo.updateLastLogin(user.id, new Date());
 
     const payload = {

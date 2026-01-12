@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import { loginSchema } from "../validators/login.schema";
+import { Link } from "react-router-dom";
+import { ROUTES } from "../../../shared/constants/routes";
 
 interface LoginFormProps {
     title: string;
@@ -10,8 +12,10 @@ interface LoginFormProps {
     error?: string | null;
     onSubmit: (data: { email: string; password: string }) => void;
 
-    showForgotPassword?:boolean;
-    onForgotPassword?:()=>void
+    showForgotPassword?: boolean;
+    onForgotPassword?: () => void;
+
+    showSignup?: boolean;
 }
 
 const LoginForm = ({
@@ -21,7 +25,8 @@ const LoginForm = ({
     error,
     onSubmit,
     showForgotPassword,
-    onForgotPassword
+    onForgotPassword,
+    showSignup
 }: LoginFormProps) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -80,19 +85,31 @@ const LoginForm = ({
                 onChange={setPassword}
             />
             {showForgotPassword && (
-  <div className="text-right mb-4">
-    <button
-      type="button"
-      onClick={onForgotPassword}
-      className="text-sm text-blue-600 hover:underline"
-    >
-      Forgot password?
-    </button>
-  </div>
-)}
+                <div className="text-right mb-4">
+                    <button
+                        type="button"
+                        onClick={onForgotPassword}
+                        className="text-sm text-blue-600 hover:underline"
+                    >
+                        Forgot password?
+                    </button>
+                </div>
+            )}
 
 
             <AuthButton label="Login" loading={loading} />
+            {showSignup && (
+                <p className="text-sm text-center mt-4">
+                    Don’t have an account?{" "}
+                    <Link
+                        to={ROUTES.AUTH.COMPANY_SIGNUP}
+                        className="text-blue-600 hover:underline"
+                    >
+                        Sign up
+                    </Link>
+                </p>
+            )}
+
         </form>
     );
 };
