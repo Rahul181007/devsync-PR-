@@ -75,14 +75,14 @@ const AppRouter = () => {
         </Route>
 
         {/* ================= COMPANY ADMIN ================= */}
-        <Route path="/company/onboarding" element={<OnboardingRoute />}>
-          <Route path="/company/onboarding/workspace" element={<WorkspacePage />} />
-          <Route path="/company/onboarding/branding" element={<BrandingPage />} />
-          <Route path="/company/onboarding/project" element={<CreateProjectPage />} />
+        <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING} element={<OnboardingRoute />}>
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_WORKSPACE} element={<WorkspacePage />} />
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_BRANDING} element={<BrandingPage />} />
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_PROJECT} element={<CreateProjectPage />} />
         </Route>
 
         <Route
-          path="/company/pending-approval"
+          path={ROUTES.COMPANY_ADMIN.COMPANY_PENDING_APPROVAL}
           element={<PendingApprovalPage />}
         />
 
