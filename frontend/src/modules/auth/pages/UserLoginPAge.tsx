@@ -6,8 +6,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { setResetRole } from "../auth.slice";
-import { ROLE_ROUTES } from "../../../shared/constants/roleRoutes";
 import { ROUTES } from "../../../shared/constants/routes";
+import { USER_ROLE_ROUTES } from "../../../shared/constants/userRoleRoutes";
 
 const UserLoginPage = () => {
   const dispatch = useAppDispatch();
@@ -37,10 +37,17 @@ const UserLoginPage = () => {
   useEffect(() => {
     dispatch(clearAuthError());
   }, [dispatch]);
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-     navigate(ROLE_ROUTES[user.role].dashboard,{replace:true})
-  }, [isAuthenticated, user, navigate]);
+useEffect(() => {
+  if (!isAuthenticated || !user) return;
+  if (user.role === "SUPER_ADMIN") return;
+  const role = user.role; 
+
+  navigate(
+    USER_ROLE_ROUTES[role].dashboard(user.companySlug!),
+    { replace: true }
+  );
+}, [isAuthenticated, user, navigate]);
+
 
   return (
     <AuthLayout

@@ -65,6 +65,7 @@ export class LoginUserUseCase {
         email: user.email,
         role: user.role,
         companyId:null,
+        companySlug: null,
         requiresOnboarding: true,
         onboardingStep: 'WORKSPACE',
         accessToken
@@ -143,6 +144,7 @@ export class LoginUserUseCase {
       email: user.email,
       role: user.role,
       companyId:user.companyId,
+      companySlug:company.slug,
       onboardingStep: 'DONE',
       accessToken,
       refreshToken

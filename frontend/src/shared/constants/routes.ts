@@ -27,7 +27,8 @@ export const ROUTES={
 
     COMPANY_ADMIN: {
     BASE: "/company",
-    DASHBOARD: "/company/dashboard",
+    DASHBOARD: (slug: string) => `/company/${slug}/dashboard`,
+    USERS: (slug: string) => `/company/${slug}/users`,
     COMPANY_ONBOARDING_BRANDING:"/company/onboarding/branding",
     COMPANY_ONBOARDING_PROJECT:"/company/onboarding/project",
     COMPANY_PENDING_APPROVAL:"/company/pending-approval"
@@ -35,6 +36,6 @@ export const ROUTES={
 
   DEVELOPER: {
     BASE: "/developer",
-    DASHBOARD: "/developer/dashboard",
+    DASHBOARD: (slug: string) => `/developer/${slug}/dashboard`,
   },
 }as const

@@ -96,7 +96,7 @@ const AppRouter = () => {
             />
           }
         >
-          <Route path={ROUTES.COMPANY_ADMIN.BASE} element={<CompanyAdminLayout />}>
+          <Route path={'/company/:companySlug'} element={<CompanyAdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CompanyDashboardPage />} />
             <Route path="users" element={<DevelopersPage/>} />
@@ -112,7 +112,7 @@ const AppRouter = () => {
             />
           }
         >
-          <Route path={ROUTES.DEVELOPER.BASE} element={<DeveloperLayout />}>
+          <Route path='/developer/:companySlug' element={<DeveloperLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DevDashboard />} />
           </Route>

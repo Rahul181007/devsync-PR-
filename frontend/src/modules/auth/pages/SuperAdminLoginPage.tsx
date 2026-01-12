@@ -19,7 +19,12 @@ const SuperAdminLoginPage=()=>{
 
  useEffect(() => {
   if (isAuthenticated && user?.role === 'SUPER_ADMIN') {
-    navigate(ROLE_ROUTES[user.role].dashboard, { replace: true });
+    
+  const dashboard = ROLE_ROUTES.SUPER_ADMIN.dashboard;
+
+  if (dashboard) {
+    navigate(dashboard, { replace: true });
+  }
   }
 }, [isAuthenticated, user, navigate]);
 

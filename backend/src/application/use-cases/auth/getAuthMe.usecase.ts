@@ -42,7 +42,7 @@ export class GetAuthMeUseCase {
         let requiresOnboarding = false;
         let waitingForApproval = false;
         let onboardingStep:OnboardingStep|null=null
-        
+        let companySlug:string|null=null
         if (user.role === 'COMPANY_ADMIN') {
             if (!user.companyId) {
                 requiresOnboarding = true;
@@ -52,7 +52,7 @@ export class GetAuthMeUseCase {
                if(!company){
                 throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
                }
-
+               companySlug=company.slug;
                onboardingStep=company.onboardingStep
 
                if(company.onboardingStep!=='DONE'){
@@ -70,7 +70,8 @@ export class GetAuthMeUseCase {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                companyId: user.companyId
+                companyId: user.companyId,
+                companySlug
             },
             requiresOnboarding,
             waitingForApproval,

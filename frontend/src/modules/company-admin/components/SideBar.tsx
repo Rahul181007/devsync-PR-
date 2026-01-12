@@ -1,12 +1,15 @@
 import { NavLink,useNavigate } from "react-router-dom";
 import { LayoutDashboard,Building2,LogOut } from "lucide-react";
-import { useAppDispatch } from "../../../store/hook";
+import { useAppDispatch, useAppSelector } from "../../../store/hook";
 import { logout } from "../../auth/auth.slice";
 
 const Sidebar=()=>{
     const dispatch=useAppDispatch();
     const navigate=useNavigate();
+    const {user}=useAppSelector((state)=>state.auth)
+     if (!user?.companySlug) return null;
 
+     const basePath = `/company/${user.companySlug}`;
     const handleLogout=async ()=>{
         await dispatch(logout());
         navigate('/company/login')
@@ -25,7 +28,7 @@ const Sidebar=()=>{
       {/* Navigation */}
       <nav className="space-y-1 flex-1">
         <NavLink
-          to="/company/dashboard"
+          to={`${basePath}/dashboard`}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-md transition ${
               isActive
@@ -39,7 +42,7 @@ const Sidebar=()=>{
         </NavLink>
 
         <NavLink
-          to="/company/users"
+          to={`${basePath}/users`}
           className={({ isActive }) =>
             `flex items-center gap-3 px-3 py-2 rounded-md transition ${
               isActive

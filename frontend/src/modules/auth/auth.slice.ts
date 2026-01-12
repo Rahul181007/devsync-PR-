@@ -12,7 +12,8 @@ export interface AuthUser {
     name: string;
     email: string;
     role: AuthRole;
-    companyId?: string
+    companyId?: string;
+    companySlug?: string | null
 }
 
 interface AuthState {
@@ -215,13 +216,15 @@ const authSlice = createSlice({
                 state.loading = true;
                 state.error = null;
 
-                state.requiresOnboarding = false;
-                state.waitingForApproval = false;
-                state.onboardingStep = null;
+
             })
             .addCase(userLogin.fulfilled, (state, action) => {
                 state.loading = false;
                 state.isAuthChecked = true;
+
+                state.requiresOnboarding = false;
+                state.waitingForApproval = false;
+                state.onboardingStep = null;
                 const payload = action.payload;
 
                 const user = {
@@ -229,7 +232,8 @@ const authSlice = createSlice({
                     name: payload.name ?? '',
                     email: payload.email,
                     role: payload.role,
-                    companyId: payload.companyId
+                    companyId: payload.companyId,
+                    companySlug: payload.companySlug ?? null
                 }
 
                 if (payload.requiresOnboarding) {

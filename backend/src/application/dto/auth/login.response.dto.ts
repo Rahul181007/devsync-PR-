@@ -5,7 +5,8 @@ export interface LoginResponseDTO{
     name:string;
     email:string;
     role:string;
-    companyId?:string|null
+    companyId?:string|null;
+    companySlug?:string|null;
     onboardingStep?:OnboardingStep,
     accessToken?:string;
     refreshToken?:string;
