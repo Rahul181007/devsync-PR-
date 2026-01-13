@@ -38,6 +38,9 @@ export const authApi={
        getMe(){
             return http.get<{data:MeResponse}>('/auth/me')
        },
+       refresh(){
+        return http.post('/auth/refresh')
+       },
 
        //password reset
        forgotPassword(email:string){

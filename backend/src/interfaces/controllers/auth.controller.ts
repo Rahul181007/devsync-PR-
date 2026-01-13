@@ -67,7 +67,12 @@ export class AuthController {
             const result = await this.refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
-
+               res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false,
+                path: "/",
+            });
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.TOKEN_REFRESHED,
                 accessToken: result.accessToken,
