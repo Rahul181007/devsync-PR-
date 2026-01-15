@@ -145,8 +145,6 @@ export const bootstrapAuth = createAsyncThunk<MeResponse, void, { rejectValue: s
     "auth/bootstrap",
     async (_, { rejectWithValue }) => {
         try {
-
-            await authApi.refresh();
             const res = await authApi.getMe();
 
             return res.data.data

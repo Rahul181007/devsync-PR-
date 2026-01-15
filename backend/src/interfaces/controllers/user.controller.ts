@@ -12,11 +12,11 @@ import { logger } from "../../shared/logger/logger";
 
 export class UserController {
     constructor(
-        private blockCompanyAdminUseCase: BlockCompanyAdminUseCase,
-        private unblockCompanyAdminUseCase: UnblockCompanyAdminUseCase,
-        private listDeveloperUseCase: ListDeveloperUsecase,
-        private blockDeveloperUseCase: BlockDeveloperUseCase,
-        private unblockDeveloperUseCase: UnblockDeveloperUseCase
+        private _blockCompanyAdminUseCase: BlockCompanyAdminUseCase,
+        private _unblockCompanyAdminUseCase: UnblockCompanyAdminUseCase,
+        private _listDeveloperUseCase: ListDeveloperUsecase,
+        private _blockDeveloperUseCase: BlockDeveloperUseCase,
+        private _unblockDeveloperUseCase: UnblockDeveloperUseCase
     ) { }
     blockCompanyAdmin = async (req: Request, res: Response) => {
         try {
@@ -27,7 +27,7 @@ export class UserController {
             }
             logger.info('Block company admin requested')
 
-            await this.blockCompanyAdminUseCase.execute(userId);
+            await this._blockCompanyAdminUseCase.execute(userId);
 
             logger.info('Company admin blocked successfully');
             return res.status(HttpStatus.OK).json({
@@ -48,7 +48,7 @@ export class UserController {
                 return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.USER.USER_ID_REQUIRED })
             }
             logger.info('Unblock company admin requested')
-            await this.unblockCompanyAdminUseCase.execute(userId);
+            await this._unblockCompanyAdminUseCase.execute(userId);
 
             logger.info('Company admin unblocked successfully')
             res.status(HttpStatus.OK).json({
@@ -78,7 +78,7 @@ export class UserController {
 
             logger.info('List developers requested')
 
-            const developers = await this.listDeveloperUseCase.execute(req.user.companyId, req.query)
+            const developers = await this._listDeveloperUseCase.execute(req.user.companyId, req.query)
 
             logger.info('List developers successful')
             const responseItems = developers.items.map(dev => ({
@@ -130,7 +130,7 @@ export class UserController {
 
 
             logger.info('Block developer requested')
-            await this.blockDeveloperUseCase.execute(userId, {
+            await this._blockDeveloperUseCase.execute(userId, {
                 id: req.user.id,
                 role: 'COMPANY_ADMIN',
                 companyId: req.user.companyId
@@ -171,7 +171,7 @@ export class UserController {
             }
 
             logger.info('Unblock developer requested')
-            await this.unblockDeveloperUseCase.execute(userId, {
+            await this._unblockDeveloperUseCase.execute(userId, {
                 id: req.user.id,
                 role: 'COMPANY_ADMIN',
                 companyId: req.user.companyId

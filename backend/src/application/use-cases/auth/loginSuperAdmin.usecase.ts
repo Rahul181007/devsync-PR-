@@ -8,11 +8,11 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 
 export class LoginSuperAdminUseCase {
-    constructor(private superAdminRepo: ISuperAdminRepository) { }
+    constructor(private _superAdminRepo: ISuperAdminRepository) { }
 
     async execute(data: LoginDTO): Promise<LoginResponseDTO> {
 
-        const superAdmin = await this.superAdminRepo.findByEmail(data.email);
+        const superAdmin = await this._superAdminRepo.findByEmail(data.email);
         if (!superAdmin) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED);
         }
@@ -27,7 +27,7 @@ export class LoginSuperAdminUseCase {
         }
 
         // update last login time stamp
-        await this.superAdminRepo.updateLastLogin(superAdmin.id, new Date())
+        await this._superAdminRepo.updateLastLogin(superAdmin.id, new Date())
 
         // prepare jwt payload
         const payload = {

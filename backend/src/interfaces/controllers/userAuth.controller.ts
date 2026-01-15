@@ -12,7 +12,7 @@ import { SignupUseCase } from "../../application/use-cases/auth/signup.usecase";
 
 
 export class UserAuthController {
-    constructor(private loginUserUseCase: LoginUserUseCase, private refreshTokenUseCase: RefreshTokenUseCase,
+    constructor(private _loginUserUseCase: LoginUserUseCase, private _refreshTokenUseCase: RefreshTokenUseCase,
         private signupUseCase: SignupUseCase
     ) { }
 
@@ -21,7 +21,7 @@ export class UserAuthController {
 
             const parsed = loginSchema.parse(req.body);
             logger.info(`User login attempted ${parsed.email}`);
-            const result = await this.loginUserUseCase.execute(parsed);
+            const result = await this._loginUserUseCase.execute(parsed);
 
             logger.info(`user login successful ${result.email}`)
 
@@ -33,6 +33,11 @@ export class UserAuthController {
                     secure: false,
                     path: "/",
                 })
+                res.cookie(
+                    'refresh_token',
+                    result.refreshToken,
+                    userCookieOptions
+                )
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
@@ -49,10 +54,15 @@ export class UserAuthController {
                     secure: false,
                     path: "/",
                 })
+                res.cookie(
+                    'refresh_token',
+                    result.refreshToken,
+                    userCookieOptions
+                )
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
-                    data:result
+                    data: result
                 });
 
             }

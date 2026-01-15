@@ -1,7 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 import jwt from 'jsonwebtoken';
 import { env } from "../../config/env";
-import { handleError } from "../../shared/utils/handleError";
 import { AcceessTokenPayload } from "../../shared/utils/token.util";
 
 export const verifyAccessToken = (
@@ -27,7 +26,16 @@ export const verifyAccessToken = (
     };
     next();
   } catch (error:unknown) {
-    // return res.status(401).json({ error: "Invalid or expired token" });
-    return handleError(error,res,401,"Invalid or expired token")
+  if (error instanceof jwt.TokenExpiredError) {
+    return res.status(401).json({
+      code: "ACCESS_TOKEN_EXPIRED",
+      message: "Access token expired"
+    });
+  }
+
+  return res.status(401).json({
+    code: "ACCESS_TOKEN_INVALID",
+    message: "Invalid access token"
+  });
   }
 };

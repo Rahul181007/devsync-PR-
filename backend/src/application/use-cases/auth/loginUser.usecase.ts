@@ -10,14 +10,14 @@ import { ICompanyRepository } from '../../../domain/repositories/company.reposit
 
 export class LoginUserUseCase {
   constructor(
-    private userRepo: IUserRepository,
-    private passwordHasher: IPasswordHasher,
-    private companyRepo: ICompanyRepository
-  ) {}
+    private _userRepo: IUserRepository,
+    private _passwordHasher: IPasswordHasher,
+    private _companyRepo: ICompanyRepository
+  ) { }
 
   async execute(data: LoginDTO): Promise<LoginResponseDTO> {
 
-    const user = await this.userRepo.findByEmail(data.email);
+    const user = await this._userRepo.findByEmail(data.email);
     if (!user) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,
@@ -25,7 +25,7 @@ export class LoginUserUseCase {
       );
     }
 
-    const isValid = await this.passwordHasher.compare(
+    const isValid = await this._passwordHasher.compare(
       data.password,
       user.passwordHash
     );
@@ -50,7 +50,7 @@ export class LoginUserUseCase {
       );
     }
 
-  
+
     if (!user.companyId) {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -58,22 +58,26 @@ export class LoginUserUseCase {
         companyId: null,
         onboarding: true
       });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
 
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        companyId:null,
+        companyId: null,
         companySlug: null,
         requiresOnboarding: true,
         onboardingStep: 'WORKSPACE',
-        accessToken
+        accessToken, refreshToken
       };
     }
 
 
-    const company = await this.companyRepo.findById(user.companyId);
+    const company = await this._companyRepo.findById(user.companyId);
     if (!company) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
@@ -89,16 +93,20 @@ export class LoginUserUseCase {
         companyId: user.companyId,
         onboarding: true
       });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
 
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        companyId:user.companyId,
+        companyId: user.companyId,
         requiresOnboarding: true,
         onboardingStep: company.onboardingStep,
-        accessToken
+        accessToken, refreshToken
       };
     }
 
@@ -110,21 +118,25 @@ export class LoginUserUseCase {
         companyId: user.companyId,
         onboarding: false
       });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
 
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        companyId:user.companyId,
+        companyId: user.companyId,
         waitingForApproval: true,
         onboardingStep: 'DONE',
-        accessToken
+        accessToken, refreshToken
       };
     }
 
 
-    await this.userRepo.updateLastLogin(user.id, new Date());
+    await this._userRepo.updateLastLogin(user.id, new Date());
 
     const payload = {
       sub: user.id,
@@ -143,8 +155,8 @@ export class LoginUserUseCase {
       name: user.name,
       email: user.email,
       role: user.role,
-      companyId:user.companyId,
-      companySlug:company.slug,
+      companyId: user.companyId,
+      companySlug: company.slug,
       onboardingStep: 'DONE',
       accessToken,
       refreshToken

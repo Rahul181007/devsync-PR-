@@ -9,7 +9,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
     constructor() {
         super(UserModel)
     }
-    private toDomain(doc: IUserDocument): User { //mapper
+    private _toDomain(doc: IUserDocument): User { //mapper
         return new User(
             doc._id.toString(),
             doc.companyId ? doc.companyId.toString() : null,
@@ -28,16 +28,16 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
 
     async findByEmail(email: string): Promise<User | null> {
         const doc = await this.model.findOne({ email });
-        return doc ? this.toDomain(doc) : null;
+        return doc ? this._toDomain(doc) : null;
     }
     async findById(id: string): Promise<User | null> {
         const doc = await this.model.findById(id);
-        return doc ? this.toDomain(doc) : null;
+        return doc ? this._toDomain(doc) : null;
     }
 
     async create(data: Partial<User>): Promise<User> {
         const doc = await this.model.create(data);
-        return this.toDomain(doc)
+        return this._toDomain(doc)
     }
 
     async assignCompany(userId: string, companyId: string): Promise<void> {
@@ -77,7 +77,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         ]);
 
         return {
-            items: items.map(val => this.toDomain(val)),
+            items: items.map(val => this._toDomain(val)),
             total
         }
     }

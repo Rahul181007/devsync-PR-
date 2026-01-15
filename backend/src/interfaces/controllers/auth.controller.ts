@@ -11,9 +11,9 @@ import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { GetAuthMeUseCase } from "../../application/use-cases/auth/getAuthMe.usecase";
 
 export class AuthController {
-    constructor(private loginSuperAdminUseCase: LoginSuperAdminUseCase,
-        private refreshTokenUseCase: RefreshTokenUseCase,
-        private getAuthMeUseCase: GetAuthMeUseCase
+    constructor(private _loginSuperAdminUseCase: LoginSuperAdminUseCase,
+        private _refreshTokenUseCase: RefreshTokenUseCase,
+        private _getAuthMeUseCase: GetAuthMeUseCase
     ) { }
 
     loginSuperAdmin = async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ export class AuthController {
             logger.info(`SuperAdmin login attempt:${req.body.email}`);
             const parsed = loginSchema.parse(req.body);
 
-            const result = await this.loginSuperAdminUseCase.execute(parsed);
+            const result = await this._loginSuperAdminUseCase.execute(parsed);
             logger.info(`SuperAdmin login successful: ${result.email}`)
 
             // storing accesstoken
@@ -64,7 +64,7 @@ export class AuthController {
                 return res.status(HttpStatus.BAD_REQUEST).json({ error: RESPONSE_MESSAGES.AUTH.INVALID_REFRESH_TOKEN });
             }
 
-            const result = await this.refreshTokenUseCase.execute(refreshToken);
+            const result = await this._refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
                res.cookie("accessToken", result.accessToken, {
@@ -94,7 +94,7 @@ export class AuthController {
                 });
             }
 
-            const result = await this.getAuthMeUseCase.execute(user.id, user.role);
+            const result = await this._getAuthMeUseCase.execute(user.id, user.role);
 
             return res.status(HttpStatus.OK).json({
                 data: result

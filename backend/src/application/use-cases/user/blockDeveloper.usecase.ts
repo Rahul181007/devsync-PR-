@@ -11,7 +11,7 @@ interface InvokerContext {
 
 export class BlockDeveloperUseCase{
     constructor(
-        private userRepo:IUserRepository
+        private _userRepo:IUserRepository
     ){}
 
     async execute(developerId:string,invoker:InvokerContext):Promise<void>{
@@ -19,7 +19,7 @@ export class BlockDeveloperUseCase{
             throw new AppError(RESPONSE_MESSAGES.AUTH.FORBIDDEN,HttpStatus.FORBIDDEN)
         }
 
-        const developer=await this.userRepo.findById(developerId);
+        const developer=await this._userRepo.findById(developerId);
         if(!developer){
             throw new AppError(RESPONSE_MESSAGES.USER.NOT_FOUND,HttpStatus.FORBIDDEN)
         }
@@ -31,6 +31,6 @@ export class BlockDeveloperUseCase{
         if(developer.companyId!==invoker.companyId){
             throw new AppError(RESPONSE_MESSAGES.AUTH.FORBIDDEN,HttpStatus.FORBIDDEN)
         }
-        await this.userRepo.updateStatus(developerId,'BLOCKED')
+        await this._userRepo.updateStatus(developerId,'BLOCKED')
     }
 }

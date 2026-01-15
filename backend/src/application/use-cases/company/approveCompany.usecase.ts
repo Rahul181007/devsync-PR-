@@ -5,11 +5,11 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class ApproveCompanyUseCase {
     constructor(
-        private companyRepo: ICompanyRepository
+        private _companyRepo: ICompanyRepository
     ) { }
 
     async execute(companyId: string, superAdminId: string): Promise<void> {
-        const company = await this.companyRepo.findById(companyId);
+        const company = await this._companyRepo.findById(companyId);
         if (!company) {
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
@@ -17,6 +17,6 @@ export class ApproveCompanyUseCase {
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_PENDING,HttpStatus.BAD_REQUEST)
         }
 
-        await this.companyRepo.updateStatus(company.id, 'APPROVED', superAdminId)
+        await this._companyRepo.updateStatus(company.id, 'APPROVED', superAdminId)
     }
 }

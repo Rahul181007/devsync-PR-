@@ -7,20 +7,20 @@ import { SignupDTO } from "../../dto/auth/signup.dto";
 
 export class SignupUseCase{
     constructor(
-        private userRepo:IUserRepository,
-        private passwordHasher:IPasswordHasher
+        private _userRepo:IUserRepository,
+        private _passwordHasher:IPasswordHasher
     ){}
 
     async execute(data:SignupDTO){
-        const user=await this.userRepo.findByEmail(data.email);
+        const user=await this._userRepo.findByEmail(data.email);
 
         if(user){
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_ALREADY_EXISTS,HttpStatus.CONFLICT)
         }
 
-        const passwordHash=await this.passwordHasher.hash(data.password);
+        const passwordHash=await this._passwordHasher.hash(data.password);
 
-       await this.userRepo.create({
+       await this._userRepo.create({
         name:data.name,
         email:data.email,
         passwordHash:passwordHash,

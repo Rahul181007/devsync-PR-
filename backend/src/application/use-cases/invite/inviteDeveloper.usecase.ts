@@ -16,9 +16,9 @@ interface InviterContext {
 
 export class InviteDeveloperUseCase {
     constructor(
-        private inviteRepo: IInviteRepository,
-        private mailService: IMailService,
-        private companyRepo: ICompanyRepository
+        private _inviteRepo: IInviteRepository,
+        private _mailService: IMailService,
+        private _companyRepo: ICompanyRepository
     ) { }
 
     async execute(input: InviteDeveloperInput, inviter: InviterContext) {
@@ -26,17 +26,17 @@ export class InviteDeveloperUseCase {
             throw new AppError(RESPONSE_MESSAGES.INVITE.ONLY_COMPANY_ADMIN, HttpStatus.FORBIDDEN)
         }
 
-        const company = await this.companyRepo.findById(inviter.companyId);
+        const company = await this._companyRepo.findById(inviter.companyId);
         if (!company) {
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND, HttpStatus.NOT_FOUND)
         }
 
-        const existingInvite = await this.inviteRepo.findPendingByEmailAndCompany(input.email, inviter.companyId);
+        const existingInvite = await this._inviteRepo.findPendingByEmailAndCompany(input.email, inviter.companyId);
         const token = InviteTokenUtil.generateToken();
         const expiresAt = InviteTokenUtil.generateExpiry();
 
         if (existingInvite) {
-            const updated = await this.inviteRepo.updateInvite(
+            const updated = await this._inviteRepo.updateInvite(
                 existingInvite.id,
                 token,
                 expiresAt
@@ -50,7 +50,7 @@ export class InviteDeveloperUseCase {
             }
             const inviteLink = `${env.FRONTEND_URL}/accept-invite?token=${token}`
 
-            await this.mailService.sendDeveloperInviteEmail({ to: updated.email, inviteLink, companyName: company.name });
+            await this._mailService.sendDeveloperInviteEmail({ to: updated.email, inviteLink, companyName: company.name });
 
             return {
                 id: updated.id,
@@ -59,7 +59,7 @@ export class InviteDeveloperUseCase {
             }
         }
 
-        const invite = await this.inviteRepo.create({
+        const invite = await this._inviteRepo.create({
             email: input.email,
             companyId: inviter.companyId,
             role: 'DEVELOPER',
@@ -75,7 +75,7 @@ export class InviteDeveloperUseCase {
         }
         const inviteLink = `${env.FRONTEND_URL}/accept-invite?token=${token}`
 
-        await this.mailService.sendDeveloperInviteEmail({
+        await this._mailService.sendDeveloperInviteEmail({
             to: invite.email,
             inviteLink,
             companyName: company.name

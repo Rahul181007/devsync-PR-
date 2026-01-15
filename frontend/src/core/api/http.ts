@@ -63,11 +63,12 @@ http.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && error.response?.data?.code === "ACCESS_TOKEN_EXPIRED" && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then(() => http(originalRequest));
+        }).then(() => http(originalRequest))
+          .catch(err => Promise.reject(err));;
       }
 
       originalRequest._retry = true;
@@ -78,6 +79,7 @@ http.interceptors.response.use(
         processQueue(null);
         return http(originalRequest);
       } catch (err) {
+        isRefreshing = false;
         processQueue(err);
         return Promise.reject(err);
       } finally {

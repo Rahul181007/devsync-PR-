@@ -8,7 +8,7 @@ import { logger } from "../../shared/logger/logger";
 
 export class ProjectController{
     constructor(
-        private createFirstProjectUseCase:CreateFirstProjectUseCase
+        private _createFirstProjectUseCase:CreateFirstProjectUseCase
     ){}
 
     createFirstProject=async(req:Request,res:Response)=>{
@@ -26,7 +26,7 @@ export class ProjectController{
 
             const parsed= createProjectSchema.parse(req.body)
 
-            const project =await this.createFirstProjectUseCase.execute(userId,companyId,parsed)
+            const project =await this._createFirstProjectUseCase.execute(userId,companyId,parsed)
 
             logger.info('First project created successfully');
 

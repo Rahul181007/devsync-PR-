@@ -8,9 +8,9 @@ import { HttpStatus } from "../../shared/constants/httpStatus";
 
 export class PasswordResetController{
     constructor(
-        private sendOtpUseCase:SendOtpUseCase,
-        private verifyOtpUseCase:VerifyOtpUseCase,
-        private resetPasswordUseCase:ResetPasswordUSeCase
+        private _sendOtpUseCase:SendOtpUseCase,
+        private _verifyOtpUseCase:VerifyOtpUseCase,
+        private _resetPasswordUseCase:ResetPasswordUSeCase
     ){}
 
     sendOtp=async(req:Request,res:Response)=>{
@@ -18,7 +18,7 @@ export class PasswordResetController{
             logger.info(`send otp requesterd to ${req.body.email}`)
             const {email}=req.body;
 
-            const response=await this.sendOtpUseCase.execute(email);
+            const response=await this._sendOtpUseCase.execute(email);
             logger.info('otp sendede successfully')
             return res.status(HttpStatus.OK).json(response)
             
@@ -31,7 +31,7 @@ export class PasswordResetController{
         try {
             const {email,otp}=req.body;
 
-            const response=await this.verifyOtpUseCase.execute(email,otp);
+            const response=await this._verifyOtpUseCase.execute(email,otp);
             logger.info('otp verification is successful')
             return res.status(HttpStatus.OK).json(response)
         } catch (error:unknown) {
@@ -44,7 +44,7 @@ export class PasswordResetController{
         try {
             const {email,newPassword}=req.body;
    
-            const response=await this.resetPasswordUseCase.excute(email,newPassword);
+            const response=await this._resetPasswordUseCase.excute(email,newPassword);
             logger.info('reser password was successful')
             return res.status(HttpStatus.OK).json(response)
         } catch (error:unknown) {

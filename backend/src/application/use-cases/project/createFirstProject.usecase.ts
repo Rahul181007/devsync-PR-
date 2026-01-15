@@ -9,10 +9,10 @@ import { CreateProjectDTO } from "../../dto/project/createProject.dto";
 
 export class CreateFirstProjectUseCase {
     constructor(
-        private projectRepo:IProjectRepository,
-        private projectMember:IProjectMemberRepository,
-        private companyRepo:ICompanyRepository,
-        private userRepo:IUserRepository  
+        private _projectRepo:IProjectRepository,
+        private _projectMember:IProjectMemberRepository,
+        private _companyRepo:ICompanyRepository,
+        private _userRepo:IUserRepository  
     ){}
 
      private _generateSlug(name: string): string {
@@ -24,7 +24,7 @@ export class CreateFirstProjectUseCase {
   }
 
   async execute(userId:string,companyId:string,data:CreateProjectDTO){
-    const user=await this.userRepo.findById(userId);
+    const user=await this._userRepo.findById(userId);
 
     if(!user){
         throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND)
@@ -34,18 +34,18 @@ export class CreateFirstProjectUseCase {
         throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.FORBIDDEN)
     }
 
-    const company=await this.companyRepo.findById(companyId);
+    const company=await this._companyRepo.findById(companyId);
 
     if(!company){
         throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
     }
 
-    const existing=await this.projectRepo.findByNameInCompany(companyId,data.name)
+    const existing=await this._projectRepo.findByNameInCompany(companyId,data.name)
     
     if(existing){
         throw new AppError(RESPONSE_MESSAGES.PROJECT.ALREADY_EXISTS,HttpStatus.CONFLICT)
     }
-    const project =await this.projectRepo.create({
+    const project =await this._projectRepo.create({
         companyId,
         name:data.name,
         slug:this._generateSlug(data.name),
@@ -56,14 +56,14 @@ export class CreateFirstProjectUseCase {
         createdBy:userId
     })
 
-    await this.projectMember.create({
+    await this._projectMember.create({
         projectId:project.id,
         userId,
         role:'OWNER'
     })
 
     if(company.onboardingStep==='PROJECT'){
-        await this.companyRepo.updateOnboardingStep(companyId,'DONE')
+        await this._companyRepo.updateOnboardingStep(companyId,'DONE')
     }
     return project
   } 

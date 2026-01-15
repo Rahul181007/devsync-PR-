@@ -9,7 +9,7 @@ import { ListDevelopersQuery } from "../../dto/user/listDevelopers.dto";
 
 export class ListDeveloperUsecase{
     constructor(
-        private userRepo:IUserRepository
+        private _userRepo:IUserRepository
     ){}
     async execute(companyId:string,query:ListDevelopersQuery){
         if(!companyId){
@@ -22,7 +22,7 @@ export class ListDeveloperUsecase{
         const page=Math.max(Number(query.page)||1,1);
         const limit=Math.min(Number(query.limit)||10,10);
         const {items,total}=
-        await this.userRepo.findDevelopersByCompany(companyId,{
+        await this._userRepo.findDevelopersByCompany(companyId,{
             page,
             limit,
             search:query.search,

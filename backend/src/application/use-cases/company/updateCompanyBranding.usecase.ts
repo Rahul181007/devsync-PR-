@@ -7,12 +7,12 @@ import { UpdateCompanyBrandingInput } from "../../dto/company/updateBranding.dto
 
 export class UpdateCompanyBrandingUseCase{
     constructor(
-        private companyRepo:ICompanyRepository,
-        private fileStorage:IFileStorage
+        private _companyRepo:ICompanyRepository,
+        private _fileStorage:IFileStorage
     ){}
 
     async execute(companyId:string,data:UpdateCompanyBrandingInput){
-        const company=await this.companyRepo.findById(companyId);
+        const company=await this._companyRepo.findById(companyId);
 
         if(!company){
             throw new AppError(
@@ -27,7 +27,7 @@ export class UpdateCompanyBrandingUseCase{
 
         try {
             if(data.logoFile){
-                uploadedLogoUrl=await this.fileStorage.upload({
+                uploadedLogoUrl=await this._fileStorage.upload({
                     file:data.logoFile,
                     folder:`companies/${companyId}/branding`,
                     contentType: data.logoMimeType ?? "image/jpeg",
@@ -35,21 +35,21 @@ export class UpdateCompanyBrandingUseCase{
                 logoUrl=uploadedLogoUrl
             }
 
-            await this.companyRepo.updateBranding(companyId,{
+            await this._companyRepo.updateBranding(companyId,{
                 ...(logoUrl!==undefined && {logoUrl}),
                 ...(data.themeColor!==undefined && {themeColor:data.themeColor})
             })
              
             if(company.onboardingStep==='BRANDING'){
-                await this.companyRepo.updateOnboardingStep(companyId,'PROJECT')
+                await this._companyRepo.updateOnboardingStep(companyId,'PROJECT')
             }
 
             if(data.logoFile && company.logoUrl){
-                await this.fileStorage.delete(company.logoUrl)
+                await this._fileStorage.delete(company.logoUrl)
             }
         } catch (error) {
             if(uploadedLogoUrl){
-                await this.fileStorage.delete(uploadedLogoUrl)
+                await this._fileStorage.delete(uploadedLogoUrl)
             }
             throw error
         }

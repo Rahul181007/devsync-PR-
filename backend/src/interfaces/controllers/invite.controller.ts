@@ -16,10 +16,10 @@ import { logger } from "../../shared/logger/logger";
 
 export class InviteController {
     constructor(
-        private createInviteUseCase: CreateInviteUseCase,
-        private verifyInviteUseCase: VerifyInviteUseCase,
-        private acceptInviteUseCase: AcceptInviteUseCase,
-        private inviteDeveloperUseCase: InviteDeveloperUseCase
+        private _createInviteUseCase: CreateInviteUseCase,
+        private _verifyInviteUseCase: VerifyInviteUseCase,
+        private _acceptInviteUseCase: AcceptInviteUseCase,
+        private _inviteDeveloperUseCase: InviteDeveloperUseCase
     ) { }
 
     createCompanyAdminInvite = async (req: Request, res: Response) => {
@@ -45,7 +45,7 @@ export class InviteController {
                 return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID })
             }
 
-            const result = await this.createInviteUseCase.execute(input, inviter, companyId)
+            const result = await this._createInviteUseCase.execute(input, inviter, companyId)
 
             logger.info('Company admin invite created successfully')
             return res.status(HttpStatus.CREATED).json({
@@ -67,7 +67,7 @@ export class InviteController {
             logger.info('Verify invite requested');
             const parsed = verifyInviteQuerySchema.parse({ token });
 
-            const result = await this.verifyInviteUseCase.execute(parsed.token);
+            const result = await this._verifyInviteUseCase.execute(parsed.token);
 
             logger.info('Invite verified successfully');
 
@@ -86,7 +86,7 @@ export class InviteController {
             logger.info('Accept invite requested');
 
             const parsed = acceptInviteQuerySchema.parse(req.body)
-            const result = await this.acceptInviteUseCase.execute(parsed)
+            const result = await this._acceptInviteUseCase.execute(parsed)
             logger.info('Invite accepted successfully');
 
             res.status(HttpStatus.OK).json({
@@ -123,7 +123,7 @@ export class InviteController {
                 role: 'COMPANY_ADMIN' as const,
                 companyId: req.user.companyId
             }
-            const result = await this.inviteDeveloperUseCase.execute({ email: parsed.email }, inviter)
+            const result = await this._inviteDeveloperUseCase.execute({ email: parsed.email }, inviter)
             logger.info('Developer invited successfully');
             return res.status(HttpStatus.CREATED).json({
                 message: RESPONSE_MESSAGES.INVITE.SENT,

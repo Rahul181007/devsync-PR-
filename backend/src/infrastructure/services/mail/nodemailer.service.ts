@@ -3,7 +3,7 @@ import { env } from '../../../config/env';
 import { IMailService } from '../../../domain/service/mail.service';
 
 export class NodemailerService implements IMailService {
-    private transporter = nodemailer.createTransport({
+    private _transporter = nodemailer.createTransport({
         host: env.Mail_HOST,
         port: Number(env.MAIL_PORT),
         secure: false,
@@ -14,7 +14,7 @@ export class NodemailerService implements IMailService {
     })
 
     async sendOtp(email: string, otp: string) {
-        await this.transporter.sendMail({
+        await this._transporter.sendMail({
             from: env.MAIL_FROM,
             to: email,
             subject: 'Password Reset OTP',
@@ -29,7 +29,7 @@ export class NodemailerService implements IMailService {
     }
 
     async sendCompanyAdminInviteEmail(data: { to: string; inviteLink: string; }): Promise<void> {
-        await this.transporter.sendMail({
+        await this._transporter.sendMail({
             from: env.MAIL_FROM,
             to: data.to,
             subject: 'You have invited as Company Admin',
@@ -45,7 +45,7 @@ export class NodemailerService implements IMailService {
     }
 
    async sendDeveloperInviteEmail(data: { to: string; inviteLink: string; companyName: string; }): Promise<void> {
-            await this.transporter.sendMail({
+            await this._transporter.sendMail({
             from: env.MAIL_FROM,
             to: data.to,
             subject: `You have invited  to ${data.companyName} as Developer`,

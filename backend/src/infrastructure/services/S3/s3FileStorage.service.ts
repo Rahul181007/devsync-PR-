@@ -4,10 +4,10 @@ import { IFileStorage } from "../../../domain/service/fileStorage.service";
 import { randomUUID } from "crypto";
 
 export class S3FileStorage implements IFileStorage {
-    private s3: S3Client;
+    private _s3: S3Client;
 
     constructor() {
-        this.s3 = new S3Client({
+        this._s3 = new S3Client({
             region: env.AWS_REGION,
             credentials: {
                 accessKeyId: env.AWS_ACCESS_KEY_ID,
@@ -21,7 +21,7 @@ export class S3FileStorage implements IFileStorage {
     ): Promise<string> {
         const key = `${data.folder}/${randomUUID()}`;
 
-        await this.s3.send(
+        await this._s3.send(
             new PutObjectCommand({
                 Bucket: env.AWS_BUCKET_NAME,
                 Key: key,
@@ -36,7 +36,7 @@ export class S3FileStorage implements IFileStorage {
     async delete(fileKeyOrUrl: string): Promise<void> {
         const key = this._extractKey(fileKeyOrUrl)
 
-        await this.s3.send(
+        await this._s3.send(
             new DeleteObjectCommand({
                 Bucket: env.AWS_BUCKET_NAME,
                 Key: key

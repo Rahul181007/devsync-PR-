@@ -6,11 +6,11 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class BlockCompanyAdminUseCase{
     constructor(
-        private userRepo:IUserRepository
+        private _userRepo:IUserRepository
     ){}
 
     async execute(targetUserId:string){
-      const user=await this.userRepo.findById(targetUserId);
+      const user=await this._userRepo.findById(targetUserId);
       if(!user){
         throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
       }
@@ -20,7 +20,7 @@ export class BlockCompanyAdminUseCase{
       if(user.status==='BLOCKED'){
         throw new AppError(RESPONSE_MESSAGES.AUTH.ALREADY_BLOCKED,HttpStatus.BAD_REQUEST)
       }
-      await this.userRepo.updateStatus(targetUserId,'BLOCKED')
+      await this._userRepo.updateStatus(targetUserId,'BLOCKED')
 
     }
 }

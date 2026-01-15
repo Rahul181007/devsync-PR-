@@ -5,11 +5,11 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class GetMyCompanyUseCase{
     constructor(
-        private companyRepo:ICompanyRepository
+        private _companyRepo:ICompanyRepository
     ){}
 
     async execute(companyId:string){
-        const company=await this.companyRepo.findById(companyId)
+        const company=await this._companyRepo.findById(companyId)
 
         if(!company){
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)

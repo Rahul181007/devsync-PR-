@@ -5,11 +5,11 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class UnblockCompanyAdminUseCase{
     constructor(
-        private userRepo:IUserRepository
+        private _userRepo:IUserRepository
     ){}
 
     async execute(targetUserId:string){
-        const user=await this.userRepo.findById(targetUserId);
+        const user=await this._userRepo.findById(targetUserId);
         if(!user){
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
         }
@@ -19,6 +19,6 @@ export class UnblockCompanyAdminUseCase{
         if(user.status==='ACTIVE'){
             throw new AppError(RESPONSE_MESSAGES.AUTH.ALREADY_ACTIVE,HttpStatus.BAD_REQUEST)
         }
-        await this.userRepo.updateStatus(targetUserId,'ACTIVE')
+        await this._userRepo.updateStatus(targetUserId,'ACTIVE')
     }
 }

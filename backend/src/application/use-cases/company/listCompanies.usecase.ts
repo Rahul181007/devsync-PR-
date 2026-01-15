@@ -5,20 +5,20 @@ import { ListCompaniesQuery } from "../../dto/company/listCompanies.dto";
 
 export class ListCompaniesUseCase{
     constructor(
-        private companyRepo:ICompanyRepository,
-        private inviteRepo:IInviteRepository,
-        private userRepo:IUserRepository
+        private _companyRepo:ICompanyRepository,
+        private _inviteRepo:IInviteRepository,
+        private _userRepo:IUserRepository
     ){}
 
    async execute(query: ListCompaniesQuery) {
-  const result = await this.companyRepo.findAll(query);
+  const result = await this._companyRepo.findAll(query);
 
   const items = await Promise.all(
     result.items.map(async (company) => {
       let admin = undefined;
 
       if (company.ownerAdminId) {
-        const user = await this.userRepo.findById(company.ownerAdminId);
+        const user = await this._userRepo.findById(company.ownerAdminId);
         if (user) {
           admin = {
             id: user.id,
@@ -30,7 +30,7 @@ export class ListCompaniesUseCase{
 
       const hasPendingInvite =
         !company.ownerAdminId &&
-        (await this.inviteRepo.hasPendingInviteForCompany(company.id));
+        (await this._inviteRepo.hasPendingInviteForCompany(company.id));
 
       return {
         id: company.id,
