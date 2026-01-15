@@ -6,11 +6,11 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class VerifyInviteUseCase{
     constructor(
-        private inviteRepository:IInviteRepository
+        private _inviteRepository:IInviteRepository
     ){}
 
     async execute(token:string){
-        const inviteDoc=await this.inviteRepository.findByToken(token)
+        const inviteDoc=await this._inviteRepository.findByToken(token)
         if(!inviteDoc){
             throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_TOKEN,HttpStatus.CONFLICT)
         }
@@ -22,6 +22,7 @@ export class VerifyInviteUseCase{
             throw new AppError(RESPONSE_MESSAGES.INVITE.EXPIRED,HttpStatus.GONE)
         }
         return {
+            inviteId:inviteDoc.id,
             email:inviteDoc.email,
             role:inviteDoc.role,
             companyId:inviteDoc.companyId

@@ -14,9 +14,9 @@ interface InviterContext{
 }
 export class CreateInviteUseCase{
     constructor(
-        private inviteRepository:IInviteRepository,
-        private companyRepo:ICompanyRepository,
-        private mailService:IMailService
+        private _inviteRepository:IInviteRepository,
+        private _companyRepo:ICompanyRepository,
+        private _mailService:IMailService
     ){}
 
     async execute(input:CreateInviteInput,inviter:InviterContext,companyId:string){
@@ -26,25 +26,25 @@ export class CreateInviteUseCase{
       if(input.role!=='COMPANY_ADMIN'){
         throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_ROLE,HttpStatus.BAD_REQUEST)
       }
-      const company=await this.companyRepo.findById(companyId);
+      const company=await this._companyRepo.findById(companyId);
       if(!company){
         throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
       }
       if(company.ownerAdminId){
         throw new AppError(RESPONSE_MESSAGES.INVITE.ALREADY_ASSIGNED,HttpStatus.CONFLICT)
       }
-      const existingInvite=await this.inviteRepository.findPendingByEmailAndCompany(input.email,companyId)
+      const existingInvite=await this._inviteRepository.findPendingByEmailAndCompany(input.email,companyId)
       if(existingInvite){
        const newToken=InviteTokenUtil.generateToken();
        const newExipry=InviteTokenUtil.generateExpiry(24);
 
-       const updateInvite=await this.inviteRepository.updateInvite(existingInvite.id,newToken,newExipry) ;
+       const updateInvite=await this._inviteRepository.updateInvite(existingInvite.id,newToken,newExipry) ;
        if(!updateInvite){
         throw new AppError(RESPONSE_MESSAGES.INVITE.CREATE_FAILED,HttpStatus.INTERNAL_SERVER_ERROR)
        }
         const inviteLink=`${env.FRONTEND_URL}/accept-invite?token=${newToken}`;
 
-        await this.mailService.sendCompanyAdminInviteEmail({
+        await this._mailService.sendCompanyAdminInviteEmail({
           to:existingInvite.email,
           inviteLink
         })
@@ -60,7 +60,7 @@ export class CreateInviteUseCase{
       const token =InviteTokenUtil.generateToken();
       const expiresAt=InviteTokenUtil.generateExpiry(24);
 
-      const invite=await this.inviteRepository.create({
+      const invite=await this._inviteRepository.create({
         email:input.email,
         companyId,
         role:input.role,
@@ -72,7 +72,7 @@ export class CreateInviteUseCase{
         throw new AppError(RESPONSE_MESSAGES.INVITE.CREATE_FAILED,HttpStatus.INTERNAL_SERVER_ERROR)
       }
       const inviteLink=`${env.FRONTEND_URL}/accept-invite?token=${token}`
-      await this.mailService.sendCompanyAdminInviteEmail({
+      await this._mailService.sendCompanyAdminInviteEmail({
         to:invite.email,
         inviteLink
       })

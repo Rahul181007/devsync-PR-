@@ -7,20 +7,20 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class GetCompanyIdUseCase {
     constructor(
-        private companyRepo: ICompanyRepository,
-        private userRepo: IUserRepository,
-        private inviteRepo: IInviteRepository
+        private _companyRepo: ICompanyRepository,
+        private _userRepo: IUserRepository,
+        private _inviteRepo: IInviteRepository
     ) { }
 
     async execute(companyId: string) {
-        const company = await this.companyRepo.findById(companyId);
+        const company = await this._companyRepo.findById(companyId);
         console.log(company)
         if (!company) {
             throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND);
         }
         let admin = undefined;
         if (company.ownerAdminId) {
-            const user = await this.userRepo.findById(company.ownerAdminId);
+            const user = await this._userRepo.findById(company.ownerAdminId);
             if (user) {
                 admin = {
                     id: user.id,
@@ -31,7 +31,7 @@ export class GetCompanyIdUseCase {
         }
         const hasPendingInvite =
             !company.ownerAdminId &&
-            (await this.inviteRepo.hasPendingInviteForCompany(company.id));
+            (await this._inviteRepo.hasPendingInviteForCompany(company.id));
 
         return {
             id: company.id,

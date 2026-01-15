@@ -9,15 +9,15 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class GetAuthMeUseCase {
     constructor(
-        private userRepo: IUserRepository,
-        private companyRepo: ICompanyRepository,
-        private superAdminRepo: ISuperAdminRepository,
+        private _userRepo: IUserRepository,
+        private _companyRepo: ICompanyRepository,
+        private _superAdminRepo: ISuperAdminRepository,
     ) { }
 
     async execute(userId: string, role: string) {
 
         if (role === 'SUPER_ADMIN') {
-            const admin = await this.superAdminRepo.findById(userId);
+            const admin = await this._superAdminRepo.findById(userId);
             if (!admin) {
                 throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
             }
@@ -35,24 +35,24 @@ export class GetAuthMeUseCase {
             }
         }
 
-        const user = await this.userRepo.findById(userId);
+        const user = await this._userRepo.findById(userId);
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
         }
         let requiresOnboarding = false;
         let waitingForApproval = false;
         let onboardingStep:OnboardingStep|null=null
-        
+        let companySlug:string|null=null
         if (user.role === 'COMPANY_ADMIN') {
             if (!user.companyId) {
                 requiresOnboarding = true;
                 onboardingStep='WORKSPACE'
             } else {
-                const company = await this.companyRepo.findById(user.companyId)
+                const company = await this._companyRepo.findById(user.companyId)
                if(!company){
                 throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
                }
-
+               companySlug=company.slug;
                onboardingStep=company.onboardingStep
 
                if(company.onboardingStep!=='DONE'){
@@ -70,7 +70,8 @@ export class GetAuthMeUseCase {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                companyId: user.companyId
+                companyId: user.companyId,
+                companySlug
             },
             requiresOnboarding,
             waitingForApproval,

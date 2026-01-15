@@ -8,12 +8,12 @@ import { HttpStatus } from '../../../shared/constants/httpStatus';
 
 export class ResetPasswordUSeCase{
     constructor(
-        private userRepo:IUserRepository,
-        private passwordResetRepo:IPasswordResetRepository
+        private _userRepo:IUserRepository,
+        private _passwordResetRepo:IPasswordResetRepository
     ){}
 
     async excute (email:string,newPassword:string){
-        const user = await this.userRepo.findByEmail(email);
+        const user = await this._userRepo.findByEmail(email);
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
         }        
@@ -21,10 +21,10 @@ export class ResetPasswordUSeCase{
         const hashedPassword=await bcrypt.hash(newPassword,10);
    
         // update user Password
-        await this.userRepo.updatePassword(user.id,hashedPassword);
+        await this._userRepo.updatePassword(user.id,hashedPassword);
 
         // remove all otps for the email
-        await this.passwordResetRepo.deleteByEmail(email)
+        await this._passwordResetRepo.deleteByEmail(email)
 
         return {message:RESPONSE_MESSAGES.AUTH.PASSWORD_RESET_SUCCESS}
     }

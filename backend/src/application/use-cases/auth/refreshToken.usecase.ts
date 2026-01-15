@@ -13,7 +13,7 @@ interface RefreshTokenPayload{
 }
 
 export class RefreshTokenUseCase{
-  constructor(private readonly superadminrepo:ISuperAdminRepository,private readonly userRepo:IUserRepository){}
+  constructor(private readonly _superadminrepo:ISuperAdminRepository,private readonly _userRepo:IUserRepository){}
 
   async execute(refreshToken:string){
     
@@ -30,7 +30,7 @@ export class RefreshTokenUseCase{
 
     switch(decoded.role){
         case 'SUPER_ADMIN':{
-        const superAdmin=await this.superadminrepo.findById(decoded.sub)
+        const superAdmin=await this._superadminrepo.findById(decoded.sub)
         if(!superAdmin)break;
         user={
             id:superAdmin.id,
@@ -40,7 +40,7 @@ export class RefreshTokenUseCase{
     }
         case 'COMPANY_ADMIN':
         case 'DEVELOPER':{
-          const  CDuser=await this.userRepo.findById(decoded.sub);
+          const  CDuser=await this._userRepo.findById(decoded.sub);
           if(!CDuser) break;
           user={
             id:CDuser.id,

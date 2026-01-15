@@ -7,7 +7,7 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 
 export class CreateCompanyUseCase{
     constructor(
-        private companyRepo:ICompanyRepository,
+        private _companyRepo:ICompanyRepository,
     ){}
     // local created we will replace it as utility function after the if we want to re use it
      private _generateSlug(name:string):string{
@@ -22,19 +22,19 @@ export class CreateCompanyUseCase{
        const normalizedName = input.name.trim().toLowerCase();
         const normalizedDomain = input.domain? input.domain.trim().toLowerCase(): undefined;
         const normalizedAdminEmail=input.adminEmail? input.adminEmail.trim().toLowerCase():undefined;
-       const company =await this.companyRepo.findByName(normalizedName)
+       const company =await this._companyRepo.findByName(normalizedName)
        if(company){
         throw new AppError(RESPONSE_MESSAGES.COMPANY.ALREADY_EXISTS,HttpStatus.CONFLICT)
        }
 
      if (normalizedDomain) {
-        const domain = await this.companyRepo.findByDomain(normalizedDomain);
+        const domain = await this._companyRepo.findByDomain(normalizedDomain);
        if (domain) {
         throw new AppError(RESPONSE_MESSAGES.COMPANY.DOMAIN_ALREADY_EXISTS, HttpStatus.CONFLICT);
        }
       }
      if(normalizedAdminEmail){
-       const isAdminMail=await this.companyRepo.findByEmail(normalizedAdminEmail)
+       const isAdminMail=await this._companyRepo.findByEmail(normalizedAdminEmail)
        if(isAdminMail){
         throw new AppError(RESPONSE_MESSAGES.COMPANY.ADMIN_EMAIL_ALREADY_EXISTS,HttpStatus.CONFLICT)
        }
@@ -42,7 +42,7 @@ export class CreateCompanyUseCase{
       
        const slug= this._generateSlug(input.name)
        
-       const newCompany=await this.companyRepo.create({
+       const newCompany=await this._companyRepo.create({
         name:input.name,
         slug,
         domain:normalizedDomain,

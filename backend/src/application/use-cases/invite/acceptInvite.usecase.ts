@@ -9,14 +9,14 @@ import { AcceptInviteInput } from "../../dto/invite/acceptInvite.dto";
 
 export class AcceptInviteUseCase {
     constructor(
-        private inviteRepo: IInviteRepository,
-        private userRepo: IUserRepository,
-        private companyRepo: ICompanyRepository,
-        private passwordHasher: IPasswordHasher
+        private _inviteRepo: IInviteRepository,
+        private _userRepo: IUserRepository,
+        private _companyRepo: ICompanyRepository,
+        private _passwordHasher: IPasswordHasher
     ) { }
 
     async execute(input: AcceptInviteInput) {
-        const invite = await this.inviteRepo.findByToken(input.token);
+        const invite = await this._inviteRepo.findByToken(input.token);
         if (!invite) {
             throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_TOKEN, HttpStatus.BAD_REQUEST);
         }
@@ -27,7 +27,7 @@ export class AcceptInviteUseCase {
             throw new AppError(RESPONSE_MESSAGES.INVITE.EXPIRED, HttpStatus.GONE)
         }
 
-        const company = await this.companyRepo.findById(invite.companyId);
+        const company = await this._companyRepo.findById(invite.companyId);
         if (!company) {
             throw new AppError(
                 RESPONSE_MESSAGES.COMPANY.NOT_FOUND,
@@ -35,24 +35,29 @@ export class AcceptInviteUseCase {
             );
         }
         
-        const hashPassword = await this.passwordHasher.hash(input.password);
+        const hashPassword = await this._passwordHasher.hash(input.password);
 
 
-        const user = await this.userRepo.create({
+        const user = await this._userRepo.create({
             email: invite.email,
             passwordHash: hashPassword,
             role: invite.role,
-            status:'PENDING_ONBOARDING',
+            status:'ACTIVE',
             companyId:invite.companyId
         })
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        await this.companyRepo.assignOwnerAdmin(invite.companyId, user.id)
-        await this.inviteRepo.markAsAccepted(invite.id)
+        if(invite.role==='COMPANY_ADMIN'){
+          await this._companyRepo.assignOwnerAdmin(invite.companyId, user.id)
+        }
+        
+        await this._inviteRepo.markAsAccepted(invite.id)
         return {
             userId: user.id,
-            companyId: invite.companyId
+            companyId: invite.companyId,
+            role:invite.role,
+            redirectTo:invite.role==='COMPANY_ADMIN'?'ONBOARDING':'DASHBOARD'
         }
     }
 }

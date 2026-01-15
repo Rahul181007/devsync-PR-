@@ -10,14 +10,14 @@ import { ICompanyRepository } from '../../../domain/repositories/company.reposit
 
 export class LoginUserUseCase {
   constructor(
-    private userRepo: IUserRepository,
-    private passwordHasher: IPasswordHasher,
-    private companyRepo: ICompanyRepository
-  ) {}
+    private _userRepo: IUserRepository,
+    private _passwordHasher: IPasswordHasher,
+    private _companyRepo: ICompanyRepository
+  ) { }
 
   async execute(data: LoginDTO): Promise<LoginResponseDTO> {
 
-    const user = await this.userRepo.findByEmail(data.email);
+    const user = await this._userRepo.findByEmail(data.email);
     if (!user) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,
@@ -25,7 +25,7 @@ export class LoginUserUseCase {
       );
     }
 
-    const isValid = await this.passwordHasher.compare(
+    const isValid = await this._passwordHasher.compare(
       data.password,
       user.passwordHash
     );
@@ -50,7 +50,7 @@ export class LoginUserUseCase {
       );
     }
 
-    // 🔑 1️⃣ SELF SIGNUP (no company yet)
+
     if (!user.companyId) {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -58,21 +58,26 @@ export class LoginUserUseCase {
         companyId: null,
         onboarding: true
       });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
 
       return {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        companyId:null,
+        companyId: null,
+        companySlug: null,
         requiresOnboarding: true,
         onboardingStep: 'WORKSPACE',
-        accessToken
+        accessToken, refreshToken
       };
     }
 
-    // 🔑 2️⃣ COMPANY EXISTS → COMPANY-DRIVEN ONBOARDING
-    const company = await this.companyRepo.findById(user.companyId);
+
+    const company = await this._companyRepo.findById(user.companyId);
     if (!company) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND,
@@ -80,7 +85,7 @@ export class LoginUserUseCase {
       );
     }
 
-    // 🔑 3️⃣ COMPANY ONBOARDING NOT DONE
+
     if (company.onboardingStep !== 'DONE') {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
@@ -88,26 +93,9 @@ export class LoginUserUseCase {
         companyId: user.companyId,
         onboarding: true
       });
-
-      return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        companyId:user.companyId,
-        requiresOnboarding: true,
-        onboardingStep: company.onboardingStep,
-        accessToken
-      };
-    }
-
-    // 🔑 4️⃣ WAITING FOR APPROVAL
-    if (company.status !== 'APPROVED') {
-      const accessToken = Tokenutilits.generateAccessToken({
+      const refreshToken = Tokenutilits.generateRefreshToken({
         sub: user.id,
-        role: user.role,
-        companyId: user.companyId,
-        onboarding: false
+        role: user.role
       });
 
       return {
@@ -115,15 +103,40 @@ export class LoginUserUseCase {
         name: user.name,
         email: user.email,
         role: user.role,
-        companyId:user.companyId,
-        waitingForApproval: true,
-        onboardingStep: 'DONE',
-        accessToken
+        companyId: user.companyId,
+        requiresOnboarding: true,
+        onboardingStep: company.onboardingStep,
+        accessToken, refreshToken
       };
     }
 
-    // 🔑 5️⃣ NORMAL LOGIN
-    await this.userRepo.updateLastLogin(user.id, new Date());
+
+    if (company.status !== 'APPROVED') {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: user.companyId,
+        onboarding: false
+      });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+        waitingForApproval: true,
+        onboardingStep: 'DONE',
+        accessToken, refreshToken
+      };
+    }
+
+
+    await this._userRepo.updateLastLogin(user.id, new Date());
 
     const payload = {
       sub: user.id,
@@ -142,7 +155,8 @@ export class LoginUserUseCase {
       name: user.name,
       email: user.email,
       role: user.role,
-      companyId:user.companyId,
+      companyId: user.companyId,
+      companySlug: company.slug,
       onboardingStep: 'DONE',
       accessToken,
       refreshToken

@@ -3,7 +3,7 @@ import { IProjectRepository } from "../../domain/repositories/project.repository
 import { IProjectDocument, ProjectModel } from "../db/models/Project.model";
 
 export class ProjectRepository implements IProjectRepository {
-    private toDomain(doc:IProjectDocument):Project {
+    private _toDomain(doc:IProjectDocument):Project {
         return new Project(
             doc._id.toString(),
             doc.companyId.toString(),
@@ -26,7 +26,7 @@ export class ProjectRepository implements IProjectRepository {
             name
         })
 
-        return doc?this.toDomain(doc):null
+        return doc?this._toDomain(doc):null
     }
 
     async create(data:Partial<Project>):Promise<Project>{
@@ -41,6 +41,6 @@ export class ProjectRepository implements IProjectRepository {
             createdBy:data.createdBy
 
         } as Partial<IProjectDocument>)
-        return this.toDomain(doc)
+        return this._toDomain(doc)
     }
 }

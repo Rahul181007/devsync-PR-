@@ -9,7 +9,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
     constructor() {
         super(CompanyModel)
     }
-    private toEntity(companyDoc: ICompanyDocument): Company { // mapper
+    private _toEntity(companyDoc: ICompanyDocument): Company { // mapper
         return new Company(
 
             companyDoc._id.toString(),
@@ -34,18 +34,18 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
         if (!companyDoc) {
             return null
         }
-        return this.toEntity(companyDoc)
+        return this._toEntity(companyDoc)
     }
 
     async findByDomain(domain: string): Promise<Company | null> {
         const companyDoc = await CompanyModel.findOne({ domain: domain })
         if (!companyDoc) return null;
-        return this.toEntity(companyDoc)
+        return this._toEntity(companyDoc)
     }
 
     async create(data: CreateCompanyData): Promise<Company> {
         const doc = await this.model.create(data)
-        return this.toEntity(doc)
+        return this._toEntity(doc)
     }
 
     async findAll(query: ListCompaniesQuery): Promise<{ items: Company[]; total: number; }> {
@@ -61,7 +61,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
         const total = await this.count(filter)
 
         return {
-            items: items.map(val => this.toEntity(val)),
+            items: items.map(val => this._toEntity(val)),
             total
         }
     }
@@ -79,7 +79,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
         if (!company) {
             return null
         } else {
-            return this.toEntity(company)
+            return this._toEntity(company)
         }
     }
 
@@ -92,7 +92,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
 
         if (!doc) return null;
 
-        return this.toEntity(doc);
+        return this._toEntity(doc);
     }
     async updateBranding(companyId: string, data: { logoUrl?: string, themeColor?: string }): Promise<void> {
         if (Object.keys(data).length === 0) {

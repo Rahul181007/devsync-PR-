@@ -1,5 +1,6 @@
 import { AcceptInviteUseCase } from "../application/use-cases/invite/acceptInvite.usecase";
 import { CreateInviteUseCase } from "../application/use-cases/invite/createInvite.usecase";
+import { InviteDeveloperUseCase } from "../application/use-cases/invite/inviteDeveloper.usecase";
 import { VerifyInviteUseCase } from "../application/use-cases/invite/verifyInvite.usecase";
 import { CompanyRepository } from "../infrastructure/repositories/company.repository";
 import { InviteRepository } from "../infrastructure/repositories/invite.repository";
@@ -27,9 +28,10 @@ const acceptInviteUseCase=new AcceptInviteUseCase(
     companyRepository,
     passwordHasher
 )
-
+const inviteDeveloperUseCase=new InviteDeveloperUseCase(inviteRepository,mailService,companyRepository)
 export const inviteController=new InviteController(
     createInviteUseCase,
     verifyInviteUseCase,
-    acceptInviteUseCase
+    acceptInviteUseCase,
+    inviteDeveloperUseCase
 )

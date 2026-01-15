@@ -9,7 +9,7 @@ export class InviteRepository extends BaseRepository<IInviteDocument> implements
         super(InviteModel)
     }
 
-    private toEntity(inviteDoc: IInviteDocument
+    private _toEntity(inviteDoc: IInviteDocument
 
     ): Invite {
         return new Invite(
@@ -34,7 +34,7 @@ export class InviteRepository extends BaseRepository<IInviteDocument> implements
         if (!inviteDOC) {
             return null
         }
-        return this.toEntity(inviteDOC)
+        return this._toEntity(inviteDOC)
     }
     async create(data: InviteData): Promise<Invite> { //remove null
         const inviteDoc = await this.model.create({
@@ -45,14 +45,14 @@ export class InviteRepository extends BaseRepository<IInviteDocument> implements
             expiresAt: data.expiresAt,
             invitedBy: data.invitedBy
         })
-        return this.toEntity(inviteDoc)
+        return this._toEntity(inviteDoc)
     }
     async findByToken(token: string): Promise<Invite | null> {
         const inviteDoc = await this.model.findOne({ token: token })
         if (!inviteDoc) {
             return null
         }
-        return this.toEntity(inviteDoc)
+        return this._toEntity(inviteDoc)
     }
 
     async markAsAccepted(inviteId: string): Promise<void> {
@@ -66,7 +66,7 @@ export class InviteRepository extends BaseRepository<IInviteDocument> implements
            
         )
 
-        return inviteDoc ? this.toEntity(inviteDoc) : null
+        return inviteDoc ? this._toEntity(inviteDoc) : null
     }
 
     async findPendingByEmailAndCompany(email: string, companyId: string): Promise<Invite | null> {
@@ -75,7 +75,7 @@ export class InviteRepository extends BaseRepository<IInviteDocument> implements
             companyId,
             status: 'PENDING'
         })
-        return invite ? this.toEntity(invite) : null
+        return invite ? this._toEntity(invite) : null
     }
     async hasPendingInviteForCompany(companyId: string): Promise<boolean> {
     return this.exists({

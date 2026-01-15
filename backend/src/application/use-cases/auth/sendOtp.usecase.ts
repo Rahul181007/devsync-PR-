@@ -8,15 +8,15 @@ import { HttpStatus } from '../../../shared/constants/httpStatus';
 
 export class SendOtpUseCase{
     constructor(
-        private useRepo:IUserRepository,
-        private passwordRepo:IPasswordResetRepository,
-        private mailService:IMailService
+        private _useRepo:IUserRepository,
+        private _passwordRepo:IPasswordResetRepository,
+        private _mailService:IMailService
     ){}
 
     async execute(email:string){
         const normalisedEmail=email.trim().toLowerCase()
 
-        const user=await this.useRepo.findByEmail(normalisedEmail);
+        const user=await this._useRepo.findByEmail(normalisedEmail);
 
         if(!user){
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
@@ -29,15 +29,15 @@ export class SendOtpUseCase{
         const expiresAt=new Date(Date.now()+5*60*1000)
 
         // remove old Otps
-        await this.passwordRepo.deleteByEmail(email);
+        await this._passwordRepo.deleteByEmail(email);
 
         //save new OTP
-        await this.passwordRepo.create({
+        await this._passwordRepo.create({
             email,
             otp,
             expiresAt
         })
-        await this.mailService.sendOtp(email,otp)
+        await this._mailService.sendOtp(email,otp)
         console.log(`OTP for ${email}: ${otp}`); // Later replace with email service
 
          return { message: RESPONSE_MESSAGES.AUTH.OTP_SENT_SUCCESS };

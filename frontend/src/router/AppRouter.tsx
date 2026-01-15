@@ -32,6 +32,7 @@ import WorkspacePage from "../modules/company-admin/pages/Onboarding/WorkspacePa
 import BrandingPage from "../modules/company-admin/pages/Onboarding/BrandingPage";
 import CreateProjectPage from "../modules/company-admin/pages/Onboarding/CreateProjectPage";
 import PendingApprovalPage from "../modules/company-admin/pages/PendingApprovalPage";
+import {DevelopersPage} from "../modules/company-admin/pages/DevelopersPage";
 
 
 const AppRouter = () => {
@@ -74,14 +75,14 @@ const AppRouter = () => {
         </Route>
 
         {/* ================= COMPANY ADMIN ================= */}
-        <Route path="/company/onboarding" element={<OnboardingRoute />}>
-          <Route path="/company/onboarding/workspace" element={<WorkspacePage />} />
-          <Route path="/company/onboarding/branding" element={<BrandingPage />} />
-          <Route path="/company/onboarding/project" element={<CreateProjectPage />} />
+        <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING} element={<OnboardingRoute />}>
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_WORKSPACE} element={<WorkspacePage />} />
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_BRANDING} element={<BrandingPage />} />
+          <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING_PROJECT} element={<CreateProjectPage />} />
         </Route>
 
         <Route
-          path="/company/pending-approval"
+          path={ROUTES.COMPANY_ADMIN.COMPANY_PENDING_APPROVAL}
           element={<PendingApprovalPage />}
         />
 
@@ -95,9 +96,10 @@ const AppRouter = () => {
             />
           }
         >
-          <Route path={ROUTES.COMPANY_ADMIN.BASE} element={<CompanyAdminLayout />}>
+          <Route path={'/company/:companySlug'} element={<CompanyAdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CompanyDashboardPage />} />
+            <Route path="users" element={<DevelopersPage/>} />
           </Route>
         </Route>
 
@@ -110,7 +112,7 @@ const AppRouter = () => {
             />
           }
         >
-          <Route path={ROUTES.DEVELOPER.BASE} element={<DeveloperLayout />}>
+          <Route path='/developer/:companySlug' element={<DeveloperLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DevDashboard />} />
           </Route>

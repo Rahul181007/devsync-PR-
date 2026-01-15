@@ -7,8 +7,8 @@ import { CreateWorkspaceDTO } from "../../dto/company/createWorkspace.dto";
 
 export class CreateWorkspaceUseCase {
     constructor(
-        private companyRepo: ICompanyRepository,
-        private userRepo: IUserRepository
+        private _companyRepo: ICompanyRepository,
+        private _userRepo: IUserRepository
     ) { }
 
     private _generateSlug(name: string): string {
@@ -25,7 +25,7 @@ export class CreateWorkspaceUseCase {
             ? data.domain.trim().toLowerCase()
             : undefined;
 
-        const user = await this.userRepo.findById(userId)
+        const user = await this._userRepo.findById(userId)
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
@@ -43,7 +43,7 @@ export class CreateWorkspaceUseCase {
 
         const slug = this._generateSlug(data.name)
 
-        const newCompany = await this.companyRepo.create({
+        const newCompany = await this._companyRepo.create({
             name: normalizedName,
             domain: normalizedDomain,
             slug,
@@ -53,8 +53,8 @@ export class CreateWorkspaceUseCase {
              onboardingStep: 'BRANDING',
             ownerAdminId: user.id,
         })
-        await this.userRepo.assignCompany(user.id, newCompany.id)
-        await this.userRepo.updateStatus(user.id,"ACTIVE")
+        await this._userRepo.assignCompany(user.id, newCompany.id)
+        await this._userRepo.updateStatus(user.id,"ACTIVE")
 
         return {
             userId:user.id,

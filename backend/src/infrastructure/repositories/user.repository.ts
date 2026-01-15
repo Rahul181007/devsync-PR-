@@ -4,11 +4,12 @@ import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
 import { BaseRepository } from "./base.repository";
 
+
 export class UserRepository extends BaseRepository<IUserDocument> implements IUserRepository {
-    constructor(){
+    constructor() {
         super(UserModel)
     }
-    private toDomain(doc: IUserDocument): User { //mapper
+    private _toDomain(doc: IUserDocument): User { //mapper
         return new User(
             doc._id.toString(),
             doc.companyId ? doc.companyId.toString() : null,
@@ -27,16 +28,16 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
 
     async findByEmail(email: string): Promise<User | null> {
         const doc = await this.model.findOne({ email });
-        return doc ? this.toDomain(doc) : null;
+        return doc ? this._toDomain(doc) : null;
     }
     async findById(id: string): Promise<User | null> {
         const doc = await this.model.findById(id);
-        return doc ? this.toDomain(doc) : null;
+        return doc ? this._toDomain(doc) : null;
     }
 
     async create(data: Partial<User>): Promise<User> {
         const doc = await this.model.create(data);
-        return this.toDomain(doc)
+        return this._toDomain(doc)
     }
 
     async assignCompany(userId: string, companyId: string): Promise<void> {
@@ -51,9 +52,37 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         await UserModel.findByIdAndUpdate(userId, { lastLoginAt: date })
     }
 
-    async updateStatus(userId: string, status:UserStatus): Promise<void> {
+    async updateStatus(userId: string, status: UserStatus): Promise<void> {
         await this.updateById(userId, { status })
     }
+    async findDevelopersByCompany(companyId: string, options: { page: number; limit: number; search?: string; status?: UserStatus; }): Promise<{ items: User[]; total: number; }> {
+        const { page, limit, status, search } = options;
+        const filter: Record<string, unknown> = {
+            companyId,
+            role: 'DEVELOPER'
+        }
+        if (status) {
+            filter.status = status
+        }
+        if (search) {
+            filter.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]
+        }
+        const [items, total] = await Promise.all([
+            this.model
+                .find(filter)
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .sort({ createdAt: -1 }),
+            this.model.countDocuments(filter)
+        ]);
 
-    
+        return {
+            items: items.map(val => this._toDomain(val)),
+            total
+        }
+    }
+
+
+
+
 }

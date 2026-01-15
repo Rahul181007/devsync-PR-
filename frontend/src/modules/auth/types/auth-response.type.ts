@@ -6,6 +6,7 @@ export interface LoginResponse {
     email: string;
     role: AuthRole;
     companyId?: string;
+    companySlug?:string|null;
 
     requiresOnboarding?: boolean;
     waitingForApproval?: boolean;
