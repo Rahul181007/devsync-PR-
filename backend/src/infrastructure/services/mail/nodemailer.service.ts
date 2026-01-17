@@ -60,4 +60,18 @@ export class NodemailerService implements IMailService {
         })
    }
     
+       async sendSignupOtp(email: string, otp: string) {
+        await this._transporter.sendMail({
+            from: env.MAIL_FROM,
+            to: email,
+            subject: 'SignUp Verification',
+            html: `
+            <h2>DevSync Verification</h2>
+            <p>Your OTP is</p>
+            <h1>${otp}</h1>
+            <p>THis OTP is valid for 10 minutes </p>
+            `
+
+        })
+    }
 }

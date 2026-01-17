@@ -24,6 +24,16 @@ export class LoginUserUseCase {
         HttpStatus.UNAUTHORIZED
       );
     }
+    if(user.status==='PENDING_VERIFICATION'){
+      throw new AppError(RESPONSE_MESSAGES.AUTH.OTP_NOT_VERIFIED,HttpStatus.FORBIDDEN)
+    }
+
+    if(user.authProvider==='GOOGLE'){
+      throw new AppError(RESPONSE_MESSAGES.AUTH.USE_GOOGLE_LOGIN,HttpStatus.BAD_REQUEST)
+    }
+    if(!user.passwordHash){
+      throw new  AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED)
+    }
 
     const isValid = await this._passwordHasher.compare(
       data.password,

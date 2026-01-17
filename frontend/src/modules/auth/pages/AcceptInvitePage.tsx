@@ -15,6 +15,7 @@ const AcceptInvitePage = () => {
     const [email, setEmail] = useState<string | null>(null);
     const [companyName, setCompanyName] = useState<string | null>(null);
     const [role,setRole]=useState<string|null>(null);
+    const [name,setName]=useState('');
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -46,10 +47,15 @@ const AcceptInvitePage = () => {
         try {
             setError(null);
 
+
             if (!token) {
                 setError("Invalid invite token");
                 return;
             }
+            if (!name.trim()) {
+  setError("Name is required");
+  return;
+}
 
             if (password.length < 6) {
                 setError("Password must be at least 6 characters");
@@ -64,6 +70,7 @@ const AcceptInvitePage = () => {
             await inviteService.acceptInvite({
                 token,
                 password,
+                name
             });
             if(role==='DEVELOPER'){
                 navigate(ROUTES.AUTH.DEVELOPER_LOGIN,{
@@ -149,6 +156,21 @@ const AcceptInvitePage = () => {
                 </div>
 
                 <div className="space-y-6">
+                    <div>
+  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+    Full Name
+  </label>
+  <input
+    id="name"
+    type="text"
+    required
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+    placeholder="Enter your full name"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+  />
+</div>
+
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                             Password

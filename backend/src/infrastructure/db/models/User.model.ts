@@ -1,67 +1,84 @@
-import mongoose,{Schema,Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IUserDocument extends Document{
-    companyId:mongoose.Types.ObjectId|null;
-    name:string;
-    email:string;
-    passwordHash:string;
-    role:'COMPANY_ADMIN'|'DEVELOPER';
-    avatarUrl:string|null;
-    status:"PENDING_ONBOARDING"|"ACTIVE" |'BLOCKED';
-    settings:{
-      theme?: string;
-      notificationPreferences?: Record<string, any>;
+export interface IUserDocument extends Document {
+    companyId: mongoose.Types.ObjectId | null;
+    name: string;
+    email: string;
+    passwordHash: string;
+    role: 'COMPANY_ADMIN' | 'DEVELOPER';
+    avatarUrl: string | null;
+    status: "PENDING_VERIFICATION" | "PENDING_ONBOARDING" | "ACTIVE" | 'BLOCKED';
+    authProvider: "LOCAL" | "GOOGLE";
+    otp: string | null;
+    otpExpiresAt: Date | null
+    settings: {
+        theme?: string;
+        notificationPreferences?: Record<string, unknown>;
     }
-    createdAt:Date;
-    updatedAt:Date,
-    lastLoginAt:Date|null
+    createdAt: Date;
+    updatedAt: Date,
+    lastLoginAt: Date | null
 }
 
-const UserSchema= new Schema<IUserDocument>(
+const UserSchema = new Schema<IUserDocument>(
     {
-        companyId:{
-            type:Schema.Types.ObjectId,
-            ref:'Company',
-            default:null
+        companyId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Company',
+            default: null
         },
-        name:{
-            type:String,
-            default:''
+        name: {
+            type: String,
+            default: ''
         },
-        email:{
-            type:String,
-            required:true,
-            unique:true
+        email: {
+            type: String,
+            required: true,
+            unique: true
         },
-        passwordHash:{
-            type:String,
-            required:true
+        passwordHash: {
+            type: String,
+            default: null,
         },
-        role:{
-            type:String,
-            enum:['COMPANY_ADMIN','DEVELOPER'],
-            required:true
+        role: {
+            type: String,
+            enum: ['COMPANY_ADMIN', 'DEVELOPER'],
+            required: true
         },
-        avatarUrl:{
-            type:String,
-            default:null
+        authProvider: {
+            type: String,
+            enum: ["LOCAL", "GOOGLE"],
+            required: true,
         },
-        status:{
-            type:String,
-            enum:["PENDING_ONBOARDING","ACTIVE",'BLOCKED'],
-            default :"PENDING_ONBOARDING"
+        avatarUrl: {
+            type: String,
+            default: null
         },
-        settings:{
-          theme: { type: String, default: "light" },
-          notificationPreferences: { type: Object, default: {} }, 
+        status: {
+            type: String,
+            enum: ["PENDING_VERIFICATION", "PENDING_ONBOARDING", "ACTIVE", 'BLOCKED'],
+            default: "PENDING_VERIFICATION"
         },
-        lastLoginAt:{
-            type:Date,
-            default:null
+        otp: {
+            type: String,
+            default: null,
+        },
+
+        otpExpiresAt: {
+            type: Date,
+            default: null,
+        },
+        settings: {
+            theme: { type: String, default: "light" },
+            notificationPreferences: { type: Object, default: {} },
+        },
+        lastLoginAt: {
+            type: Date,
+            default: null
         }
 
     },
-    {timestamps:true}
+    { timestamps: true }
 );
 
-export const UserModel=mongoose.model<IUserDocument>('User',UserSchema)
+export const UserModel = mongoose.model<IUserDocument>('User', UserSchema)

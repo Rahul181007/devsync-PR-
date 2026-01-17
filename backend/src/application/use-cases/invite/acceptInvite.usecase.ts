@@ -16,7 +16,17 @@ export class AcceptInviteUseCase {
     ) { }
 
     async execute(input: AcceptInviteInput) {
+
+        if (!input.name?.trim()) {
+            throw new AppError(
+                RESPONSE_MESSAGES.AUTH.NAME_REQUIRED,
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
         const invite = await this._inviteRepo.findByToken(input.token);
+
+
         if (!invite) {
             throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_TOKEN, HttpStatus.BAD_REQUEST);
         }
@@ -34,30 +44,39 @@ export class AcceptInviteUseCase {
                 HttpStatus.NOT_FOUND
             );
         }
-        
+
         const hashPassword = await this._passwordHasher.hash(input.password);
+        const existingUser = await this._userRepo.findByEmail(invite.email);
+        if (existingUser) {
+            throw new AppError(
+                RESPONSE_MESSAGES.AUTH.USER_ALREADY_EXISTS,
+                HttpStatus.CONFLICT
+            );
+        }
 
 
         const user = await this._userRepo.create({
+            name: input.name,
             email: invite.email,
             passwordHash: hashPassword,
             role: invite.role,
-            status:'ACTIVE',
-            companyId:invite.companyId
+            authProvider: 'LOCAL',
+            status: 'ACTIVE',
+            companyId: invite.companyId
         })
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        if(invite.role==='COMPANY_ADMIN'){
-          await this._companyRepo.assignOwnerAdmin(invite.companyId, user.id)
+        if (invite.role === 'COMPANY_ADMIN') {
+            await this._companyRepo.assignOwnerAdmin(invite.companyId, user.id)
         }
-        
+
         await this._inviteRepo.markAsAccepted(invite.id)
         return {
             userId: user.id,
             companyId: invite.companyId,
-            role:invite.role,
-            redirectTo:invite.role==='COMPANY_ADMIN'?'ONBOARDING':'DASHBOARD'
+            role: invite.role,
+            redirectTo: invite.role === 'COMPANY_ADMIN' ? 'ONBOARDING' : 'DASHBOARD'
         }
     }
 }

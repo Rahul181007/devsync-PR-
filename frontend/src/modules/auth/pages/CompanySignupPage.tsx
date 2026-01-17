@@ -5,6 +5,7 @@ import { clearAuthError, companySignup } from "../auth.slice";
 import { ROUTES } from "../../../shared/constants/routes";
 import AuthInput from "../components/AuthInput";
 import AuthLayout from "../components/AuthLayout";
+import GoogleSignupButton from "../components/GoogleSignupButton";
 
 
 
@@ -12,7 +13,9 @@ const CompanySignupPage = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch()
 
-    const { loading, error } = useAppSelector((state) => state.auth)
+    const { loading, error,otpSent } = useAppSelector((state) => state.auth)
+
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -23,6 +26,12 @@ const CompanySignupPage = () => {
         dispatch(clearAuthError())
     }, [dispatch])
 
+    useEffect(()=>{
+        if(otpSent){
+            navigate(ROUTES.AUTH.VERIFY_OTP,{replace:true})
+        }
+    },[otpSent,navigate])
+
     const handleSubmit = async (data: { name: string; email: string; password: string }) => {
         setLocalError(null);
         if (password !== confirmPassword) {
@@ -30,13 +39,11 @@ const CompanySignupPage = () => {
             return
         }
 
-        const res = await dispatch(
+         dispatch(
             companySignup(data)
         )
 
-        if (companySignup.fulfilled.match(res)) {
-            navigate(ROUTES.AUTH.COMPANY_LOGIN, { replace: true })
-        }
+
     }
 
 
@@ -95,6 +102,16 @@ const CompanySignupPage = () => {
                     >
                         {loading ? "Creating account..." : "Create Account"}
                     </button>
+
+                    <div className="flex items-center gap-2 my-4">
+            <div className="flex-1 h-px bg-gray-300" />
+            <span className="text-xs text-gray-400">OR</span>
+            <div className="flex-1 h-px bg-gray-300" />
+          </div>
+                    <div className="mb-4 flex justify-center">
+            <GoogleSignupButton />
+          </div>
+
                     <p className="text-sm text-center mt-4">
                         Already have an account?{" "}
                         <Link

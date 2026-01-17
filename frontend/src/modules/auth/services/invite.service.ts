@@ -3,6 +3,7 @@ import { http } from "../../../core/api/http";
 export interface AcceptInvitePayload{
     token:string;
     password:string;
+    name:string;
 }
 
 export const inviteService={

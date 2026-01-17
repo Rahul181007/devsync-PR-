@@ -9,11 +9,20 @@ import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { userCookieOptions } from "../../config/userCookieOptions";
 import { signupSchema } from "../../application/validators/auth/signup.validator";
 import { SignupUseCase } from "../../application/use-cases/auth/signup.usecase";
+import { GoogleSignupUseCase } from "../../application/use-cases/auth/google-signup.usecase";
+import { VerifySignupOtpUseCase } from "../../application/use-cases/auth/verify-signup-otp.usecase";
+import { GoogleLoginUseCase } from "../../application/use-cases/auth/google-login.usecase";
 
 
 export class UserAuthController {
-    constructor(private _loginUserUseCase: LoginUserUseCase, private _refreshTokenUseCase: RefreshTokenUseCase,
-        private signupUseCase: SignupUseCase
+    constructor(
+        private _loginUserUseCase: LoginUserUseCase,
+        private _refreshTokenUseCase: RefreshTokenUseCase,
+        private _signupUseCase: SignupUseCase,
+        private _googleSignupUseCase: GoogleSignupUseCase,
+        private _verifySignupOtpUseCase: VerifySignupOtpUseCase,
+        private _googleLoginUseCase: GoogleLoginUseCase
+
     ) { }
 
     login = async (req: Request, res: Response) => {
@@ -94,12 +103,68 @@ export class UserAuthController {
             logger.info(`User signup attempted ${req.body.email}`);
 
             const parsed = signupSchema.parse(req.body);
-            await this.signupUseCase.execute(parsed);
+            const result=await this._signupUseCase.execute(parsed);
 
             logger.info(`User signup successful ${parsed.email}`);
 
             return res.status(HttpStatus.CREATED).json({
-                message: RESPONSE_MESSAGES.AUTH.USER_CREATED
+                message: RESPONSE_MESSAGES.AUTH.USER_CREATED,
+                data:result
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+    googleSignupUseCase = async (req: Request, res: Response) => {
+        try {
+            const { idToken } = req.body;
+            const result=await this._googleSignupUseCase.execute(idToken)
+            res.status(HttpStatus.OK).json({
+                message: "OTP sent successfully. Please verify to continue",
+                data:result
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    verifySignupOtp = async (req: Request, res: Response) => {
+        try {
+            const { email, otp } = req.body;
+            await this._verifySignupOtpUseCase.execute(email, otp)
+            res.status(HttpStatus.OK).json({
+                message: RESPONSE_MESSAGES.AUTH.OTP_VERIFIED
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    googleLogin = async (req: Request, res: Response) => {
+        try {
+            const { idToken } = req.body;
+            if (!idToken) {
+                res.status(HttpStatus.BAD_REQUEST).json({
+                    message: 'idToken is required'
+                })
+                return
+            }
+
+            const result =await this._googleLoginUseCase.execute(idToken);
+            res.cookie('accessToken',result.accessToken,{
+                httpOnly:true,
+                sameSite:'lax',
+                secure:false,
+                path:'/'
+            })
+
+            res.cookie('refresh_token',result.refreshToken,userCookieOptions)
+
+
+
+            res.status(HttpStatus.OK).json({
+                message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
+                data: result
             })
         } catch (error: unknown) {
             return handleError(error, res)

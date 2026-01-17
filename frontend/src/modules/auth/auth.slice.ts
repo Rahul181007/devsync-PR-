@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi, type MeResponse } from "./services/auth.api";
 import { getErrorMessage } from "../../shared/utiils/getErrorMessage";
-import type { LoginResponse } from "./types/auth-response.type";
+import type { LoginPayload } from "./types/auth-response.type";
 
 
 export type AuthRole = 'SUPER_ADMIN' | 'COMPANY_ADMIN' | "DEVELOPER";
@@ -12,7 +12,7 @@ export interface AuthUser {
     name: string;
     email: string;
     role: AuthRole;
-    companyId?: string;
+    companyId?: string | null;
     companySlug?: string | null
 }
 
@@ -68,7 +68,7 @@ export const superAdminLogin = createAsyncThunk(
 
 // company admin & developer Login
 
-export const userLogin = createAsyncThunk<LoginResponse, { email: string; password: string }, { rejectValue: string }>(
+export const userLogin = createAsyncThunk<LoginPayload, { email: string; password: string }, { rejectValue: string }>(
     'auth/userLogin',
     async (
         data: { email: string; password: string }, { rejectWithValue }
@@ -82,11 +82,12 @@ export const userLogin = createAsyncThunk<LoginResponse, { email: string; passwo
     }
 )
 
-export const companySignup = createAsyncThunk<void, { name: string, email: string, password: string }, { rejectValue: string }>(
+export const companySignup = createAsyncThunk<{email:string}, { name: string, email: string, password: string }, { rejectValue: string }>(
     "auth/companySignup",
     async (data, { rejectWithValue }) => {
         try {
-            await authApi.signup(data)
+           const res= await authApi.signup(data)
+           return res.data.data;
         } catch (error: unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
@@ -148,6 +149,55 @@ export const bootstrapAuth = createAsyncThunk<MeResponse, void, { rejectValue: s
             const res = await authApi.getMe();
 
             return res.data.data
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
+
+export const googleSignup = createAsyncThunk<
+    {email:string}, string,
+    { rejectValue: string }
+
+>(
+    'auth/googleSignup',
+    async (idToken, { rejectWithValue }) => {
+        try {
+           const res= await authApi.googleSignup(idToken);
+            return res.data.data
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
+
+export const verifySignupOtp = createAsyncThunk<
+    void,
+    { email: string; otp: string },
+    { rejectValue: string }>
+    (
+        "auth/verifySignupOtp",
+        async (data, { rejectWithValue }) => {
+            try {
+                await authApi.verifySignupOtp(data)
+            } catch (error: unknown) {
+                return rejectWithValue(getErrorMessage(error))
+            }
+        }
+    )
+
+export const googleLogin = createAsyncThunk<
+    LoginPayload,
+    string,
+    { rejectValue: string }
+>(
+    "auth/googleLogin",
+    async (idToken, { rejectWithValue }) => {
+        try {
+            const res = await authApi.googleLogin(idToken)
+            return res.data.data;
         } catch (error: unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
@@ -324,8 +374,15 @@ const authSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(companySignup.fulfilled, (state) => {
-                state.loading = false
+            .addCase(companySignup.fulfilled, (state, action) => {
+                state.loading = false;
+                state.otpSent = true;
+                state.user = {
+                    id: '',
+                    name: '',
+                    email: action.payload.email,
+                    role: 'COMPANY_ADMIN'
+                }
             })
             .addCase(companySignup.rejected, (state, action) => {
                 state.loading = false;
@@ -354,6 +411,99 @@ const authSlice = createSlice({
                 state.loading = false;
             })
 
+
+            .addCase(googleSignup.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(googleSignup.fulfilled, (state, action) => {
+                state.loading = false;
+                state.otpSent = true;
+                state.user = {
+                    id: "",
+                    name: "",
+                    email:action.payload.email,
+                    role: "COMPANY_ADMIN",
+                };
+            })
+            .addCase(googleSignup.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string
+            })
+
+            .addCase(verifySignupOtp.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(verifySignupOtp.fulfilled, (state) => {
+                state.loading = false;
+                state.otpVerified = true;
+                state.otpSent = false;
+            })
+            .addCase(verifySignupOtp.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string
+            })
+
+            .addCase(googleLogin.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+
+
+            })
+            .addCase(googleLogin.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isAuthChecked = true;
+
+                state.requiresOnboarding = false;
+                state.waitingForApproval = false;
+                state.onboardingStep = null;
+                const payload = action.payload;
+
+                const user = {
+                    id: payload.id,
+                    name: payload.name ?? '',
+                    email: payload.email,
+                    role: payload.role,
+                    companyId: payload.companyId,
+                    companySlug: payload.companySlug ?? null
+                }
+
+                if (payload.requiresOnboarding) {
+                    state.user = user;
+                    state.isAuthenticated = true;
+                    state.requiresOnboarding = true;
+                    state.waitingForApproval = false;
+
+                    state.onboardingStep = payload.onboardingStep ?? null;
+                    return
+                }
+
+                if (payload.waitingForApproval) {
+                    state.user = user;
+                    state.isAuthenticated = true;
+                    state.requiresOnboarding = false;
+                    state.waitingForApproval = true;
+
+                    state.onboardingStep = payload.onboardingStep ?? null;
+                    return
+                }
+
+
+
+
+                state.user = user;
+                state.isAuthenticated = true;
+                state.requiresOnboarding = false;
+                state.waitingForApproval = false;
+                state.onboardingStep = null;
+            })
+            .addCase(googleLogin.rejected, (state, action) => {
+                state.loading = false;
+                state.user = null;
+                state.isAuthenticated = false
+                state.error = action.payload as string
+            })
 
 
     }
