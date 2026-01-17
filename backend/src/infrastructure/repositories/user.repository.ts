@@ -19,6 +19,9 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
             doc.role,
             doc.avatarUrl,
             doc.status,
+            doc.authProvider,
+            doc.otp,
+            doc.otpExpiresAt,
             doc.settings,
             doc.createdAt,
             doc.updatedAt,
@@ -35,10 +38,40 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         return doc ? this._toDomain(doc) : null;
     }
 
-    async create(data: Partial<User>): Promise<User> {
-        const doc = await this.model.create(data);
-        return this._toDomain(doc)
+    async create(data: {
+        companyId?: string | null;
+        name: string;
+        email: string;
+        passwordHash?: string | null;
+        role: "COMPANY_ADMIN" | "DEVELOPER";
+        authProvider: "LOCAL" | "GOOGLE";
+        avatarUrl?: string | null;
+        status: UserStatus;
+        otp?: string | null;
+        otpExpiresAt?: Date | null;
+        settings?: {
+            theme?: string;
+            notificationPreferences?: Record<string, unknown>;
+        };
+    }): Promise<User> {
+
+        const doc = await this.model.create({
+            companyId: data.companyId ?? null,
+            name: data.name,
+            email: data.email,
+            passwordHash: data.passwordHash ?? undefined, // ✅ FIX
+            role: data.role,
+            authProvider: data.authProvider,
+            avatarUrl: data.avatarUrl ?? null,
+            status: data.status,
+            otp: data.otp ?? null,
+            otpExpiresAt: data.otpExpiresAt ?? null,
+            settings: data.settings ?? {},
+        });
+
+        return this._toDomain(doc);
     }
+
 
     async assignCompany(userId: string, companyId: string): Promise<void> {
         await this.updateById(userId, { companyId })
@@ -81,7 +114,9 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
             total
         }
     }
-
+   async updateOtp(userId: string, otp: string | null, otpExpiresAt: Date | null): Promise<void> {
+       await this.updateById(userId,{otp,otpExpiresAt})
+   }
 
 
 

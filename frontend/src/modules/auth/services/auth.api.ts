@@ -14,15 +14,18 @@ export interface LoginRequest{
 }
 
 export interface LoginResponse {
-    message:string
-    data:{
-        id:string;
-        name:string;
-        email:string;
-        role:'SUPER_ADMIN'|'COMPANY_ADMIN'|'DEVELOPER'
-        companyId?:string
-    },
-    accessToken:string;
+  message: string;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    role: 'SUPER_ADMIN' | 'COMPANY_ADMIN' | 'DEVELOPER';
+    companyId?: string | null;
+    companySlug?: string | null;
+    requiresOnboarding?: boolean;
+    waitingForApproval?: boolean;
+    onboardingStep?: OnboardingStep;
+  };
 }
 
 export const authApi={
@@ -62,8 +65,21 @@ export const authApi={
        logout(){
         return http.post('/auth/logout')
        },
-       signup(data:{email:string;password:string}){
-        return http.post('/auth/signup',data)
+       signup(data:{name:string;email:string;password:string}){
+        return http.post<{data:{email:string}}>('/auth/signup',data)
+       },
+
+       googleSignup(idToken:string){
+        return http.post<{data:{email:string}}>('/auth/google/signup',{idToken})
+       },
+
+       verifySignupOtp(data:{email:string;otp:string}){
+        return http.post('/auth/verify-signup-otp',data)
+       },
+       googleLogin(idToken:string){
+        return http.post ('/auth/google/login',{idToken})
        }
+
+
         
 }

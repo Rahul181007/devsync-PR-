@@ -10,8 +10,11 @@ export const RESPONSE_MESSAGES = {
         ACCOUNT_NOT_FOUND: "Account not found",
         PASSWORD_RESET_SUCCESS: "Password reset successfully",
         OTP_SENT_SUCCESS: "OTP send successfully",
+        OTP_NOT_VERIFIED:'Otp not verified',
         INVALID_OTP: "Invalid or expired OTP",
         OTP_VERIFIED: "OTP verified",
+        OTP_ALREADY_VERIFIED:'Otp is alreafy exist',
+        OTP_EXPIRED:'Otp is expired',
         USER_CREATION_FAILED: "Failed to create user account",
         ALREADY_BLOCKED: "User is already blocked",
         ALREADY_ACTIVE: "User is already active",
@@ -27,7 +30,11 @@ export const RESPONSE_MESSAGES = {
         WAITING_FOR_APPROVAL:'Waiting for approval',
         ONBOARDING_REQUIRED:'Onboarding required',
         WORKSPACE_CREATION_NOT_ALLOWED:'Workspace creation is not allowed',
-        WORKSPACE_ALREADY_EXISTS:'Workspace is already exist'
+        WORKSPACE_ALREADY_EXISTS:'Workspace is already exist',
+        EMAIL_NOT_VERIFIED:'Email not verified',
+        USE_GOOGLE_LOGIN:'use google login',
+        USE_PASSWORD_LOGIN:'user password login',
+        NAME_REQUIRED:"Name is required"
     },
 
     COMPANY: {

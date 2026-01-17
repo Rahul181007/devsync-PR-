@@ -10,4 +10,6 @@ export interface IMailService{
         inviteLink:string,
         companyName:string,
     }):Promise<void>
+
+    sendSignupOtp(email: string, otp: string): Promise<void>;
 }

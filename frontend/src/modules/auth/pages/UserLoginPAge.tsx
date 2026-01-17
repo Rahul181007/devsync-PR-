@@ -62,6 +62,7 @@ useEffect(() => {
           showForgotPassword
           onForgotPassword={handleForgotPassword}
           showSignup={isCompanyAdminLogin}
+          showGoogleLogin={isCompanyAdminLogin}
         />
       }
     />

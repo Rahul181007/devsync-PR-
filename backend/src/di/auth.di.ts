@@ -12,4 +12,4 @@ const userRepository=new UserRepository();
 const companyRepository=new CompanyRepository()
 const loginUseCase= new LoginSuperAdminUseCase(superAdminRepo);
 const getAuthMeUseCase=new GetAuthMeUseCase(userRepository,companyRepository,superAdminRepo)
-export const authController=new AuthController(loginUseCase,refreshTokenUseCase,getAuthMeUseCase)
+export const authController=new AuthController(loginUseCase,refreshTokenUseCase,getAuthMeUseCase);

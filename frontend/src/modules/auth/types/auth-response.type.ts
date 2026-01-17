@@ -1,14 +1,13 @@
-import type { AuthRole } from "../auth.slice";
-export type OnboardingStep = 'WORKSPACE' | 'BRANDING' | 'PROJECT' | 'DONE';
-export interface LoginResponse {
-    id: string;
-    name?: string;
-    email: string;
-    role: AuthRole;
-    companyId?: string;
-    companySlug?:string|null;
+import type { OnboardingStep, AuthRole } from "../auth.slice";
 
-    requiresOnboarding?: boolean;
-    waitingForApproval?: boolean;
-    onboardingStep?: OnboardingStep;
+export interface LoginPayload {
+  id: string;
+  name: string;
+  email: string;
+  role: AuthRole;
+  companyId?: string | null;
+  companySlug?: string | null;
+  requiresOnboarding?: boolean;
+  waitingForApproval?: boolean;
+  onboardingStep?: OnboardingStep;
 }

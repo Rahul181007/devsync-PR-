@@ -15,6 +15,7 @@ export const ROUTES={
 
     ACCEPT_INVITE: "/accept-invite",
     COMPANY_SIGNUP: "/company/signup",
+    VERIFY_SIGNUP_OTP:'/company/verify'
   },
 
     SUPER_ADMIN: {

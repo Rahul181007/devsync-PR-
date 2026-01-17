@@ -13,7 +13,9 @@ import { GetAuthMeUseCase } from "../../application/use-cases/auth/getAuthMe.use
 export class AuthController {
     constructor(private _loginSuperAdminUseCase: LoginSuperAdminUseCase,
         private _refreshTokenUseCase: RefreshTokenUseCase,
-        private _getAuthMeUseCase: GetAuthMeUseCase
+        private _getAuthMeUseCase: GetAuthMeUseCase,
+
+        
     ) { }
 
     loginSuperAdmin = async (req: Request, res: Response) => {

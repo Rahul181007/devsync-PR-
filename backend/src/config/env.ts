@@ -22,7 +22,10 @@ export const env = {
   AWS_REGION: process.env.AWS_REGION as string,
   AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
-  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
+
+  //google Auth
+  GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID
 
 };
 
