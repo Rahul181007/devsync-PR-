@@ -11,6 +11,8 @@ import { CreateWorkspaceUseCase } from "../application/use-cases/company/createW
 import { GetMyCompanyUseCase } from "../application/use-cases/company/getMyCompany.usecase";
 import { UpdateCompanyBrandingUseCase } from "../application/use-cases/company/updateCompanyBranding.usecase";
 import { S3FileStorage } from "../infrastructure/services/S3/s3FileStorage.service";
+import { RejectCompanyUseCase } from "../application/use-cases/company/reject-company.usecase";
+import { ReapplyCompanyUseCase } from "../application/use-cases/company/reapplyCompany.usecase";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
@@ -25,8 +27,8 @@ const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRe
 const getCompanyByIdUseCase=new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
 const getMyCompanyUseCase=new GetMyCompanyUseCase(companyRepository)
 const updateCompanyBrandingUseCase=new UpdateCompanyBrandingUseCase(companyRepository,fileStorage);
-
-
+const rejectCompanyUseCase=new RejectCompanyUseCase(companyRepository)
+const reapplyCompanyUseCase=new ReapplyCompanyUseCase(companyRepository)
 export const companyController=new CompanyController(
     createCompanyUseCase,
     listCompaniesUseCase,
@@ -35,5 +37,7 @@ export const companyController=new CompanyController(
     getCompanyByIdUseCase,
     createWorkspaceUseCase,
     getMyCompanyUseCase,
-    updateCompanyBrandingUseCase
+    updateCompanyBrandingUseCase,
+    rejectCompanyUseCase,
+    reapplyCompanyUseCase
 );

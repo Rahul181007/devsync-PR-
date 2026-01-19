@@ -1,4 +1,4 @@
-export type CompanyStatus='PENDING'|'APPROVED'|"SUSPENDED";
+export type CompanyStatus='PENDING'|'APPROVED'|'REJECTED'|"SUSPENDED";
 export type CompanyCreatedBy ='self'|'superadmin'
 export type OnboardingStep= 'WORKSPACE'| 'BRANDING'| 'PROJECT'| 'DONE';
 
@@ -13,6 +13,8 @@ export class Company {
     public ownerAdminId?: string,
     public domain?: string,
     public approvedBy?: string,
+    public rejectionReason?: string,   
+    public reviewedAt?: Date,  
     public logoUrl?: string,
     public themeColor?: string,
     public currentPlanId?: string,

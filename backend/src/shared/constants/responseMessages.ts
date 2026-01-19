@@ -50,8 +50,10 @@ export const RESPONSE_MESSAGES = {
         NOT_APPROVED: 'Company is not approved',
         COMPANY_ID: 'Company id is required',
         WORKSPACE_CREATED:'Workspace created',
-        BRANDING_UPDATED:'Branding updated'
-
+        BRANDING_UPDATED:'Branding updated',
+        REJECTION_REASON:'"Rejection reason is required"',
+        REJECTED:'Rejected',
+        REAPPLIED:'Reapplied'
     },
 
     INVITE: {

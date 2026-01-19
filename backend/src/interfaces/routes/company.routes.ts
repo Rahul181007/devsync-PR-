@@ -10,11 +10,12 @@ router.get('/superadmin/companies',verifyAccessToken,requireRole('SUPER_ADMIN'),
 router.get('/superadmin/companies/:companyId',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.getCompanyById)
 router.patch('/superadmin/companies/:id/approve',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.approveCompany);
 router.patch('/superadmin/companies/:id/suspend',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.suspendCompany);
-
+router.post('/superadmin/companies/:id/reject',verifyAccessToken,requireRole('SUPER_ADMIN'),companyController.rejectCompany);
 
 //company- create workspace -onboarding 1
 // we have to use Onboarding middle ware with verify access token for routes other than onboarding in company
 router.post('/company/workspace',verifyAccessToken,requireRole('COMPANY_ADMIN'),companyController.createWorkspace)
 router.get('/company/me',verifyAccessToken,requireRole('COMPANY_ADMIN'),companyController.getMyCompany)
 router.patch('/company/branding',verifyAccessToken,requireRole('COMPANY_ADMIN'),upload.single('logo'),companyController.updateBranding)
+router.post('/company/reapply',verifyAccessToken,requireRole('COMPANY_ADMIN'),companyController.reapplyCompany)
 export default router
