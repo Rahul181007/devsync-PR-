@@ -9,5 +9,11 @@ export interface LoginPayload {
   companySlug?: string | null;
   requiresOnboarding?: boolean;
   waitingForApproval?: boolean;
-  onboardingStep?: OnboardingStep;
+
+  rejectedCompany?:boolean;
+  rejectionReason?:string|null;
+
+ suspendedCompany?:boolean
+
+    onboardingStep?: OnboardingStep;
 }

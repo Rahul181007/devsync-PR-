@@ -24,15 +24,15 @@ export class LoginUserUseCase {
         HttpStatus.UNAUTHORIZED
       );
     }
-    if(user.status==='PENDING_VERIFICATION'){
-      throw new AppError(RESPONSE_MESSAGES.AUTH.OTP_NOT_VERIFIED,HttpStatus.FORBIDDEN)
+    if (user.status === 'PENDING_VERIFICATION') {
+      throw new AppError(RESPONSE_MESSAGES.AUTH.OTP_NOT_VERIFIED, HttpStatus.FORBIDDEN)
     }
 
-    if(user.authProvider==='GOOGLE'){
-      throw new AppError(RESPONSE_MESSAGES.AUTH.USE_GOOGLE_LOGIN,HttpStatus.BAD_REQUEST)
+    if (user.authProvider === 'GOOGLE') {
+      throw new AppError(RESPONSE_MESSAGES.AUTH.USE_GOOGLE_LOGIN, HttpStatus.BAD_REQUEST)
     }
-    if(!user.passwordHash){
-      throw new  AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS,HttpStatus.UNAUTHORIZED)
+    if (!user.passwordHash) {
+      throw new AppError(RESPONSE_MESSAGES.AUTH.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED)
     }
 
     const isValid = await this._passwordHasher.compare(
@@ -121,7 +121,7 @@ export class LoginUserUseCase {
     }
 
 
-    if (company.status !== 'APPROVED') {
+    if (company.status === 'PENDING') {
       const accessToken = Tokenutilits.generateAccessToken({
         sub: user.id,
         role: user.role,
@@ -145,6 +145,58 @@ export class LoginUserUseCase {
       };
     }
 
+    if (company.status === 'REJECTED') {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: user.companyId,
+        onboarding: false
+      });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+
+        rejectedCompany: true,
+        rejectionReason: company.rejectionReason ?? null,
+
+        onboardingStep: 'DONE',
+        accessToken, refreshToken
+      };
+    }
+
+    if (company.status === 'SUSPENDED') {
+      const accessToken = Tokenutilits.generateAccessToken({
+        sub: user.id,
+        role: user.role,
+        companyId: user.companyId,
+        onboarding: false
+      });
+      const refreshToken = Tokenutilits.generateRefreshToken({
+        sub: user.id,
+        role: user.role
+      });
+
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+
+        suspendedCompany: true,
+
+        onboardingStep: 'DONE',
+        accessToken, refreshToken
+      };
+    }
 
     await this._userRepo.updateLastLogin(user.id, new Date());
 

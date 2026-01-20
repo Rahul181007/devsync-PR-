@@ -26,5 +26,9 @@ export const companyService={
     },
     suspendCompany:(companyId:string)=>{
         return http.patch(`/superadmin/companies/${companyId}/suspend`)
+    },
+    rejectCompany(companyId:string,reason:string){
+        return http.post(`/superadmin/companies/${companyId}/reject`,{reason})
     }
+
 }

@@ -13,7 +13,7 @@ interface CompaniesState{
     total:number;
 
     search:string;
-    status: "ALL" | "PENDING" | "APPROVED" | "SUSPENDED";
+    status: "ALL" | "PENDING" | "APPROVED"|"REJECTED"| "SUSPENDED";
 }
 
 const initialState:CompaniesState={
@@ -33,7 +33,7 @@ interface FetchCompaniesQuery {
   page: number;
   limit: number;
   search?: string;
-  status?: "PENDING" | "APPROVED" | "SUSPENDED";
+  status?: "PENDING" | "APPROVED"| "REJECTED" | "SUSPENDED";
 }
 
 
@@ -41,7 +41,7 @@ interface FetchCompaniesQuery {
 export const fetchCompanies=createAsyncThunk(
     'companies/fetch',
     async(
-        params:{page:number;limit:number;search?:string;status?:"ALL" | "PENDING" | "APPROVED" | "SUSPENDED";},{rejectWithValue}
+        params:{page:number;limit:number;search?:string;status?:"ALL" | "PENDING" | "APPROVED"|"REJECTED"| "SUSPENDED";},{rejectWithValue}
     )=>{
         try {
             const queryParams:FetchCompaniesQuery={
@@ -75,6 +75,18 @@ export const approveCompany=createAsyncThunk(
         await companyService.approveCompany(companyId);
 
         dispatch(fetchCompanies({page,limit,search}))
+    }
+)
+
+export const rejectCompany=createAsyncThunk(
+    'companies/reject',
+    async({companyId,reason,page,limit,search,status}:{companyId:string;reason:string;page:number;limit:number;search?:string;status?:"ALL" | "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";},{dispatch,rejectWithValue})=>{
+       try {
+          await companyService.rejectCompany(companyId,reason);
+          dispatch(fetchCompanies({page,limit,search,status}))
+       } catch (error:unknown) {
+        return rejectWithValue(getErrorMessage(error))
+       }
     }
 )
 

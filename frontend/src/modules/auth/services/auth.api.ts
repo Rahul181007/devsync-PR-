@@ -5,6 +5,9 @@ export interface MeResponse{
     user:AuthUser;
     requiresOnboarding: boolean;
     waitingForApproval: boolean;
+    rejectedCompany:boolean;
+    rejectionReason:string|null;
+    suspendedCompany:boolean
     onboardingStep:OnboardingStep;
 }
 
@@ -78,8 +81,13 @@ export const authApi={
        },
        googleLogin(idToken:string){
         return http.post ('/auth/google/login',{idToken})
-       }
-
+       },
+       reapplyCompany() {
+  return http.post<{ success: boolean; message: string }>(
+    "/company/reapply"
+  );
+}
+        
 
         
 }

@@ -25,6 +25,11 @@ interface AuthState {
 
     requiresOnboarding: boolean;
     waitingForApproval: boolean;
+
+    rejectedCompany: boolean;
+    rejectionReason: string | null
+
+    suspendedCompany: boolean
     onboardingStep: OnboardingStep | null;
 
     otpSent: boolean;
@@ -44,6 +49,10 @@ const initialState: AuthState = {
     isAuthChecked: false,
     requiresOnboarding: false,
     waitingForApproval: false,
+
+    rejectedCompany: false,
+    rejectionReason: null,
+    suspendedCompany: false,
     onboardingStep: null,
     otpSent: false,
     otpVerified: false,
@@ -82,12 +91,12 @@ export const userLogin = createAsyncThunk<LoginPayload, { email: string; passwor
     }
 )
 
-export const companySignup = createAsyncThunk<{email:string}, { name: string, email: string, password: string }, { rejectValue: string }>(
+export const companySignup = createAsyncThunk<{ email: string }, { name: string, email: string, password: string }, { rejectValue: string }>(
     "auth/companySignup",
     async (data, { rejectWithValue }) => {
         try {
-           const res= await authApi.signup(data)
-           return res.data.data;
+            const res = await authApi.signup(data)
+            return res.data.data;
         } catch (error: unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
@@ -100,6 +109,17 @@ export const sendForgotPasswordOtp = createAsyncThunk(
         try {
             const res = await authApi.forgotPassword(email);
             return res.data.message;
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
+export const reapplyCompany = createAsyncThunk<void, void, { rejectValue: string }>(
+    "auth/reapplyCompany",
+    async (_, { rejectWithValue }) => {
+        try {
+            await authApi.reapplyCompany();
         } catch (error: unknown) {
             return rejectWithValue(getErrorMessage(error))
         }
@@ -157,14 +177,14 @@ export const bootstrapAuth = createAsyncThunk<MeResponse, void, { rejectValue: s
 
 
 export const googleSignup = createAsyncThunk<
-    {email:string}, string,
+    { email: string }, string,
     { rejectValue: string }
 
 >(
     'auth/googleSignup',
     async (idToken, { rejectWithValue }) => {
         try {
-           const res= await authApi.googleSignup(idToken);
+            const res = await authApi.googleSignup(idToken);
             return res.data.data
         } catch (error: unknown) {
             return rejectWithValue(getErrorMessage(error))
@@ -274,6 +294,9 @@ const authSlice = createSlice({
 
                 state.requiresOnboarding = false;
                 state.waitingForApproval = false;
+                state.rejectedCompany = false;
+                state.rejectionReason = null;
+                state.suspendedCompany = false;
                 state.onboardingStep = null;
                 const payload = action.payload;
 
@@ -304,6 +327,34 @@ const authSlice = createSlice({
 
                     state.onboardingStep = payload.onboardingStep ?? null;
                     return
+                }
+                if (payload.rejectedCompany) {
+                    state.user = user;
+                    state.isAuthenticated = true;
+
+                    state.rejectedCompany = true;
+                    state.rejectionReason = payload.rejectionReason ?? null;
+
+                    state.requiresOnboarding = false;
+                    state.waitingForApproval = false;
+                    state.suspendedCompany = false;
+
+                    state.onboardingStep = 'DONE';
+                    return;
+                }
+                if (payload.suspendedCompany) {
+                    state.user = user;
+                    state.isAuthenticated = true;
+
+                    state.suspendedCompany = true;
+
+                    state.requiresOnboarding = false;
+                    state.waitingForApproval = false;
+                    state.rejectedCompany = false;
+                    state.rejectionReason = null;
+
+                    state.onboardingStep = 'DONE';
+                    return;
                 }
 
 
@@ -394,11 +445,16 @@ const authSlice = createSlice({
             })
 
             .addCase(bootstrapAuth.fulfilled, (state, action) => {
-                const { user, requiresOnboarding, waitingForApproval, onboardingStep } = action.payload;
+                const { user, requiresOnboarding, waitingForApproval, onboardingStep, rejectedCompany, rejectionReason, suspendedCompany } = action.payload;
 
                 state.user = user;
                 state.requiresOnboarding = requiresOnboarding;
                 state.waitingForApproval = waitingForApproval;
+
+                state.rejectedCompany = rejectedCompany ?? false;
+                state.rejectionReason = rejectionReason ?? null;
+                state.suspendedCompany = suspendedCompany ?? false;
+
                 state.onboardingStep = onboardingStep ?? null;
 
                 state.isAuthenticated = true;
@@ -422,7 +478,7 @@ const authSlice = createSlice({
                 state.user = {
                     id: "",
                     name: "",
-                    email:action.payload.email,
+                    email: action.payload.email,
                     role: "COMPANY_ADMIN",
                 };
             })
@@ -488,7 +544,34 @@ const authSlice = createSlice({
                     state.onboardingStep = payload.onboardingStep ?? null;
                     return
                 }
+                if (payload.rejectedCompany) {
+                    state.user = user;
+                    state.isAuthenticated = true;
 
+                    state.rejectedCompany = true;
+                    state.rejectionReason = payload.rejectionReason ?? null;
+
+                    state.requiresOnboarding = false;
+                    state.waitingForApproval = false;
+                    state.suspendedCompany = false;
+
+                    state.onboardingStep = 'DONE';
+                    return;
+                }
+                if (payload.suspendedCompany) {
+                    state.user = user;
+                    state.isAuthenticated = true;
+
+                    state.suspendedCompany = true;
+
+                    state.requiresOnboarding = false;
+                    state.waitingForApproval = false;
+                    state.rejectedCompany = false;
+                    state.rejectionReason = null;
+
+                    state.onboardingStep = 'DONE';
+                    return;
+                }
 
 
 
@@ -505,6 +588,25 @@ const authSlice = createSlice({
                 state.error = action.payload as string
             })
 
+
+            .addCase(reapplyCompany.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(reapplyCompany.fulfilled, (state) => {
+                state.loading = false;
+                state.rejectedCompany = false;
+                state.rejectionReason = null;
+                state.suspendedCompany = false;
+
+                state.waitingForApproval = true;
+                state.requiresOnboarding = false;
+                state.onboardingStep = 'DONE';
+            })
+            .addCase(reapplyCompany.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
 
     }
 })

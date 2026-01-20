@@ -32,7 +32,9 @@ import WorkspacePage from "../modules/company-admin/pages/Onboarding/WorkspacePa
 import BrandingPage from "../modules/company-admin/pages/Onboarding/BrandingPage";
 import CreateProjectPage from "../modules/company-admin/pages/Onboarding/CreateProjectPage";
 import PendingApprovalPage from "../modules/company-admin/pages/PendingApprovalPage";
-import {DevelopersPage} from "../modules/company-admin/pages/DevelopersPage";
+import { DevelopersPage } from "../modules/company-admin/pages/DevelopersPage";
+import RejectedCompanyPage from "../modules/company-admin/pages/RejectedCompanyPage";
+import SuspendedCompanyPage from "../modules/company-admin/pages/SuspendedCompanyPage";
 
 
 const AppRouter = () => {
@@ -85,6 +87,12 @@ const AppRouter = () => {
           path={ROUTES.COMPANY_ADMIN.COMPANY_PENDING_APPROVAL}
           element={<PendingApprovalPage />}
         />
+        <Route path={ROUTES.COMPANY_ADMIN.COMPANY_REJECTED} element={<RejectedCompanyPage />} />
+        <Route
+          path={ROUTES.COMPANY_ADMIN.COMPANY_SUSPENDED}
+          element={<SuspendedCompanyPage />}
+        />
+
 
 
 
@@ -99,7 +107,7 @@ const AppRouter = () => {
           <Route path={'/company/:companySlug'} element={<CompanyAdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<CompanyDashboardPage />} />
-            <Route path="users" element={<DevelopersPage/>} />
+            <Route path="users" element={<DevelopersPage />} />
           </Route>
         </Route>
 

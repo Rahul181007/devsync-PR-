@@ -14,4 +14,11 @@ export interface LoginResponseDTO{
     requiresOnboarding?:boolean;
     waitingForApproval?:boolean;
 
+ 
+  rejectedCompany?: boolean;
+  rejectionReason?: string | null;
+
+
+  suspendedCompany?: boolean;
+
 }
