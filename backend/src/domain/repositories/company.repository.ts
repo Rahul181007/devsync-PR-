@@ -36,4 +36,6 @@ export interface ICompanyRepository{
     updateBranding(companyId:string,data:{logoUrl?:string,themeColor?:string}):Promise<void>
 
     updateOnboardingStep(companyId:string,step:OnboardingStep):Promise<void>
+
+    save(company: Company): Promise<void>;
 }

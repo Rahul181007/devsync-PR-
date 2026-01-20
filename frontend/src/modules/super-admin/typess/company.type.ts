@@ -1,4 +1,4 @@
-export type CompanyStatus = 'APPROVED' | 'PENDING' | 'SUSPENDED';
+export type CompanyStatus = 'APPROVED' | 'PENDING' |'REJECTED' |'SUSPENDED';
 export type AdminStatus = 'ACTIVE' | 'BLOCKED'
 
 export interface CompanyAdmin {

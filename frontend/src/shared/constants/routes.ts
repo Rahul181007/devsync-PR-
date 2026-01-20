@@ -24,6 +24,7 @@ export const ROUTES={
     COMPANIES: "/super-admin/companies",
     COMPANY_DETAIL: (companyId: string) =>
       `/super-admin/companies/${companyId}`,
+
   },
 
     COMPANY_ADMIN: {
@@ -34,7 +35,9 @@ export const ROUTES={
     COMPANY_ONBOARDING_WORKSPACE:"/company/onboarding/workspace",
     COMPANY_ONBOARDING_BRANDING:"/company/onboarding/branding",
     COMPANY_ONBOARDING_PROJECT:"/company/onboarding/project",
-    COMPANY_PENDING_APPROVAL:"/company/pending-approval"
+    COMPANY_PENDING_APPROVAL:"/company/pending-approval",
+    COMPANY_REJECTED:'/company/rejected',
+    COMPANY_SUSPENDED:'/company/suspended'
   },
 
   DEVELOPER: {

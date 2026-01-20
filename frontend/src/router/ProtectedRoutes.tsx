@@ -1,5 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../store/hook";
+import LoadingSpinner from "../shared/components/LoadingSpinner";
+
 
 interface AppRouteProps {
   allowedRoles: ("SUPER_ADMIN" | "COMPANY_ADMIN" | "DEVELOPER")[];
@@ -15,16 +17,17 @@ const AppRoute = ({
      isAuthChecked,
      requiresOnboarding,
      waitingForApproval,
+     rejectedCompany,
+     suspendedCompany,
      onboardingStep
 
   } = useAppSelector(
     (state) => state.auth
   );
 
-
-  if (!isAuthChecked) {
-    return <div>Loading...</div>; // spinner / skeleton
-  }
+if (!isAuthChecked) {
+  return <LoadingSpinner />; 
+}
   if (!isAuthenticated || !user) {
     return <Navigate to={loginPath} replace />;
   }
@@ -32,7 +35,7 @@ if (requiresOnboarding) {
 
   
   if (!onboardingStep) {
-    return <div>Loading onboarding...</div>;
+     return <LoadingSpinner />;
   }
 
   switch (onboardingStep) {
@@ -55,6 +58,12 @@ if (requiresOnboarding) {
     return <Navigate to='/company/pending-approval' replace />
   }
 
+  if(rejectedCompany){
+     return <Navigate to="/company/rejected" replace />;
+  }
+  if (suspendedCompany) {
+    return <Navigate to="/company/suspended" replace />;
+  }
   
 
   if (!allowedRoles.includes(user.role)) {

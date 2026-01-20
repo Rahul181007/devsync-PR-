@@ -21,6 +21,8 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             companyDoc.ownerAdminId?.toString() ?? undefined,
             companyDoc.domain ?? undefined,
             companyDoc.approvedBy?.toString() ?? undefined,
+            companyDoc.rejectionReason??undefined,
+            companyDoc.reviewedAt??undefined,
             companyDoc.logoUrl ?? undefined,
             companyDoc.themeColor ?? undefined,
             companyDoc.currentPlanId?.toString() ?? undefined,
@@ -112,5 +114,14 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             { _id: companyId },
             { $set: { onboardingStep: step } }
         );
+    }
+
+    async save(company: Company): Promise<void> {
+        await this.updateById(company.id,{
+            status:company.status,
+            approvedBy:company.approvedBy??null,
+            rejectionReason:company.rejectionReason??null,
+            reviewedAt:company.reviewedAt??null
+        })
     }
 }

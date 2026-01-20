@@ -31,7 +31,10 @@ export class GetAuthMeUseCase {
                 },
                 requiresOnboarding: false,
                 waitingForApproval: false,
-                onboardingStep:null,
+                rejectedCompany: false,
+                rejectionReason: null,
+                suspendedCompany: false,
+                onboardingStep: null,
             }
         }
 
@@ -41,25 +44,34 @@ export class GetAuthMeUseCase {
         }
         let requiresOnboarding = false;
         let waitingForApproval = false;
-        let onboardingStep:OnboardingStep|null=null
-        let companySlug:string|null=null
+        let rejectedCompany = false;
+        let rejectionReason: string | null = null;
+        let suspendedCompany = false;
+        let onboardingStep: OnboardingStep | null = null
+        let companySlug: string | null = null
         if (user.role === 'COMPANY_ADMIN') {
             if (!user.companyId) {
                 requiresOnboarding = true;
-                onboardingStep='WORKSPACE'
+                onboardingStep = 'WORKSPACE'
             } else {
                 const company = await this._companyRepo.findById(user.companyId)
-               if(!company){
-                throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND,HttpStatus.NOT_FOUND)
-               }
-               companySlug=company.slug;
-               onboardingStep=company.onboardingStep
+                if (!company) {
+                    throw new AppError(RESPONSE_MESSAGES.COMPANY.NOT_FOUND, HttpStatus.NOT_FOUND)
+                }
+                companySlug = company.slug;
+                onboardingStep = company.onboardingStep
 
-               if(company.onboardingStep!=='DONE'){
-                requiresOnboarding=true;
-               }else if(company.status!=='APPROVED'){
-                waitingForApproval=true;
-               }
+                if (company.onboardingStep !== 'DONE') {
+                    requiresOnboarding = true;
+                } else if (company.status === 'PENDING') {
+                    waitingForApproval = true;
+                } else if (company.status === 'REJECTED') {
+                    rejectedCompany = true;
+                    rejectionReason = company.rejectionReason ?? null;
+                }
+                else if (company.status === 'SUSPENDED') {
+                    suspendedCompany = true;
+                }
             }
         }
 
@@ -75,6 +87,9 @@ export class GetAuthMeUseCase {
             },
             requiresOnboarding,
             waitingForApproval,
+            rejectedCompany,
+            rejectionReason,
+            suspendedCompany,
             onboardingStep
 
         }

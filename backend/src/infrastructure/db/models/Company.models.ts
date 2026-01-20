@@ -7,10 +7,12 @@ export interface ICompanyDocument extends Document {
     createdBy: 'self' | 'superadmin';
     approvedBy: mongoose.Types.ObjectId | null;
     ownerAdminId: mongoose.Types.ObjectId | null;
-    onboardingStep: 'WORKSPACE'| 'BRANDING'| 'PROJECT'| 'DONE';
+    onboardingStep: 'WORKSPACE' | 'BRANDING' | 'PROJECT' | 'DONE';
     logoUrl: string | null;
     themeColor: string | null;
-    status: 'PENDING' | 'APPROVED' | 'SUSPENDED';
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
+    rejectionReason: string | null;
+    reviewedAt: Date | null;
     currentPlanId: mongoose.Types.ObjectId | null;
     subscriptionId: mongoose.Types.ObjectId | null;
     createdAt: Date;
@@ -46,6 +48,11 @@ const companySchema = new Schema<ICompanyDocument>(
             ref: 'SuperAdmin',
             default: null
         },
+        rejectionReason: {
+            type: String,
+            default: null
+        },
+
         ownerAdminId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
@@ -66,7 +73,7 @@ const companySchema = new Schema<ICompanyDocument>(
         },
         status: {
             type: String,
-            enum: ['PENDING', 'APPROVED', 'SUSPENDED'],
+            enum: ['PENDING', 'APPROVED', "REJECTED", 'SUSPENDED'],
             default: "PENDING"
         },
         currentPlanId: {
@@ -83,7 +90,11 @@ const companySchema = new Schema<ICompanyDocument>(
         adminEmail: {
             type: String,
             default: null
-        }
+        },
+        reviewedAt: {
+            type: Date,
+            default: null
+        },
 
     },
     { timestamps: true }
