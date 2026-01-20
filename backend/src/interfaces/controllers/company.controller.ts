@@ -17,6 +17,7 @@ import { UpdateCompanyBrandingUseCase } from "../../application/use-cases/compan
 import { Tokenutilits } from "../../shared/utils/token.util";
 import { RejectCompanyUseCase } from "../../application/use-cases/company/reject-company.usecase";
 import { ReapplyCompanyUseCase } from "../../application/use-cases/company/reapplyCompany.usecase";
+import { UnsuspendCompanyUseCase } from "../../application/use-cases/company/unsuspend-company.usecase";
 
 
 
@@ -32,8 +33,9 @@ export class CompanyController {
         private _createWorkspaceUseCase: CreateWorkspaceUseCase,
         private _getMyCompanyUseCase: GetMyCompanyUseCase,
         private _updateCompanyBrandingUseCase: UpdateCompanyBrandingUseCase,
-        private _rejectCompanyUseCase:RejectCompanyUseCase,
-        private _reapplyCompanyUseCase:ReapplyCompanyUseCase,
+        private _rejectCompanyUseCase: RejectCompanyUseCase,
+        private _reapplyCompanyUseCase: ReapplyCompanyUseCase,
+        private _unsuspendCompanyUseCase: UnsuspendCompanyUseCase,
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {
@@ -141,62 +143,87 @@ export class CompanyController {
         }
     }
 
-    rejectCompany=async(req:Request,res:Response)=>{
+    unsuspendCompany = async (req: Request, res: Response) => {
         try {
-            const companyId=req.params.id;
-            const {reason}=req.body;
+            const companyId = req.params.id;
 
-            if(!companyId){
-                logger.warn("RejectCompany called without companyId");
-                return res.status(HttpStatus.BAD_REQUEST).json({
-                    message:RESPONSE_MESSAGES.COMPANY.COMPANY_ID
-                })
+            if (!companyId) {
+                logger.warn("UnSuspendCompany called without companyId");
+                return res.status(HttpStatus.BAD_REQUEST).json({ message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID });
             }
 
-            if(!req.user || !req.user.id){
-                logger.warn(`RejectCompany unauthorized attempt companyId=${companyId}`);
-                return res.status(HttpStatus.UNAUTHORIZED).json({
-                    message:RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
-                })
+            if (!req.user || !req.user.id) {
+                logger.warn(`UnSuspendCompany unauthorized attempt companyId=${companyId}`);
+                return res.status(HttpStatus.UNAUTHORIZED).json({ message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED })
             }
-        logger.info(`RejectCompany started companyId=${companyId} by superAdmin=${req.user.id}`);
-        
-        await this._rejectCompanyUseCase.execute({
-            companyId,
-            rejectedBy:req.user.id,
-            reason
-        })
-        logger.info(`RejectCompany success companyId=${companyId}`);
-
-        return res.status(HttpStatus.OK).json({
-            success:true,
-            message:RESPONSE_MESSAGES.COMPANY.REJECTED
-        })
-
-        } catch (error:unknown) {
-             logger.error(`RejectCompany failed companyId=${req.params.id}`, error);
-             return handleError(error,res)
+            await this._unsuspendCompanyUseCase.execute(companyId);
+            logger.info(`UnSuspendCompany success companyId=${companyId}`);
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: RESPONSE_MESSAGES.COMPANY.APPROVED
+            })
+        } catch (error) {
+            logger.error(`UnSuspendCompany failed companyId=${req.params.id}`, error);
+            return handleError(error, res)
         }
     }
 
-    reapplyCompany=async(req:Request,res:Response)=>{
+    rejectCompany = async (req: Request, res: Response) => {
         try {
-            const companyId=req.user?.companyId
+            const companyId = req.params.id;
+            const { reason } = req.body;
 
-            if(!companyId){
+            if (!companyId) {
+                logger.warn("RejectCompany called without companyId");
+                return res.status(HttpStatus.BAD_REQUEST).json({
+                    message: RESPONSE_MESSAGES.COMPANY.COMPANY_ID
+                })
+            }
+
+            if (!req.user || !req.user.id) {
+                logger.warn(`RejectCompany unauthorized attempt companyId=${companyId}`);
+                return res.status(HttpStatus.UNAUTHORIZED).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                })
+            }
+            logger.info(`RejectCompany started companyId=${companyId} by superAdmin=${req.user.id}`);
+
+            await this._rejectCompanyUseCase.execute({
+                companyId,
+                rejectedBy: req.user.id,
+                reason
+            })
+            logger.info(`RejectCompany success companyId=${companyId}`);
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: RESPONSE_MESSAGES.COMPANY.REJECTED
+            })
+
+        } catch (error: unknown) {
+            logger.error(`RejectCompany failed companyId=${req.params.id}`, error);
+            return handleError(error, res)
+        }
+    }
+
+    reapplyCompany = async (req: Request, res: Response) => {
+        try {
+            const companyId = req.user?.companyId
+
+            if (!companyId) {
                 return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
+                    message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
                 })
             }
 
             await this._reapplyCompanyUseCase.execute(companyId);
 
             return res.status(HttpStatus.OK).json({
-                success:true,
-                message:RESPONSE_MESSAGES.COMPANY.REAPPLIED
+                success: true,
+                message: RESPONSE_MESSAGES.COMPANY.REAPPLIED
             })
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 
@@ -266,23 +293,23 @@ export class CompanyController {
             const companyId = req.user?.companyId
 
             if (!companyId) {
-                 logger.warn('Get my company failed: companyId missing in user context')
+                logger.warn('Get my company failed: companyId missing in user context')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.COMPANY_NOT_FOUND
                 })
             }
-            
+
             logger.info(`Get my company requested | companyId: ${companyId}`);
 
             const company = await this._getMyCompanyUseCase.execute(companyId);
-             logger.info(`Get my company successful | companyId: ${companyId}`);
+            logger.info(`Get my company successful | companyId: ${companyId}`);
 
             return res.status(HttpStatus.OK).json({
                 data: company
             })
 
         } catch (error: unknown) {
-                    logger.error('Get my company failed', {companyId: req.user?.companyId,error});
+            logger.error('Get my company failed', { companyId: req.user?.companyId, error });
             return handleError(error, res)
         }
     }
@@ -305,13 +332,13 @@ export class CompanyController {
                 logoFile: req.file?.buffer,
                 logoMimeType: req.file?.mimetype,
             })
-             logger.info(`Branding updated successfully | companyId: ${companyId}`);
+            logger.info(`Branding updated successfully | companyId: ${companyId}`);
 
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.COMPANY.BRANDING_UPDATED
             })
         } catch (error: unknown) {
-                    logger.error('Update branding failed', {companyId: req.user?.companyId,error});
+            logger.error('Update branding failed', { companyId: req.user?.companyId, error });
             return handleError(error, res)
         }
     }

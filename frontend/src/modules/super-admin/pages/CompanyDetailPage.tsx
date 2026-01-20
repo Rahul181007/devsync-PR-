@@ -5,7 +5,7 @@ import { companyService } from "../services/company.service";
 import CompanyInfoCard from "../components/CompanyInfoCard";
 import CompanyAdminSection from "../components/CompanyAdminSection";
 import { useAppDispatch } from "../../../store/hook";
-import { suspendCompany } from "../store/companies.slice";
+import { suspendCompany,unsuspendCompany } from "../store/companies.slice";
 import { clearAuthError } from "../../auth/auth.slice";
 
 const CompanyDetailPage = () => {
@@ -13,6 +13,7 @@ const CompanyDetailPage = () => {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSuspendConfirm, setShowSuspendConfirm] = useState(false);
+  const [showUnsuspendConfirm, setShowUnsuspendConfirm] = useState(false);
   const [suspendLoading, setSuspendLoading] = useState(false);
   const dispatch = useAppDispatch();
   
@@ -50,6 +51,21 @@ useEffect(() => {
       await fetchCompany();
     } catch (error) {
       console.error("Failed to suspend company", error);
+    } finally {
+      setSuspendLoading(false);
+    }
+  };
+
+  const handleUnssuspend = async () => {
+    if (!companyId) return;
+    
+    try {
+      setSuspendLoading(true);
+      await dispatch(unsuspendCompany(companyId));
+      setShowUnsuspendConfirm(false);
+      await fetchCompany();
+    } catch (error) {
+      console.error("Failed to unsuspend company", error);
     } finally {
       setSuspendLoading(false);
     }
@@ -168,12 +184,102 @@ useEffect(() => {
         </div>
       )}
 
+      {/* Unsuspend Company Confirmation Modal */}
+      {showUnsuspendConfirm && company && (
+        <div className="fixed inset-0 z-50">
+          {/* Modal container positioned over main content */}
+          <div className="absolute left-64 right-0 top-16 bottom-0 flex items-center justify-center p-6">
+            {/* Transparent backdrop with ONLY blur effect - NO background color */}
+            <div 
+              className="absolute inset-0 backdrop-blur-sm"
+              onClick={() => !suspendLoading && setShowUnsuspendConfirm(false)}
+            />
+            
+            {/* Modal Content */}
+            <div className="relative bg-white rounded-xl shadow-2xl max-w-md w-full z-10 border border-gray-200">
+              {/* Modal Header */}
+              <div className="px-6 pt-6 pb-4 border-b border-gray-200">
+                <div className="flex items-center">
+                  <div className="shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Unsuspend Company</h3>
+                    <p className="text-sm text-gray-500 mt-1">This action will restore all company operations</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Modal Body */}
+              <div className="px-6 py-4">
+                <div className="mb-4">
+                  <p className="text-gray-700 mb-3">
+                    Are you sure you want to unsuspend <span className="font-semibold text-gray-900">{company.name}</span>?
+                  </p>
+                  <p className="text-gray-600 text-sm mb-4">
+                    This will restore the company's account. All company users, including admins, will regain access to the platform.
+                  </p>
+                  
+                  {/* Warning Box */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                    <div className="flex">
+                      <svg className="w-5 h-5 text-green-500 mr-2 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <p className="text-sm text-green-700 font-medium">Important</p>
+                        <p className="text-sm text-green-600 mt-1">
+                          This will restore all company operations and give company users access to the platform again.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Company Details */}
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
+                    <div className="text-sm">
+                      <p className="font-medium text-gray-700 mb-1">Company Details:</p>
+                      <p className="text-gray-600">• Company: {company.name}</p>
+                      <p className="text-gray-600">• Domain: {company.domain || "Not specified"}</p>
+                      {company.admin && (
+                        <p className="text-gray-600">• Admin: {company.admin.email}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowUnsuspendConfirm(false)}
+                    className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                    disabled={suspendLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUnssuspend}
+                    disabled={suspendLoading}
+                    className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {suspendLoading ? "Unsuspending..." : "Unsuspend Company"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
           <CompanyInfoCard 
             company={company} 
-            onSuspend={() => setShowSuspendConfirm(true)} 
+            onSuspend={()=>setShowSuspendConfirm(true)} 
+            onUnsuspend={() => setShowUnsuspendConfirm(true)}
           />
           
           <div className="mt-6">

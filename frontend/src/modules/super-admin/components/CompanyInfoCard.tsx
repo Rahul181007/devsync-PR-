@@ -3,9 +3,10 @@ import type { Company } from "../typess/company.type";
 interface Props {
   company: Company;
   onSuspend: () => void;
+  onUnsuspend:()=>void;
 }
 
-const CompanyInfoCard = ({ company, onSuspend }: Props) => {
+const CompanyInfoCard = ({ company, onSuspend,onUnsuspend }: Props) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "APPROVED":
@@ -33,14 +34,24 @@ const CompanyInfoCard = ({ company, onSuspend }: Props) => {
             <p className="text-gray-600">Company Details</p>
           </div>
           
-          {company.status === "APPROVED" && (
-            <button
-              onClick={onSuspend}
-              className="bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              Suspend Company
-            </button>
-          )}
+{company.status === "APPROVED" && (
+  <button
+    onClick={onSuspend}
+    className="bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+  >
+    Suspend Company
+  </button>
+)}
+
+{company.status === "SUSPENDED" && (
+  <button
+    onClick={onUnsuspend}
+    className="bg-linear-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+  >
+    Unsuspend Company
+  </button>
+)}
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

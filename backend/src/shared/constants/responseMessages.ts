@@ -53,7 +53,8 @@ export const RESPONSE_MESSAGES = {
         BRANDING_UPDATED:'Branding updated',
         REJECTION_REASON:'"Rejection reason is required"',
         REJECTED:'Rejected',
-        REAPPLIED:'Reapplied'
+        REAPPLIED:'Reapplied',
+        
     },
 
     INVITE: {
