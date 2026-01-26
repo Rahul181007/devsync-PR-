@@ -6,7 +6,7 @@ export interface IProjectDocument extends Document{
     name:string;
     slug:string;
     description?:string;
-    status:'ACTIVE'|'ARCHIVED';
+    status:'ACTIVE'|'ARCHIVED'|'COMPLETED';
     startDate?:Date;
     endDate?:Date;
     currentSprintId?:mongoose.Types.ObjectId|null;
@@ -37,7 +37,7 @@ const ProjectSchema=new Schema<IProjectDocument>(
         },
         status:{
             type:String,
-            enum:['ACTIVE','ARCHIVED'],
+            enum:['ACTIVE','ARCHIVED','COMPLETED'],
             default:'ACTIVE'
         },
         startDate:{

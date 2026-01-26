@@ -7,6 +7,6 @@ export const projectApi={
         startDate?:string;
         endDate?:string;
     }){
-        return http.post("/company/projects",data)
+        return http.post("/company/projects/first",data)
     }
 }
