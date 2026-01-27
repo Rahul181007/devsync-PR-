@@ -7,48 +7,95 @@ import { AppError } from "../../../shared/errors/AppError";
 
 export class GetProjectDetailUseCase {
     constructor(
-        private _projectRepo:IProjectRepository,
-        private _projectMemberRepo:IProjectMemberRepository,
-        private  _userRepo:IUserRepository
-    ){}
+        private _projectRepo: IProjectRepository,
+        private _projectMemberRepo: IProjectMemberRepository,
+        private _userRepo: IUserRepository
+    ) { }
 
-    async execute(userId:string,companyId:string,projectId:string){
-        const user=await this._userRepo.findById(userId);
-        if(!user){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);
+    async execute(userId: string, companyId: string, projectId: string) {
+        const user = await this._userRepo.findById(userId);
+        if (!user) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-         
-        const project=await this._projectRepo.findById(projectId);
 
-        if(!project){
+        const project = await this._projectRepo.findById(projectId);
+
+        if (!project) {
             throw new AppError(
                 RESPONSE_MESSAGES.PROJECT.PROJECT_NOT_FOUND,
                 HttpStatus.NOT_FOUND
             )
         }
 
-        if(project.companyId!==companyId){
+        if (project.companyId !== companyId) {
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
                 HttpStatus.FORBIDDEN
             )
         }
 
-        if(user.role==='COMPANY_ADMIN'){
-            return project
+        if (user.role === 'COMPANY_ADMIN') {
+            const members = await this._projectMemberRepo.findMembersByProject(projectId);
+            const enrichedMembers = await Promise.all(
+                members.map(async (member) => {
+                    const memberUser = await this._userRepo.findById(member.userId);
+                    if (!memberUser) return null
+                    return {
+                        role: member.role,
+                        user: {
+                            id: memberUser.id,
+                            name: memberUser.name,
+                            email: memberUser.email,
+                            role: memberUser.role
+                        }
+                    }
+                })
+
+            )
+
+            const projectMembers = enrichedMembers.filter(Boolean)
+
+            return {
+                ...project,
+                members: projectMembers,
+            };
         }
-        if(user.role==='DEVELOPER'){
-            const isMember=await this._projectMemberRepo.isMember(
+        if (user.role === 'DEVELOPER') {
+
+            const members = await this._projectMemberRepo.findMembersByProject(projectId);
+            const enrichedMembers = await Promise.all(
+                members.map(async (member) => {
+                    const memberUser = await this._userRepo.findById(member.userId);
+                    if (!memberUser) return null
+                    return {
+                        role: member.role,
+                        user: {
+                            id: memberUser.id,
+                            name: memberUser.name,
+                            email: memberUser.email,
+                            role: memberUser.role
+                        }
+                    }
+                })
+
+            )
+
+            const projectMembers = enrichedMembers.filter(Boolean)
+            const isMember = await this._projectMemberRepo.isMember(
                 projectId,
                 userId
             )
-            if(!isMember){
-               throw new AppError(
-                RESPONSE_MESSAGES.PROJECT.ACCESS_DENIED,
-                HttpStatus.FORBIDDEN
-               )
+            if (!isMember) {
+                throw new AppError(
+                    RESPONSE_MESSAGES.PROJECT.ACCESS_DENIED,
+                    HttpStatus.FORBIDDEN
+                )
             }
-            return project
+            return {
+                ...project,
+                members: projectMembers,
+            };
+
         }
 
         throw new AppError(

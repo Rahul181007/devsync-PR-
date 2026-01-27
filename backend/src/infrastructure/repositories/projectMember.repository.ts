@@ -33,4 +33,16 @@ export class ProjectMemberRepository implements IProjectMemberRepository{
             projectId
         })
     }
+    async findMembersByProject(projectId: string) {
+  const members = await ProjectMemberModel
+    .find({ projectId })
+    .select("userId role");
+
+  return members.map(m => ({
+    userId:m.userId.toString(),
+    role: m.role,
+   
+  }));
+}
+
 }
