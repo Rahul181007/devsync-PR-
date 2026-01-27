@@ -42,6 +42,6 @@ export const ROUTES={
 
   DEVELOPER: {
     BASE: "/developer",
-    DASHBOARD: (slug: string) => `/developer/${slug}/dashboard`,
+    DASHBOARD: () => `/developer/dashboard`,
   },
 }as const

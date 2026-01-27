@@ -37,6 +37,8 @@ import RejectedCompanyPage from "../modules/company-admin/pages/RejectedCompanyP
 import SuspendedCompanyPage from "../modules/company-admin/pages/SuspendedCompanyPage";
 import { ProjectListingPage } from "../modules/company-admin/pages/projects/ProjectListingPage";
 import ProjectDetailPage from "../modules/company-admin/pages/projects/ProjectDetailPage";
+import { DevProjectListingPage } from "../modules/developer/pages/projects/DevProjectListingPage";
+import { DevProjectDetailPage } from "../modules/developer/pages/projects/DevProjectDetailPage";
 
 
 const AppRouter = () => {
@@ -124,9 +126,11 @@ const AppRouter = () => {
             />
           }
         >
-          <Route path='/developer/:companySlug' element={<DeveloperLayout />}>
+          <Route path='/developer' element={<DeveloperLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DevDashboard />} />
+            <Route path="projects" element={<DevProjectListingPage />}/>
+            <Route path="projects/:projectId" element={<DevProjectDetailPage/>}/>
           </Route>
         </Route>
         {/* ================= Error================= */}

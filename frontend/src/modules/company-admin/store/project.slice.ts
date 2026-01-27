@@ -257,7 +257,7 @@ const projectSlice = createSlice({
             .addCase(getProjectDetail.pending,(state)=>{
                 state.loading=true;
                 state.error=null;
-                
+                state.selectedProject=null
             })
 
             .addCase(getProjectDetail.fulfilled,(state,action)=>{
