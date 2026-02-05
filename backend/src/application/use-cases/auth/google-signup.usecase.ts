@@ -1,11 +1,12 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IGoogleAuthService } from "../../../domain/service/google-auth.service";
 import { IMailService } from "../../../domain/service/mail.service";
+import { IGoogleSignupUseCase } from "../../interface/auth/IGoogleSignupUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 
-export class GoogleSignupUseCase {
+export class GoogleSignupUseCase implements IGoogleSignupUseCase {
     constructor(
         private _userRepo: IUserRepository,
         private _googleAuthServices: IGoogleAuthService,

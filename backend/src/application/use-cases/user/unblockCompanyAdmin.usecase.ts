@@ -2,8 +2,9 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IUnblockCompanyAdminUseCase } from "../../interface/user/IUnblockCompanyAdminUseCase";
 
-export class UnblockCompanyAdminUseCase{
+export class UnblockCompanyAdminUseCase implements IUnblockCompanyAdminUseCase{
     constructor(
         private _userRepo:IUserRepository
     ){}

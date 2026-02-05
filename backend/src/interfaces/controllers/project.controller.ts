@@ -1,31 +1,31 @@
 import { Request, Response } from "express";
-import { CreateFirstProjectUseCase } from "../../application/use-cases/project/createFirstProject.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { createProjectSchema, createProjectWithMembersSchema } from "../../application/validators/project/createProject.validator";
 import { handleError } from "../../shared/utils/handleError";
 import { logger } from "../../shared/logger/logger";
-import { ListProjectsUseCase } from "../../application/use-cases/project/ListProjectsUseCase";
 import { listProjectsQuerySchema } from "../../application/validators/project/listProjects.validator";
-import { GetProjectDetailUseCase } from "../../application/use-cases/project/getProjectDetail.usecase";
-import { UpdateProjectUseCase } from "../../application/use-cases/project/updateProject.usecase";
 import { updateProjectSchema } from "../../application/validators/project/updateProject.validator";
-import { DeleteProjectUseCase } from "../../application/use-cases/project/deleteProject.usecase";
-import { CreateProjectUseCase } from "../../application/use-cases/project/createProject.usecase";
 import { addProjectMemberSchema } from "../../application/validators/project/addProjectMember.validator";
-import { AddProjectMemberUseCase } from "../../application/use-cases/project/addProjectMember.usecase";
-import { RemoveProjectMemberUseCase } from "../../application/use-cases/project/removeProjectMember.usecase";
+import { ICreateFirstProjectUseCase } from "../../application/interface/project/ICreateFirstProjectUseCase";
+import { IListProjectsUseCase } from "../../application/interface/project/IListProjectsUseCase";
+import { IGetProjectDetailUseCase } from "../../application/interface/project/IGetProjectDetailUseCase";
+import { IUpdateProjectUseCase } from "../../application/interface/project/IUpdateProjectUseCase";
+import { IDeleteProjectUseCase } from "../../application/interface/project/IDeleteProjectUseCase";
+import { ICreateProjectUseCase } from "../../application/interface/project/ICreateProjectUseCase";
+import { IAddProjectMemberUseCase } from "../../application/interface/project/IAddProjectMemberUseCase";
+import { IRemoveProjectMemberUseCase } from "../../application/interface/project/IRemoveProjectMemberUseCase";
 
 export class ProjectController {
     constructor(
-        private _createFirstProjectUseCase: CreateFirstProjectUseCase,
-        private _listProjectUseCase: ListProjectsUseCase,
-        private _getProjectDetailUseCase: GetProjectDetailUseCase,
-        private _updateProjectUseCase: UpdateProjectUseCase,
-        private _deleteProjectUseCase: DeleteProjectUseCase,
-        private _createProjectUseCase: CreateProjectUseCase,
-        private _addProjectMemberUseCase: AddProjectMemberUseCase,
-        private _removeProjectMemberUseCase: RemoveProjectMemberUseCase
+        private _createFirstProjectUseCase: ICreateFirstProjectUseCase,
+        private _listProjectUseCase: IListProjectsUseCase,
+        private _getProjectDetailUseCase: IGetProjectDetailUseCase,
+        private _updateProjectUseCase: IUpdateProjectUseCase,
+        private _deleteProjectUseCase: IDeleteProjectUseCase,
+        private _createProjectUseCase: ICreateProjectUseCase,
+        private _addProjectMemberUseCase: IAddProjectMemberUseCase,
+        private _removeProjectMemberUseCase: IRemoveProjectMemberUseCase
 
     ) { }
 

@@ -1,25 +1,25 @@
-import { CreateInviteUseCase } from "../../application/use-cases/invite/createInvite.usecase";
 import { Request, Response } from "express";
 import { inviteSchema } from "../../application/validators/invite/createInvite.validator";
 import { handleError } from "../../shared/utils/handleError";
 import { verifyInviteQuerySchema } from "../../application/validators/invite/verifyInvite.validator";
-import { VerifyInviteUseCase } from "../../application/use-cases/invite/verifyInvite.usecase";
 import { acceptInviteQuerySchema } from "../../application/validators/invite/acceptInvite.validator";
-import { AcceptInviteUseCase } from "../../application/use-cases/invite/acceptInvite.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { inviteDeveloperSchema } from "../../application/validators/invite/inviteDeveloper.validator";
-import { InviteDeveloperUseCase } from "../../application/use-cases/invite/inviteDeveloper.usecase";
 import { logger } from "../../shared/logger/logger";
+import { IAcceptInviteUseCase } from "../../application/interface/invite/IAcceptInviteUseCase";
+import { ICreateInviteUseCase } from "../../application/interface/invite/ICreateInviteUseCase";
+import { IVerifyInviteUseCase } from "../../application/interface/invite/IVerifyInviteUseCase";
+import { IInviteDeveloperUseCase } from "../../application/interface/invite/IInviteDeveloperUseCase";
 
 
 
 export class InviteController {
     constructor(
-        private _createInviteUseCase: CreateInviteUseCase,
-        private _verifyInviteUseCase: VerifyInviteUseCase,
-        private _acceptInviteUseCase: AcceptInviteUseCase,
-        private _inviteDeveloperUseCase: InviteDeveloperUseCase
+        private _createInviteUseCase: ICreateInviteUseCase,
+        private _verifyInviteUseCase: IVerifyInviteUseCase,
+        private _acceptInviteUseCase: IAcceptInviteUseCase,
+        private _inviteDeveloperUseCase: IInviteDeveloperUseCase
     ) { }
 
     createCompanyAdminInvite = async (req: Request, res: Response) => {

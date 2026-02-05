@@ -4,15 +4,17 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { GetCompanyByIdResponse } from "../../dto/company/getCompanyByIdResponse.dto";
+import { IGetCompanyByIdUseCase } from "../../interface/company/IGetCompanyByIdUseCase";
 
-export class GetCompanyIdUseCase {
+export class GetCompanyIdUseCase implements IGetCompanyByIdUseCase {
     constructor(
         private _companyRepo: ICompanyRepository,
         private _userRepo: IUserRepository,
         private _inviteRepo: IInviteRepository
     ) { }
 
-    async execute(companyId: string) {
+    async execute(companyId: string):Promise<GetCompanyByIdResponse> {
         const company = await this._companyRepo.findById(companyId);
         console.log(company)
         if (!company) {

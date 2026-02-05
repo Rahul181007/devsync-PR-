@@ -1,16 +1,16 @@
 import { Request,Response } from "express";
-import { SendOtpUseCase } from "../../application/use-cases/auth/sendOtp.usecase";
-import { VerifyOtpUseCase } from "../../application/use-cases/auth/verifyOtp.usecase";
-import { ResetPasswordUSeCase } from "../../application/use-cases/auth/resetPassword.usecase";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
+import { ISendOtpUseCase } from "../../application/interface/auth/ISendOtpUseCase";
+import { IVerifyOtpUseCase } from "../../application/interface/auth/IVerifyOtpUseCase";
+import { IResetPasswordUseCase } from "../../application/interface/auth/IResetPasswordUseCase";
 
 export class PasswordResetController{
     constructor(
-        private _sendOtpUseCase:SendOtpUseCase,
-        private _verifyOtpUseCase:VerifyOtpUseCase,
-        private _resetPasswordUseCase:ResetPasswordUSeCase
+        private _sendOtpUseCase:ISendOtpUseCase,
+        private _verifyOtpUseCase:IVerifyOtpUseCase,
+        private _resetPasswordUseCase:IResetPasswordUseCase
     ){}
 
     sendOtp=async(req:Request,res:Response)=>{
@@ -44,7 +44,7 @@ export class PasswordResetController{
         try {
             const {email,newPassword}=req.body;
    
-            const response=await this._resetPasswordUseCase.excute(email,newPassword);
+            const response=await this._resetPasswordUseCase.execute(email,newPassword);
             logger.info('reser password was successful')
             return res.status(HttpStatus.OK).json(response)
         } catch (error:unknown) {

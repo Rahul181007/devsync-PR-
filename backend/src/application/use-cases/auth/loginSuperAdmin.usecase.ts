@@ -6,8 +6,9 @@ import { Tokenutilits } from "../../../shared/utils/token.util";
 import { AppError } from "../../../shared/errors/AppError";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { ILoginSuperAdminUseCase } from "../../interface/auth/ILoginSuperAdminUseCase";
 
-export class LoginSuperAdminUseCase {
+export class LoginSuperAdminUseCase implements ILoginSuperAdminUseCase {
     constructor(private _superAdminRepo: ISuperAdminRepository) { }
 
     async execute(data: LoginDTO): Promise<LoginResponseDTO> {

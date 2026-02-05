@@ -7,19 +7,19 @@ import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { InviteTokenUtil } from "../../../shared/utils/inviteToken.util";
 import { CreateInviteInput } from "../../dto/invite/createInvite.dto";
+import { CreateInviteResponse } from "../../dto/invite/createInviteResponse.dto";
+import { InviterContext } from "../../dto/invite/inviterContext.dto";
+import { ICreateInviteUseCase } from "../../interface/invite/ICreateInviteUseCase";
 
-interface InviterContext{
-    id:string;
-    role:'SUPER_ADMIN'
-}
-export class CreateInviteUseCase{
+
+export class CreateInviteUseCase implements ICreateInviteUseCase{
     constructor(
         private _inviteRepository:IInviteRepository,
         private _companyRepo:ICompanyRepository,
         private _mailService:IMailService
     ){}
 
-    async execute(input:CreateInviteInput,inviter:InviterContext,companyId:string){
+    async execute(input:CreateInviteInput,inviter:InviterContext,companyId:string):Promise<CreateInviteResponse>{
       if(inviter.role!=='SUPER_ADMIN'){
         throw new AppError(RESPONSE_MESSAGES.INVITE.ONLY_SUPER_ADMIN,HttpStatus.FORBIDDEN)
       }

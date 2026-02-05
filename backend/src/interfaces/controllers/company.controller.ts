@@ -1,23 +1,23 @@
-import { CreateCompanyUseCase } from "../../application/use-cases/company/createCompany.usecase";
 import { Request, Response } from "express";
 import { companySchema } from "../../application/validators/company/createCompany.validator";
 import { handleError } from "../../shared/utils/handleError";
-import { ListCompaniesUseCase } from "../../application/use-cases/company/listCompanies.usecase";
-import { ApproveCompanyUseCase } from "../../application/use-cases/company/approveCompany.usecase";
-import { SuspendCompanyUseCase } from "../../application/use-cases/company/suspendCompany.usecase";
 import { logger } from "../../shared/logger/logger";
-import { GetCompanyIdUseCase } from "../../application/use-cases/company/getCompanyById.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
-import { CreateWorkspaceUseCase } from "../../application/use-cases/company/createWorkspace.usecase";
 import { createWorkspaceSchema } from "../../application/validators/company/createWorkspace.validator";
-import { GetMyCompanyUseCase } from "../../application/use-cases/company/getMyCompany.usecase";
 import { updateCompanyBrandingSchema } from "../../application/validators/company/updateBranding.validator";
-import { UpdateCompanyBrandingUseCase } from "../../application/use-cases/company/updateCompanyBranding.usecase";
 import { Tokenutilits } from "../../shared/utils/token.util";
-import { RejectCompanyUseCase } from "../../application/use-cases/company/reject-company.usecase";
-import { ReapplyCompanyUseCase } from "../../application/use-cases/company/reapplyCompany.usecase";
-import { UnsuspendCompanyUseCase } from "../../application/use-cases/company/unsuspend-company.usecase";
+import { ICreateCompanyUseCase } from "../../application/interface/company/ICreateCompanyUseCase";
+import { IListCompaniesUseCase } from "../../application/interface/company/IListCompaniesUseCase";
+import { IApproveCompanyUseCase } from "../../application/interface/company/IApproveCompanyUseCase";
+import { ISuspendCompanyUseCase } from "../../application/interface/company/ISuspendCompanyUseCase";
+import { IGetCompanyByIdUseCase } from "../../application/interface/company/IGetCompanyByIdUseCase";
+import { ICreateWorkspaceUseCase } from "../../application/interface/company/ICreateWorkspaceUseCase";
+import { IGetMyCompanyUseCase } from "../../application/interface/company/IGetMyCompanyUseCase";
+import { IUpdateCompanyBrandingUseCase } from "../../application/interface/company/IUpdateCompanyBrandingUseCase";
+import { IRejectCompanyUseCase } from "../../application/interface/company/IRejectCompanyUseCase";
+import { IReapplyCompanyUseCase } from "../../application/interface/company/IReapplyCompanyUseCase";
+import { IUnsuspendCompanyUseCase } from "../../application/interface/company/IUnsuspendCompanyUseCase";
 
 
 
@@ -25,17 +25,17 @@ import { UnsuspendCompanyUseCase } from "../../application/use-cases/company/uns
 
 export class CompanyController {
     constructor(
-        private _createCompanyUseCase: CreateCompanyUseCase,
-        private _listCompaniesUseCase: ListCompaniesUseCase,
-        private _approveCompanyUseCase: ApproveCompanyUseCase,
-        private _suspendCompanyUseCase: SuspendCompanyUseCase,
-        private _getCompanyByIdUseCase: GetCompanyIdUseCase,
-        private _createWorkspaceUseCase: CreateWorkspaceUseCase,
-        private _getMyCompanyUseCase: GetMyCompanyUseCase,
-        private _updateCompanyBrandingUseCase: UpdateCompanyBrandingUseCase,
-        private _rejectCompanyUseCase: RejectCompanyUseCase,
-        private _reapplyCompanyUseCase: ReapplyCompanyUseCase,
-        private _unsuspendCompanyUseCase: UnsuspendCompanyUseCase,
+        private _createCompanyUseCase: ICreateCompanyUseCase,
+        private _listCompaniesUseCase: IListCompaniesUseCase,
+        private _approveCompanyUseCase: IApproveCompanyUseCase,
+        private _suspendCompanyUseCase: ISuspendCompanyUseCase,
+        private _getCompanyByIdUseCase: IGetCompanyByIdUseCase,
+        private _createWorkspaceUseCase: ICreateWorkspaceUseCase,
+        private _getMyCompanyUseCase: IGetMyCompanyUseCase,
+        private _updateCompanyBrandingUseCase: IUpdateCompanyBrandingUseCase,
+        private _rejectCompanyUseCase: IRejectCompanyUseCase,
+        private _reapplyCompanyUseCase: IReapplyCompanyUseCase,
+        private _unsuspendCompanyUseCase: IUnsuspendCompanyUseCase,
     ) { }
     createCompany = async (req: Request, res: Response) => {
         try {

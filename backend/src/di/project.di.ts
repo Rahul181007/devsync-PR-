@@ -1,3 +1,11 @@
+import { IAddProjectMemberUseCase } from "../application/interface/project/IAddProjectMemberUseCase";
+import { ICreateFirstProjectUseCase } from "../application/interface/project/ICreateFirstProjectUseCase";
+import { ICreateProjectUseCase } from "../application/interface/project/ICreateProjectUseCase";
+import { IDeleteProjectUseCase } from "../application/interface/project/IDeleteProjectUseCase";
+import { IGetProjectDetailUseCase } from "../application/interface/project/IGetProjectDetailUseCase";
+import { IListProjectsUseCase } from "../application/interface/project/IListProjectsUseCase";
+import { IRemoveProjectMemberUseCase } from "../application/interface/project/IRemoveProjectMemberUseCase";
+import { IUpdateProjectUseCase } from "../application/interface/project/IUpdateProjectUseCase";
 import { AddProjectMemberUseCase } from "../application/use-cases/project/addProjectMember.usecase";
 import { CreateFirstProjectUseCase } from "../application/use-cases/project/createFirstProject.usecase";
 import { CreateProjectUseCase } from "../application/use-cases/project/createProject.usecase";
@@ -18,14 +26,14 @@ const projectMemberRepository=new ProjectMemberRepository();
 const companyRepository=new CompanyRepository();
 const userRepository=new  UserRepository();
 const mailRepo=new NodemailerService();
-const createFirstProjectUseCase=new CreateFirstProjectUseCase(projectRepository,projectMemberRepository,companyRepository,userRepository);
-const listProjectsUseCase=new ListProjectsUseCase(projectRepository,projectMemberRepository,userRepository)
-const getProjectDetailUseCase= new GetProjectDetailUseCase(projectRepository,projectMemberRepository,userRepository);
-const updateProjectUseCase=new UpdateProjectUseCase(projectRepository,userRepository);
-const deleteProjectUseCase=new DeleteProjectUseCase(projectRepository,userRepository,projectMemberRepository);
-const createProjectUseCase=new CreateProjectUseCase(projectRepository,projectMemberRepository,userRepository,companyRepository,mailRepo);
-const addProjectMemberUseCase=new AddProjectMemberUseCase(projectRepository,projectMemberRepository,userRepository);
-const removeProjectMemberUseCase=new RemoveProjectMemberUseCase(projectRepository,projectMemberRepository,userRepository)
+const createFirstProjectUseCase:ICreateFirstProjectUseCase=new CreateFirstProjectUseCase(projectRepository,projectMemberRepository,companyRepository,userRepository);
+const listProjectsUseCase:IListProjectsUseCase=new ListProjectsUseCase(projectRepository,projectMemberRepository,userRepository)
+const getProjectDetailUseCase:IGetProjectDetailUseCase= new GetProjectDetailUseCase(projectRepository,projectMemberRepository,userRepository);
+const updateProjectUseCase:IUpdateProjectUseCase=new UpdateProjectUseCase(projectRepository,userRepository);
+const deleteProjectUseCase:IDeleteProjectUseCase=new DeleteProjectUseCase(projectRepository,userRepository,projectMemberRepository);
+const createProjectUseCase:ICreateProjectUseCase=new CreateProjectUseCase(projectRepository,projectMemberRepository,userRepository,companyRepository,mailRepo);
+const addProjectMemberUseCase:IAddProjectMemberUseCase=new AddProjectMemberUseCase(projectRepository,projectMemberRepository,userRepository);
+const removeProjectMemberUseCase:IRemoveProjectMemberUseCase=new RemoveProjectMemberUseCase(projectRepository,projectMemberRepository,userRepository)
 export const projectController=new ProjectController(
     createFirstProjectUseCase,
     listProjectsUseCase,

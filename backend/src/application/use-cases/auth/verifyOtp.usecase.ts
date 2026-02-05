@@ -2,8 +2,9 @@ import { IPasswordResetRepository } from "../../../domain/repositories/passwordR
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IVerifyOtpUseCase } from "../../interface/auth/IVerifyOtpUseCase";
 
-export class VerifyOtpUseCase{
+export class VerifyOtpUseCase implements IVerifyOtpUseCase{
     constructor(private _passwordResetRepo:IPasswordResetRepository){}
 
     async execute(email:string,otp:string){

@@ -4,15 +4,16 @@ import { IPasswordResetRepository } from '../../../domain/repositories/passwordR
 import { AppError } from '../../../shared/errors/AppError';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
+import { IResetPasswordUseCase } from '../../interface/auth/IResetPasswordUseCase';
 
 
-export class ResetPasswordUSeCase{
+export class ResetPasswordUSeCase implements IResetPasswordUseCase{
     constructor(
         private _userRepo:IUserRepository,
         private _passwordResetRepo:IPasswordResetRepository
     ){}
 
-    async excute (email:string,newPassword:string){
+    async execute (email:string,newPassword:string){
         const user = await this._userRepo.findByEmail(email);
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND);

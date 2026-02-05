@@ -4,8 +4,10 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { CreateWorkspaceDTO } from "../../dto/company/createWorkspace.dto";
+import { CreateWorkspaceResponse } from "../../dto/company/createWorkspaceResponse.dto";
+import { ICreateWorkspaceUseCase } from "../../interface/company/ICreateWorkspaceUseCase";
 
-export class CreateWorkspaceUseCase {
+export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
     constructor(
         private _companyRepo: ICompanyRepository,
         private _userRepo: IUserRepository
@@ -19,7 +21,7 @@ export class CreateWorkspaceUseCase {
             .replace(/\s+/g, "-")
     }
 
-    async execute(userId: string, data: CreateWorkspaceDTO) {
+    async execute(userId: string, data: CreateWorkspaceDTO):Promise<CreateWorkspaceResponse> {
         const normalizedName = data.name.trim();
         const normalizedDomain = data.domain
             ? data.domain.trim().toLowerCase()

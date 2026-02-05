@@ -7,12 +7,13 @@ import { IUserRepository } from '../../../domain/repositories/user.repository';
 import { RequestUser } from '../../../shared/types/AuthUser';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
+import { IRefreshTokenUseCase } from '../../interface/auth/IRefreshTokenUseCase';
 interface RefreshTokenPayload{
     sub:string;
     role:'SUPER_ADMIN'|'COMPANY_ADMIN'|'DEVELOPER'
 }
 
-export class RefreshTokenUseCase{
+export class RefreshTokenUseCase implements IRefreshTokenUseCase{
   constructor(private readonly _superadminrepo:ISuperAdminRepository,private readonly _userRepo:IUserRepository){}
 
   async execute(refreshToken:string){

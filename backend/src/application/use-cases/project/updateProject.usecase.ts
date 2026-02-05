@@ -4,8 +4,10 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { UpdateProjectDTO } from "../../dto/project/updateProject.dto";
+import { UpdateProjectResponse } from "../../dto/project/updateProjectResponse.dto";
+import { IUpdateProjectUseCase } from "../../interface/project/IUpdateProjectUseCase";
 
-export class UpdateProjectUseCase {
+export class UpdateProjectUseCase implements IUpdateProjectUseCase {
     constructor(
         private _projectRepo: IProjectRepository,
         private _userRepo: IUserRepository
@@ -24,7 +26,7 @@ export class UpdateProjectUseCase {
         companyId: string,
         projectId: string,
         data: UpdateProjectDTO
-    ) {
+    ):Promise<UpdateProjectResponse> {
         const user = await this._userRepo.findById(userId);
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);

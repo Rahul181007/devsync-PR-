@@ -3,8 +3,9 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IBlockCompanyAdminUseCase } from "../../interface/user/IBlockCompanyAdminUseCase";
 
-export class BlockCompanyAdminUseCase{
+export class BlockCompanyAdminUseCase implements IBlockCompanyAdminUseCase{
     constructor(
         private _userRepo:IUserRepository
     ){}

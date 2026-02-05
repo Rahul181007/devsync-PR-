@@ -1,12 +1,13 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IMailService } from "../../../domain/service/mail.service";
 import { IPasswordHasher } from "../../../domain/service/password-hasher";
+import { ISignupUseCase } from "../../interface/auth/ISignupUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { SignupDTO } from "../../dto/auth/signup.dto";
 
-export class SignupUseCase{
+export class SignupUseCase implements ISignupUseCase{
     constructor(
         private _userRepo:IUserRepository,
         private _passwordHasher:IPasswordHasher,

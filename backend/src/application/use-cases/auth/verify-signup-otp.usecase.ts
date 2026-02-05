@@ -1,9 +1,10 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { IVerifySignupOtpUseCase } from "../../interface/auth/IVerifySignupOtpUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 
-export class VerifySignupOtpUseCase {
+export class VerifySignupOtpUseCase implements IVerifySignupOtpUseCase {
     constructor(
       private _userRepo:IUserRepository
     ){}

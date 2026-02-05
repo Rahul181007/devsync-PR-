@@ -6,9 +6,12 @@ import { IMailService } from "../../../domain/service/mail.service";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
-import { createProjectWithMemberDTO } from "../../dto/project/createProjectWithMembers.dto";
+import { CreateProjectResponse } from "../../dto/project/createProjectResponse.dto";
+import { CreateProjectWithMembersDTO } from "../../dto/project/createProjectWithMembers.dto";
+import { ICreateProjectUseCase } from "../../interface/project/ICreateProjectUseCase";
 
-export class CreateProjectUseCase{
+
+export class CreateProjectUseCase implements ICreateProjectUseCase{
     constructor(
         private _projectRepo:IProjectRepository,
         private _projectMemberRepo:IProjectMemberRepository,
@@ -25,7 +28,7 @@ export class CreateProjectUseCase{
         .replace(/\s+/g, "-")
     }
 
-    async execute(userId:string,companyId:string,data:createProjectWithMemberDTO){
+    async execute(userId:string,companyId:string,data:CreateProjectWithMembersDTO):Promise<CreateProjectResponse>{
         const admin=await this._userRepo.findById(userId);
 
         if(!admin){

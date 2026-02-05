@@ -4,8 +4,9 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IDeleteProjectUseCase } from "../../interface/project/IDeleteProjectUseCase";
 
-export class DeleteProjectUseCase {
+export class DeleteProjectUseCase implements IDeleteProjectUseCase {
     constructor(
         private  _projectRepo:IProjectRepository,
         private _userRepo:IUserRepository,

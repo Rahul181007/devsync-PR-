@@ -1,19 +1,20 @@
 import { Request, Response } from "express";
 import { loginSchema } from "../../application/validators/auth/login.validator";
-import { LoginSuperAdminUseCase } from "../../application/use-cases/auth/loginSuperAdmin.usecase";
-import { RefreshTokenUseCase } from "../../application/use-cases/auth/refreshToken.usecase";
 import { superAdminCookieOptions } from "../../config/superAdminCookieOption";
 import { userCookieOptions } from "../../config/userCookieOptions";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
-import { GetAuthMeUseCase } from "../../application/use-cases/auth/getAuthMe.usecase";
+
+import { IGetAuthMeUseCase } from "../../application/interface/auth/IGetAuthMeUseCase";
+import { ILoginSuperAdminUseCase } from "../../application/interface/auth/ILoginSuperAdminUseCase";
+import { IRefreshTokenUseCase } from "../../application/interface/auth/IRefreshTokenUseCase";
 
 export class AuthController {
-    constructor(private _loginSuperAdminUseCase: LoginSuperAdminUseCase,
-        private _refreshTokenUseCase: RefreshTokenUseCase,
-        private _getAuthMeUseCase: GetAuthMeUseCase,
+    constructor(private _loginSuperAdminUseCase: ILoginSuperAdminUseCase,
+        private _refreshTokenUseCase: IRefreshTokenUseCase,
+        private _getAuthMeUseCase: IGetAuthMeUseCase,
 
         
     ) { }
@@ -90,6 +91,7 @@ export class AuthController {
     me = async (req: Request, res: Response) => {
         try {
             const user = req.user
+            logger.info("auth me ")
             if (!user?.id || !user?.role) {
                 return res.status(HttpStatus.UNAUTHORIZED).json({
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED

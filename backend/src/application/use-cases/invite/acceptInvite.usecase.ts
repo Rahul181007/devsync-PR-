@@ -6,8 +6,10 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { AcceptInviteInput } from "../../dto/invite/acceptInvite.dto";
+import { AcceptInviteResponse } from "../../dto/invite/acceptInviteResponse.dto";
+import { IAcceptInviteUseCase } from "../../interface/invite/IAcceptInviteUseCase";
 
-export class AcceptInviteUseCase {
+export class AcceptInviteUseCase implements IAcceptInviteUseCase {
     constructor(
         private _inviteRepo: IInviteRepository,
         private _userRepo: IUserRepository,
@@ -15,7 +17,7 @@ export class AcceptInviteUseCase {
         private _passwordHasher: IPasswordHasher
     ) { }
 
-    async execute(input: AcceptInviteInput) {
+    async execute(input: AcceptInviteInput):Promise<AcceptInviteResponse> {
 
         if (!input.name?.trim()) {
             throw new AppError(

@@ -4,9 +4,10 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IRemoveProjectMemberUseCase } from "../../interface/project/IRemoveProjectMemberUseCase";
 
 
-export class RemoveProjectMemberUseCase{
+export class RemoveProjectMemberUseCase implements IRemoveProjectMemberUseCase{
     constructor(
         private _projectRepo:IProjectRepository,
         private _projectMemberRepo:IProjectMemberRepository,

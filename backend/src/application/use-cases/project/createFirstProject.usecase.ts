@@ -5,9 +5,11 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { CreateFirstProjectResponse } from "../../dto/project/createFirstProjectResponse.dto";
 import { CreateProjectDTO } from "../../dto/project/createProject.dto";
+import { ICreateFirstProjectUseCase } from "../../interface/project/ICreateFirstProjectUseCase";
 
-export class CreateFirstProjectUseCase {
+export class CreateFirstProjectUseCase implements ICreateFirstProjectUseCase {
     constructor(
         private _projectRepo:IProjectRepository,
         private _projectMember:IProjectMemberRepository,
@@ -23,7 +25,7 @@ export class CreateFirstProjectUseCase {
       .replace(/\s+/g, "-");
   }
 
-  async execute(userId:string,companyId:string,data:CreateProjectDTO){
+  async execute(userId:string,companyId:string,data:CreateProjectDTO):Promise<CreateFirstProjectResponse>{
     const user=await this._userRepo.findById(userId);
 
     if(!user){

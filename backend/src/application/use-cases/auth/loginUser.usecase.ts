@@ -7,8 +7,9 @@ import { AppError } from '../../../shared/errors/AppError';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
 import { ICompanyRepository } from '../../../domain/repositories/company.repository';
+import { ILoginUserUseCase } from '../../interface/auth/ILoginUserUseCase';
 
-export class LoginUserUseCase {
+export class LoginUserUseCase implements ILoginUserUseCase {
   constructor(
     private _userRepo: IUserRepository,
     private _passwordHasher: IPasswordHasher,

@@ -5,8 +5,9 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import {  AddProjectMemberDTO } from "../../dto/project/addProjectMember.dto";
+import { IAddProjectMemberUseCase } from "../../interface/project/IAddProjectMemberUseCase";
 
-export class AddProjectMemberUseCase{
+export class AddProjectMemberUseCase implements IAddProjectMemberUseCase{
     constructor(
         private _projectRepo:IProjectRepository,
         private _projectMemberRepo:IProjectMemberRepository,

@@ -1,27 +1,28 @@
 import { Request, Response } from "express";
 import { loginSchema } from "../../application/validators/auth/login.validator";
-import { LoginUserUseCase } from "../../application/use-cases/auth/loginUser.usecase";
-import { RefreshTokenUseCase } from "../../application/use-cases/auth/refreshToken.usecase";
+
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { userCookieOptions } from "../../config/userCookieOptions";
 import { signupSchema } from "../../application/validators/auth/signup.validator";
-import { SignupUseCase } from "../../application/use-cases/auth/signup.usecase";
-import { GoogleSignupUseCase } from "../../application/use-cases/auth/google-signup.usecase";
-import { VerifySignupOtpUseCase } from "../../application/use-cases/auth/verify-signup-otp.usecase";
-import { GoogleLoginUseCase } from "../../application/use-cases/auth/google-login.usecase";
+import { IGoogleLoginUseCase } from "../../application/interface/auth/IGoogleLoginUseCase";
+import { IGoogleSignupUseCase } from "../../application/interface/auth/IGoogleSignupUseCase";
+import { ILoginUserUseCase } from "../../application/interface/auth/ILoginUserUseCase";
+import { IRefreshTokenUseCase } from "../../application/interface/auth/IRefreshTokenUseCase";
+import { ISignupUseCase } from "../../application/interface/auth/ISignupUseCase";
+import { IVerifySignupOtpUseCase } from "../../application/interface/auth/IVerifySignupOtpUseCase";
 
 
 export class UserAuthController {
     constructor(
-        private _loginUserUseCase: LoginUserUseCase,
-        private _refreshTokenUseCase: RefreshTokenUseCase,
-        private _signupUseCase: SignupUseCase,
-        private _googleSignupUseCase: GoogleSignupUseCase,
-        private _verifySignupOtpUseCase: VerifySignupOtpUseCase,
-        private _googleLoginUseCase: GoogleLoginUseCase
+        private _loginUserUseCase: ILoginUserUseCase,
+        private _refreshTokenUseCase: IRefreshTokenUseCase,
+        private _signupUseCase: ISignupUseCase,
+        private _googleSignupUseCase:IGoogleSignupUseCase,
+        private _verifySignupOtpUseCase: IVerifySignupOtpUseCase,
+        private _googleLoginUseCase: IGoogleLoginUseCase
 
     ) { }
 

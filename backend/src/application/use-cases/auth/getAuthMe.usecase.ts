@@ -3,11 +3,12 @@ import { OnboardingStep } from "../../../domain/entities/company.entity";
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
 import { ISuperAdminRepository } from "../../../domain/repositories/superAdmin.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { IGetAuthMeUseCase } from "../../interface/auth/IGetAuthMeUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 
-export class GetAuthMeUseCase {
+export class GetAuthMeUseCase implements IGetAuthMeUseCase {
     constructor(
         private _userRepo: IUserRepository,
         private _companyRepo: ICompanyRepository,
