@@ -10,15 +10,24 @@ import { VerifySignupOtpUseCase } from "../application/use-cases/auth/verify-sig
 import { GoogleAuthService } from "../infrastructure/security/google-auth.service";
 import { GoogleLoginUseCase } from "../application/use-cases/auth/google-login.usecase";
 import { NodemailerService } from "../infrastructure/services/mail/nodemailer.service";
+import { IGoogleLoginUseCase } from "../application/interface/auth/IGoogleLoginUseCase";
+import { IGoogleSignupUseCase } from "../application/interface/auth/IGoogleSignupUseCase";
+import { ILoginUserUseCase } from "../application/interface/auth/ILoginUserUseCase";
+import { ISignupUseCase } from "../application/interface/auth/ISignupUseCase";
+import { IVerifySignupOtpUseCase } from "../application/interface/auth/IVerifySignupOtpUseCase";
+import { IResendSignupOtpUseCase } from "../application/interface/auth/IResendSignupOtpUseCase";
+import { ResendSignupOtpUseCase } from "../application/use-cases/auth/ResendSignupOtpUseCase";
 const userRepository=new UserRepository();
 const companyRepository=new CompanyRepository();
 const passwordHasher=new BcryptPasswordHasher();
 const googleAuthService=new GoogleAuthService();
-const emailService=new NodemailerService()
- const googleSignupUseCase=new GoogleSignupUseCase(userRepository,googleAuthService,emailService);
- const verifySignupOtpUseCase=new VerifySignupOtpUseCase(userRepository)
+const emailService=new NodemailerService();
 
-const loginUserUseCase=new LoginUserUseCase(userRepository,passwordHasher,companyRepository);
-const signupUseCase=new SignupUseCase(userRepository,passwordHasher,emailService)
-const googleLoginUseCase=new GoogleLoginUseCase(userRepository,companyRepository,googleAuthService)
-export const userAuthController=new UserAuthController(loginUserUseCase,refreshTokenUseCase,signupUseCase,googleSignupUseCase,verifySignupOtpUseCase,googleLoginUseCase)
+const googleSignupUseCase:IGoogleSignupUseCase=new GoogleSignupUseCase(userRepository,googleAuthService,emailService);
+const verifySignupOtpUseCase:IVerifySignupOtpUseCase=new VerifySignupOtpUseCase(userRepository)
+const loginUserUseCase:ILoginUserUseCase=new LoginUserUseCase(userRepository,passwordHasher,companyRepository);
+const signupUseCase:ISignupUseCase=new SignupUseCase(userRepository,passwordHasher,emailService)
+const googleLoginUseCase:IGoogleLoginUseCase=new GoogleLoginUseCase(userRepository,companyRepository,googleAuthService);
+const resendSignupOtpUseCase:IResendSignupOtpUseCase=new ResendSignupOtpUseCase(userRepository,emailService)
+
+export const userAuthController=new UserAuthController(loginUserUseCase,refreshTokenUseCase,signupUseCase,googleSignupUseCase,verifySignupOtpUseCase,googleLoginUseCase,resendSignupOtpUseCase)

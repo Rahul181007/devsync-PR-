@@ -2,8 +2,9 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IReapplyCompanyUseCase } from "../../interface/company/IReapplyCompanyUseCase";
 
-export class ReapplyCompanyUseCase{
+export class ReapplyCompanyUseCase implements IReapplyCompanyUseCase{
     constructor(
         private _companyRepo:ICompanyRepository
     ){}
@@ -20,7 +21,7 @@ export class ReapplyCompanyUseCase{
 
         if(company.status!=='REJECTED'){
             throw new AppError(
-                `company cannot reapply when status is ${company.id}`,
+                `company cannot reapply when status is ${company.status}`,
                 HttpStatus.FORBIDDEN
             )
         }

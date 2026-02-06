@@ -115,6 +115,18 @@ export const sendForgotPasswordOtp = createAsyncThunk(
     }
 )
 
+export const sendSignupOtp = createAsyncThunk(
+    "auth/sendSignupOtp",
+    async (email: string, { rejectWithValue }) => {
+        try {
+            const res = await authApi.resendSignupOtp(email);
+            return res.data.message
+        } catch (error) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
 export const reapplyCompany = createAsyncThunk<void, void, { rejectValue: string }>(
     "auth/reapplyCompany",
     async (_, { rejectWithValue }) => {
@@ -392,6 +404,8 @@ const authSlice = createSlice({
                 state.error = action.payload as string
             })
 
+
+
             //verify otp
             .addCase(verifyForgotPasswordOtp.pending, (state) => {
                 state.loading = true;
@@ -483,6 +497,19 @@ const authSlice = createSlice({
                 };
             })
             .addCase(googleSignup.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string
+            })
+
+            .addCase(sendSignupOtp.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(sendSignupOtp.fulfilled, (state) => {
+                state.loading = false;
+                state.otpSent = true
+            })
+            .addCase(sendSignupOtp.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string
             })

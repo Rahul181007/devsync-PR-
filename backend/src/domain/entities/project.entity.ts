@@ -1,4 +1,4 @@
-export type ProjectStatus='ACTIVE'|'ARCHIVED'
+export type ProjectStatus='ACTIVE'|'ARCHIVED'|'COMPLETED'
 
 export class Project {
   constructor(

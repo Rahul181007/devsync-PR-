@@ -2,15 +2,17 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { IInviteRepository } from "../../../domain/repositories/invites.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { ListCompaniesQuery } from "../../dto/company/listCompanies.dto";
+import { ListCompaniesResponse } from "../../dto/company/listCompaniesResponse.dto";
+import { IListCompaniesUseCase } from "../../interface/company/IListCompaniesUseCase";
 
-export class ListCompaniesUseCase{
+export class ListCompaniesUseCase implements IListCompaniesUseCase{
     constructor(
         private _companyRepo:ICompanyRepository,
         private _inviteRepo:IInviteRepository,
         private _userRepo:IUserRepository
     ){}
 
-   async execute(query: ListCompaniesQuery) {
+   async execute(query: ListCompaniesQuery):Promise<ListCompaniesResponse> {
   const result = await this._companyRepo.findAll(query);
 
   const items = await Promise.all(

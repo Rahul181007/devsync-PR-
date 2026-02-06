@@ -52,6 +52,10 @@ export const authApi={
        forgotPassword(email:string){
          return http.post ('/auth/forgot-password',{email})
        },
+
+       resendSignupOtp(email:string){
+        return http.post('/auth/resend-signup-otp',{email})
+       },
        
        verifyOtp(data:{email:string;otp:string}){
         return http.post ('/auth/verify-otp',data)

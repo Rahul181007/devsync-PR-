@@ -3,9 +3,11 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { AppError } from "../../../shared/errors/AppError";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
+import { CreateCompanyResponse } from "../../dto/company/createCompanyResponse.dto";
+import { ICreateCompanyUseCase } from "../../interface/company/ICreateCompanyUseCase";
 
 
-export class CreateCompanyUseCase{
+export class CreateCompanyUseCase implements ICreateCompanyUseCase{
     constructor(
         private _companyRepo:ICompanyRepository,
     ){}
@@ -18,7 +20,7 @@ export class CreateCompanyUseCase{
             .replace(/\s+/g,"-")
         }
 
-    async execute(input:CreateCompanyInput){
+    async execute(input:CreateCompanyInput):Promise<CreateCompanyResponse>{
        const normalizedName = input.name.trim().toLowerCase();
         const normalizedDomain = input.domain? input.domain.trim().toLowerCase(): undefined;
         const normalizedAdminEmail=input.adminEmail? input.adminEmail.trim().toLowerCase():undefined;
@@ -53,6 +55,14 @@ export class CreateCompanyUseCase{
         adminEmail:normalizedAdminEmail??null
        })
        console.log(newCompany)
-       return newCompany
+       return {
+        id:newCompany.id,
+        name:newCompany.name,
+        slug:newCompany.slug,
+        domain:newCompany.domain,
+        status:newCompany.status,
+        onboardingStep:newCompany.onboardingStep,
+        adminEmail:newCompany.adminEmail
+       }
     }
 }

@@ -1,25 +1,26 @@
-import { CreateInviteUseCase } from "../../application/use-cases/invite/createInvite.usecase";
 import { Request, Response } from "express";
 import { inviteSchema } from "../../application/validators/invite/createInvite.validator";
 import { handleError } from "../../shared/utils/handleError";
 import { verifyInviteQuerySchema } from "../../application/validators/invite/verifyInvite.validator";
-import { VerifyInviteUseCase } from "../../application/use-cases/invite/verifyInvite.usecase";
 import { acceptInviteQuerySchema } from "../../application/validators/invite/acceptInvite.validator";
-import { AcceptInviteUseCase } from "../../application/use-cases/invite/acceptInvite.usecase";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { inviteDeveloperSchema } from "../../application/validators/invite/inviteDeveloper.validator";
-import { InviteDeveloperUseCase } from "../../application/use-cases/invite/inviteDeveloper.usecase";
 import { logger } from "../../shared/logger/logger";
+import { IAcceptInviteUseCase } from "../../application/interface/invite/IAcceptInviteUseCase";
+import { ICreateInviteUseCase } from "../../application/interface/invite/ICreateInviteUseCase";
+import { IVerifyInviteUseCase } from "../../application/interface/invite/IVerifyInviteUseCase";
+import { IInviteDeveloperUseCase } from "../../application/interface/invite/IInviteDeveloperUseCase";
+import { Role } from "../../shared/constants/roleenum";
 
 
 
 export class InviteController {
     constructor(
-        private _createInviteUseCase: CreateInviteUseCase,
-        private _verifyInviteUseCase: VerifyInviteUseCase,
-        private _acceptInviteUseCase: AcceptInviteUseCase,
-        private _inviteDeveloperUseCase: InviteDeveloperUseCase
+        private _createInviteUseCase: ICreateInviteUseCase,
+        private _verifyInviteUseCase: IVerifyInviteUseCase,
+        private _acceptInviteUseCase: IAcceptInviteUseCase,
+        private _inviteDeveloperUseCase: IInviteDeveloperUseCase
     ) { }
 
     createCompanyAdminInvite = async (req: Request, res: Response) => {
@@ -27,7 +28,7 @@ export class InviteController {
             const input = inviteSchema.parse(req.body);
 
 
-            if (!req.user || req.user.role !== 'SUPER_ADMIN') {
+            if (!req.user || req.user.role !== Role.SUPER_ADMIN) {
                 logger.warn('Create company admin invite failed: forbidden access');
                 return res.status(HttpStatus.FORBIDDEN).json({ message: RESPONSE_MESSAGES.AUTH.FORBIDDEN });
 
@@ -35,7 +36,7 @@ export class InviteController {
 
             const inviter = {
                 id: req.user.id,
-                role: 'SUPER_ADMIN' as const
+                role: Role.SUPER_ADMIN as const
             }
 
             const { companyId } = req.params
@@ -103,7 +104,7 @@ export class InviteController {
         try {
             const parsed = inviteDeveloperSchema.parse(req.body);
 
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Invite developer failed: forbidden access');
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -120,7 +121,7 @@ export class InviteController {
             logger.info('Invite developer requested');
             const inviter = {
                 id: req.user.id,
-                role: 'COMPANY_ADMIN' as const,
+                role: Role.COMPANY_ADMIN as const,
                 companyId: req.user.companyId
             }
             const result = await this._inviteDeveloperUseCase.execute({ email: parsed.email }, inviter)

@@ -34,7 +34,8 @@ export const RESPONSE_MESSAGES = {
         EMAIL_NOT_VERIFIED:'Email not verified',
         USE_GOOGLE_LOGIN:'use google login',
         USE_PASSWORD_LOGIN:'user password login',
-        NAME_REQUIRED:"Name is required"
+        NAME_REQUIRED:"Name is required",
+        USER_ALREADY_VERIFIED:"User already verified"
     },
 
     COMPANY: {
@@ -82,7 +83,20 @@ export const RESPONSE_MESSAGES = {
     },
     PROJECT:{
         ALREADY_EXISTS:'Project already exist',
-        CREATED:'Project created'
+        CREATED:'Project created',
+        PROJECT_NOT_FOUND:'Project  not found',
+        ACCESS_DENIED:'Access denied',
+        ARCHIVED:'Archived',
+        USER_NOT_IN_COMPANY:'User not in company',
+        MEMBER_ALREADY_EXISTS:'Member already exist',
+        MEMBER_NOT_FOUND:'Member not found',
+        LIST_FETCHED:'List fetched',
+        ID_REQUIRED:'ProjectId is required',
+        FETCHED:'project fetched',
+        UPDATED:'Project is updated',
+        MEMBER_ADDED:'MEMBER ADDED',
+        CANNOT_REMOVE_OWNER:'Cannot remove an owner',
+        DEVELOPER_ONLY_BE_ADDED:'Developer can only be added',
     },
 
     COMMON: {

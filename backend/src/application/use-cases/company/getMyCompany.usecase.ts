@@ -2,13 +2,15 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { GetMyCompanyResponse } from "../../dto/company/getMyCompanyResponse.dto";
+import { IGetMyCompanyUseCase } from "../../interface/company/IGetMyCompanyUseCase";
 
-export class GetMyCompanyUseCase{
+export class GetMyCompanyUseCase implements IGetMyCompanyUseCase{
     constructor(
         private _companyRepo:ICompanyRepository
     ){}
 
-    async execute(companyId:string){
+    async execute(companyId:string):Promise<GetMyCompanyResponse>{
         const company=await this._companyRepo.findById(companyId)
 
         if(!company){

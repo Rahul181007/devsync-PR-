@@ -1,5 +1,5 @@
 import { NavLink,useNavigate } from "react-router-dom";
-import { LayoutDashboard,Building2,LogOut } from "lucide-react";
+import { LayoutDashboard,Building2,LogOut, FolderKanban } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../store/hook";
 import { logout } from "../../auth/auth.slice";
 
@@ -54,6 +54,21 @@ const Sidebar=()=>{
           <Building2 size={18} />
           User
         </NavLink>
+
+
+        <NavLink
+  to={`${basePath}/projects`}
+  className={({ isActive }) =>
+    `flex items-center gap-3 px-3 py-2 rounded-md transition ${
+      isActive
+        ? "bg-slate-700"
+        : "text-slate-300 hover:bg-slate-800 hover:text-white"
+    }`
+  }
+>
+  <FolderKanban size={18} />
+  Projects
+</NavLink>
       </nav>
 
       {/* Logout */}

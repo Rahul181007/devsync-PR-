@@ -1,21 +1,20 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
+import { BlockDeveloperContext } from "../../dto/user/blockDeveloperContext.dto";
+import { IUnblockDeveloperUseCase } from "../../interface/user/IUnblockDeveloperUseCase";
 
-interface InvokerContext{
-    id:string;
-    role:'COMPANY_ADMIN',
-    companyId:string
-}
 
-export class UnblockDeveloperUseCase{
+
+export class UnblockDeveloperUseCase implements IUnblockDeveloperUseCase{
     constructor(
         private _userRepo:IUserRepository
     ){}
 
-    async execute(developerId:string,invoker:InvokerContext){
-            if (invoker.role !== 'COMPANY_ADMIN') {
+    async execute(developerId:string,invoker:BlockDeveloperContext){
+            if (invoker.role !== Role.COMPANY_ADMIN) {
       throw new AppError(RESPONSE_MESSAGES.AUTH.FORBIDDEN, HttpStatus.FORBIDDEN);
     }
 
@@ -24,7 +23,7 @@ export class UnblockDeveloperUseCase{
       throw new AppError(RESPONSE_MESSAGES.USER.NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 
-    if (developer.role !== 'DEVELOPER') {
+    if (developer.role !== Role.DEVELOPER) {
       throw new AppError(RESPONSE_MESSAGES.AUTH.FORBIDDEN, HttpStatus.FORBIDDEN);
     }
 

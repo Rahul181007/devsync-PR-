@@ -3,7 +3,7 @@ import mongoose ,{Schema,Document} from "mongoose";
 export interface IProjectMemberDocument extends Document{
     projectId:mongoose.Types.ObjectId;
     userId:mongoose.Types.ObjectId;
-    role: "OWNER" | "ADMIN" | "DEVELOPER";
+    role: "OWNER" | "DEVELOPER";
     createdAt:Date;
 }
 
@@ -24,7 +24,7 @@ const ProjectMemberSchema=new Schema<IProjectMemberDocument>(
         },
         role:{
             type:String,
-             enum: ["OWNER", "ADMIN", "DEVELOPER"],
+             enum: ["OWNER", "DEVELOPER"],
              required:true
         }
     },

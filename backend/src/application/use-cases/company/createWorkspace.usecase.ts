@@ -2,10 +2,13 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { CreateWorkspaceDTO } from "../../dto/company/createWorkspace.dto";
+import { CreateWorkspaceResponse } from "../../dto/company/createWorkspaceResponse.dto";
+import { ICreateWorkspaceUseCase } from "../../interface/company/ICreateWorkspaceUseCase";
 
-export class CreateWorkspaceUseCase {
+export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
     constructor(
         private _companyRepo: ICompanyRepository,
         private _userRepo: IUserRepository
@@ -19,7 +22,7 @@ export class CreateWorkspaceUseCase {
             .replace(/\s+/g, "-")
     }
 
-    async execute(userId: string, data: CreateWorkspaceDTO) {
+    async execute(userId: string, data: CreateWorkspaceDTO):Promise<CreateWorkspaceResponse> {
         const normalizedName = data.name.trim();
         const normalizedDomain = data.domain
             ? data.domain.trim().toLowerCase()
@@ -30,7 +33,7 @@ export class CreateWorkspaceUseCase {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        if (user.role !== 'COMPANY_ADMIN') {
+        if (user.role !== Role.COMPANY_ADMIN) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.FORBIDDEN)
         }
         if (user.status !== 'PENDING_ONBOARDING') {

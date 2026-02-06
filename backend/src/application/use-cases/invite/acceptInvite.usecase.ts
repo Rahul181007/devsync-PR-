@@ -4,10 +4,13 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IPasswordHasher } from "../../../domain/service/password-hasher";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { AcceptInviteInput } from "../../dto/invite/acceptInvite.dto";
+import { AcceptInviteResponse } from "../../dto/invite/acceptInviteResponse.dto";
+import { IAcceptInviteUseCase } from "../../interface/invite/IAcceptInviteUseCase";
 
-export class AcceptInviteUseCase {
+export class AcceptInviteUseCase implements IAcceptInviteUseCase {
     constructor(
         private _inviteRepo: IInviteRepository,
         private _userRepo: IUserRepository,
@@ -15,7 +18,7 @@ export class AcceptInviteUseCase {
         private _passwordHasher: IPasswordHasher
     ) { }
 
-    async execute(input: AcceptInviteInput) {
+    async execute(input: AcceptInviteInput):Promise<AcceptInviteResponse> {
 
         if (!input.name?.trim()) {
             throw new AppError(
@@ -67,7 +70,7 @@ export class AcceptInviteUseCase {
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        if (invite.role === 'COMPANY_ADMIN') {
+        if (invite.role === Role.COMPANY_ADMIN) {
             await this._companyRepo.assignOwnerAdmin(invite.companyId, user.id)
         }
 
@@ -76,7 +79,7 @@ export class AcceptInviteUseCase {
             userId: user.id,
             companyId: invite.companyId,
             role: invite.role,
-            redirectTo: invite.role === 'COMPANY_ADMIN' ? 'ONBOARDING' : 'DASHBOARD'
+            redirectTo: invite.role === Role.COMPANY_ADMIN ? 'ONBOARDING' : 'DASHBOARD'
         }
     }
 }

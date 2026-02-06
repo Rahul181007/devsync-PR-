@@ -1,3 +1,7 @@
+import { IAcceptInviteUseCase } from "../application/interface/invite/IAcceptInviteUseCase";
+import { ICreateInviteUseCase } from "../application/interface/invite/ICreateInviteUseCase";
+import { IInviteDeveloperUseCase } from "../application/interface/invite/IInviteDeveloperUseCase";
+import { IVerifyInviteUseCase } from "../application/interface/invite/IVerifyInviteUseCase";
 import { AcceptInviteUseCase } from "../application/use-cases/invite/acceptInvite.usecase";
 import { CreateInviteUseCase } from "../application/use-cases/invite/createInvite.usecase";
 import { InviteDeveloperUseCase } from "../application/use-cases/invite/inviteDeveloper.usecase";
@@ -16,19 +20,19 @@ const useRepository=new UserRepository();
 const mailService=new NodemailerService();
 const passwordHasher=new BcryptPasswordHasher();
 
-const createInviteUseCase=new CreateInviteUseCase(
+const createInviteUseCase:ICreateInviteUseCase=new CreateInviteUseCase(
     inviteRepository,
     companyRepository,
     mailService
 );
-const verifyInviteUseCase=new VerifyInviteUseCase(inviteRepository)
-const acceptInviteUseCase=new AcceptInviteUseCase(
+const verifyInviteUseCase:IVerifyInviteUseCase=new VerifyInviteUseCase(inviteRepository)
+const acceptInviteUseCase:IAcceptInviteUseCase=new AcceptInviteUseCase(
     inviteRepository,
     useRepository,
     companyRepository,
     passwordHasher
 )
-const inviteDeveloperUseCase=new InviteDeveloperUseCase(inviteRepository,mailService,companyRepository)
+const inviteDeveloperUseCase:IInviteDeveloperUseCase=new InviteDeveloperUseCase(inviteRepository,mailService,companyRepository)
 export const inviteController=new InviteController(
     createInviteUseCase,
     verifyInviteUseCase,

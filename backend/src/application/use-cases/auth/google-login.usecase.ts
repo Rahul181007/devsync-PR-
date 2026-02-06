@@ -1,13 +1,14 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IGoogleAuthService } from "../../../domain/service/google-auth.service";
+import { IGoogleLoginUseCase } from "../../interface/auth/IGoogleLoginUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { Tokenutilits } from "../../../shared/utils/token.util";
 import { LoginResponseDTO } from "../../dto/auth/login.response.dto";
 
-export class GoogleLoginUseCase {
+export class GoogleLoginUseCase implements IGoogleLoginUseCase {
     constructor(
         private _userRepo: IUserRepository,
         private _companyRepo: ICompanyRepository,

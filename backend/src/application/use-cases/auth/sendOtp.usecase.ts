@@ -5,8 +5,9 @@ import { IMailService } from '../../../domain/service/mail.service';
 import { AppError } from '../../../shared/errors/AppError';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
+import { ISendOtpUseCase } from '../../interface/auth/ISendOtpUseCase';
 
-export class SendOtpUseCase{
+export class SendOtpUseCase implements ISendOtpUseCase{
     constructor(
         private _useRepo:IUserRepository,
         private _passwordRepo:IPasswordResetRepository,

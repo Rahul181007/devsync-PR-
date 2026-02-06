@@ -7,12 +7,14 @@ import { IUserRepository } from '../../../domain/repositories/user.repository';
 import { RequestUser } from '../../../shared/types/AuthUser';
 import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
+import { IRefreshTokenUseCase } from '../../interface/auth/IRefreshTokenUseCase';
+import { Role } from '../../../shared/constants/roleenum';
 interface RefreshTokenPayload{
     sub:string;
     role:'SUPER_ADMIN'|'COMPANY_ADMIN'|'DEVELOPER'
 }
 
-export class RefreshTokenUseCase{
+export class RefreshTokenUseCase implements IRefreshTokenUseCase{
   constructor(private readonly _superadminrepo:ISuperAdminRepository,private readonly _userRepo:IUserRepository){}
 
   async execute(refreshToken:string){
@@ -29,7 +31,7 @@ export class RefreshTokenUseCase{
     let user:RequestUser|null=null;
 
     switch(decoded.role){
-        case 'SUPER_ADMIN':{
+        case Role.SUPER_ADMIN:{
         const superAdmin=await this._superadminrepo.findById(decoded.sub)
         if(!superAdmin)break;
         user={
@@ -38,8 +40,8 @@ export class RefreshTokenUseCase{
         }
         break;
     }
-        case 'COMPANY_ADMIN':
-        case 'DEVELOPER':{
+        case Role.COMPANY_ADMIN:
+        case Role.DEVELOPER:{
           const  CDuser=await this._userRepo.findById(decoded.sub);
           if(!CDuser) break;
           user={

@@ -4,14 +4,15 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { UpdateCompanyBrandingInput } from "../../dto/company/updateBranding.dto";
+import { IUpdateCompanyBrandingUseCase } from "../../interface/company/IUpdateCompanyBrandingUseCase";
 
-export class UpdateCompanyBrandingUseCase{
+export class UpdateCompanyBrandingUseCase implements IUpdateCompanyBrandingUseCase{
     constructor(
         private _companyRepo:ICompanyRepository,
         private _fileStorage:IFileStorage
     ){}
 
-    async execute(companyId:string,data:UpdateCompanyBrandingInput){
+    async execute(companyId:string,data:UpdateCompanyBrandingInput):Promise<void>{
         const company=await this._companyRepo.findById(companyId);
 
         if(!company){

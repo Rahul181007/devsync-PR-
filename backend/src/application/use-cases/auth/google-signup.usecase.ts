@@ -1,11 +1,13 @@
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IGoogleAuthService } from "../../../domain/service/google-auth.service";
 import { IMailService } from "../../../domain/service/mail.service";
+import { IGoogleSignupUseCase } from "../../interface/auth/IGoogleSignupUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { Role } from "../../../shared/constants/roleenum";
 
-export class GoogleSignupUseCase {
+export class GoogleSignupUseCase implements IGoogleSignupUseCase {
     constructor(
         private _userRepo: IUserRepository,
         private _googleAuthServices: IGoogleAuthService,
@@ -28,7 +30,7 @@ export class GoogleSignupUseCase {
             name: googleUser.name,
             email: googleUser.email,
             passwordHash: null,
-            role: 'COMPANY_ADMIN',
+            role: Role.COMPANY_ADMIN,
             authProvider: 'GOOGLE',
             status: 'PENDING_VERIFICATION',
             companyId: null,

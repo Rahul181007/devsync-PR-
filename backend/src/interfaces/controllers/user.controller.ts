@@ -1,22 +1,23 @@
-import { BlockCompanyAdminUseCase } from "../../application/use-cases/user/blockCompanyAdmin.usecase";
-import { UnblockCompanyAdminUseCase } from "../../application/use-cases/user/unblockCompanyAdmin.usecase";
 import { Request, Response } from "express";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
-import { ListDeveloperUsecase } from "../../application/use-cases/user/listDevelopers.usecase";
-import { BlockDeveloperUseCase } from "../../application/use-cases/user/blockDeveloper.usecase";
-import { UnblockDeveloperUseCase } from "../../application/use-cases/user/unblockDeveloper.usecase";
 import { logger } from "../../shared/logger/logger";
+import { IBlockCompanyAdminUseCase } from "../../application/interface/user/IBlockCompanyAdminUseCase";
+import { IUnblockCompanyAdminUseCase } from "../../application/interface/user/IUnblockCompanyAdminUseCase";
+import { IListDevelopersUseCase } from "../../application/interface/user/IListDevelopersUseCase";
+import { IBlockDeveloperUseCase } from "../../application/interface/user/IBlockDeveloperUseCase";
+import { IUnblockDeveloperUseCase } from "../../application/interface/user/IUnblockDeveloperUseCase";
+import { Role } from "../../shared/constants/roleenum";
 
 
 export class UserController {
     constructor(
-        private _blockCompanyAdminUseCase: BlockCompanyAdminUseCase,
-        private _unblockCompanyAdminUseCase: UnblockCompanyAdminUseCase,
-        private _listDeveloperUseCase: ListDeveloperUsecase,
-        private _blockDeveloperUseCase: BlockDeveloperUseCase,
-        private _unblockDeveloperUseCase: UnblockDeveloperUseCase
+        private _blockCompanyAdminUseCase: IBlockCompanyAdminUseCase,
+        private _unblockCompanyAdminUseCase: IUnblockCompanyAdminUseCase,
+        private _listDeveloperUseCase: IListDevelopersUseCase,
+        private _blockDeveloperUseCase: IBlockDeveloperUseCase,
+        private _unblockDeveloperUseCase: IUnblockDeveloperUseCase
     ) { }
     blockCompanyAdmin = async (req: Request, res: Response) => {
         try {
@@ -62,7 +63,7 @@ export class UserController {
     }
     listDevelopers = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('List developers failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -81,25 +82,11 @@ export class UserController {
             const developers = await this._listDeveloperUseCase.execute(req.user.companyId, req.query)
 
             logger.info('List developers successful')
-            const responseItems = developers.items.map(dev => ({
-                id: dev.id,
-                name: dev.name,
-                email: dev.email,
-                role: dev.role,
-                status: dev.status,
-                avatarUrl: dev.avatarUrl,
-                createdAt: dev.createdAt,
-                updatedAt: dev.updatedAt,
-                lastLoginAt: dev.lastLoginAt
 
-            }))
 
             return res.status(HttpStatus.OK).json({
                 success: true,
-                data: {
-                    items: responseItems,
-                    pagination: developers.pagination
-                }
+                data:developers
             })
         } catch (error: unknown) {
             logger.error('List developers failed', { userId: req.user?.id, companyId: req.user?.companyId, error });
@@ -109,7 +96,7 @@ export class UserController {
 
     blockDevelopers = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Block developer failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -151,7 +138,7 @@ export class UserController {
 
     unblockDeveloper = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Unblock developer failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN

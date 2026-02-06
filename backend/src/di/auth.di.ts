@@ -5,11 +5,13 @@ import { refreshTokenUseCase } from "./authRefresh.di";
 import { GetAuthMeUseCase } from "../application/use-cases/auth/getAuthMe.usecase";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { CompanyRepository } from "../infrastructure/repositories/company.repository";
+import { IGetAuthMeUseCase } from "../application/interface/auth/IGetAuthMeUseCase";
+import { ILoginSuperAdminUseCase } from "../application/interface/auth/ILoginSuperAdminUseCase";
 
 
 const superAdminRepo=new SuperAdminRepository();
 const userRepository=new UserRepository();
 const companyRepository=new CompanyRepository()
-const loginUseCase= new LoginSuperAdminUseCase(superAdminRepo);
-const getAuthMeUseCase=new GetAuthMeUseCase(userRepository,companyRepository,superAdminRepo)
+const loginUseCase:ILoginSuperAdminUseCase= new LoginSuperAdminUseCase(superAdminRepo);
+const getAuthMeUseCase:IGetAuthMeUseCase=new GetAuthMeUseCase(userRepository,companyRepository,superAdminRepo)
 export const authController=new AuthController(loginUseCase,refreshTokenUseCase,getAuthMeUseCase);

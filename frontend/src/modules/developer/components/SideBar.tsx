@@ -1,18 +1,18 @@
-import { NavLink,useNavigate } from "react-router-dom";
-import { LayoutDashboard,Building2,LogOut } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { LayoutDashboard, FolderKanban, LogOut } from "lucide-react";
 import { useAppDispatch } from "../../../store/hook";
 import { logout } from "../../auth/auth.slice";
 
-const Sidebar=()=>{
-    const dispatch=useAppDispatch();
-    const navigate=useNavigate();
+const Sidebar = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    const handleLogout=async ()=>{
-        await dispatch(logout());
-        navigate('/developer/login')
-    }
+  const handleLogout = async () => {
+    await dispatch(logout());
+    navigate("/developer/login");
+  };
 
-      return (
+  return (
     <aside className="w-64 bg-linear-to-b from-slate-900 to-slate-800 text-white min-h-screen flex flex-col p-4">
       {/* Logo */}
       <div className="flex items-center gap-2 mb-10">
@@ -48,8 +48,8 @@ const Sidebar=()=>{
             }`
           }
         >
-          <Building2 size={18} />
-         Project
+          <FolderKanban size={18} />
+          Projects
         </NavLink>
       </nav>
 
@@ -63,7 +63,6 @@ const Sidebar=()=>{
       </button>
     </aside>
   );
-
-}
+};
 
 export default Sidebar;

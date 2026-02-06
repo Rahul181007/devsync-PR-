@@ -4,14 +4,16 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { ListDevelopersQuery } from "../../dto/user/listDevelopers.dto";
+import { ListDevelopersResponse } from "../../dto/user/listDevelopersResponse.dto";
+import { IListDevelopersUseCase } from "../../interface/user/IListDevelopersUseCase";
 
 
 
-export class ListDeveloperUsecase{
+export class ListDeveloperUsecase implements IListDevelopersUseCase{
     constructor(
         private _userRepo:IUserRepository
     ){}
-    async execute(companyId:string,query:ListDevelopersQuery){
+    async execute(companyId:string,query:ListDevelopersQuery):Promise<ListDevelopersResponse>{
         if(!companyId){
             throw new AppError(
                 RESPONSE_MESSAGES.COMPANY.NOT_FOUND,

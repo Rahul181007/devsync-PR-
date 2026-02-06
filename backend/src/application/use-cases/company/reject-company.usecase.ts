@@ -2,18 +2,16 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { RejectCompanyInput } from "../../dto/company/rejectCompany.dto";
+import { IRejectCompanyUseCase } from "../../interface/company/IRejectCompanyUseCase";
 
-export class RejectCompanyUseCase{
+export class RejectCompanyUseCase implements IRejectCompanyUseCase{
     constructor(
       private _companyRepo:ICompanyRepository
     ){}
 
-    async execute(param:{
-        companyId:string;
-        rejectedBy:string;
-        reason:string
-    }):Promise<void>{
-        const {companyId,rejectedBy,reason}=param
+    async execute(input: RejectCompanyInput):Promise<void>{
+        const {companyId,rejectedBy,reason}=input
 
         if(!reason || reason.trim().length<5){
             throw new AppError(RESPONSE_MESSAGES.COMPANY.REJECTION_REASON,HttpStatus.BAD_REQUEST)

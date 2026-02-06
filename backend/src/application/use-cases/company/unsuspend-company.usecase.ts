@@ -2,8 +2,9 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
+import { IUnsuspendCompanyUseCase } from "../../interface/company/IUnsuspendCompanyUseCase";
 
-export class UnsuspendCompanyUseCase{
+export class UnsuspendCompanyUseCase implements IUnsuspendCompanyUseCase{
     constructor(
         private _companyRepo:ICompanyRepository
     ){}

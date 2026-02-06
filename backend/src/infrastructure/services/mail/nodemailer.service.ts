@@ -44,8 +44,8 @@ export class NodemailerService implements IMailService {
         })
     }
 
-   async sendDeveloperInviteEmail(data: { to: string; inviteLink: string; companyName: string; }): Promise<void> {
-            await this._transporter.sendMail({
+    async sendDeveloperInviteEmail(data: { to: string; inviteLink: string; companyName: string; }): Promise<void> {
+        await this._transporter.sendMail({
             from: env.MAIL_FROM,
             to: data.to,
             subject: `You have invited  to ${data.companyName} as Developer`,
@@ -58,9 +58,9 @@ export class NodemailerService implements IMailService {
                   `
 
         })
-   }
-    
-       async sendSignupOtp(email: string, otp: string) {
+    }
+
+    async sendSignupOtp(email: string, otp: string) {
         await this._transporter.sendMail({
             from: env.MAIL_FROM,
             to: email,
@@ -74,4 +74,18 @@ export class NodemailerService implements IMailService {
 
         })
     }
+    async sendDeveloperAddedToProjectEmail(data: { to: string; projectName: string; companyName: string; }): Promise<void> {
+        await this._transporter.sendMail({
+            from: env.MAIL_FROM,
+            to: data.to,
+            subject: `Added to project ${data.projectName}`,
+            html: `
+      <p>Hello,</p>
+      <p>You have been added to the project <b>${data.projectName}</b>
+      in <b>${data.companyName}</b>.</p>
+      <p>You can now access it from your dashboard.</p>
+    `
+        })
+    }
+
 }
