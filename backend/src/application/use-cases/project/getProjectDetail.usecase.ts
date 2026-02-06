@@ -3,6 +3,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { GetProjectDetailResponse } from "../../dto/project/getProjectDetailResponse.dto";
 import { IGetProjectDetailUseCase } from "../../interface/project/IGetProjectDetailUseCase";
@@ -34,7 +35,7 @@ export class GetProjectDetailUseCase implements IGetProjectDetailUseCase {
   }
 
   // Developer access check
-  if (user.role === "DEVELOPER") {
+  if (user.role === Role.DEVELOPER) {
     const isMember = await this._projectMemberRepo.isMember(projectId, userId);
     if (!isMember) {
       throw new AppError(RESPONSE_MESSAGES.PROJECT.ACCESS_DENIED, HttpStatus.FORBIDDEN);

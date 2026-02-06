@@ -47,30 +47,39 @@ export const createFirstProject = createAsyncThunk<void, {
 
 
 export const listProjects = createAsyncThunk<
-    {
-        data: Project[];
-        total: number;
-        page: number;
-        limit: number;
-    },
-    {
-        page?: number;
-        limit?: number;
-        search?: string;
-        status?: 'ACTIVE' | 'ARCHIVED' | 'COMPLETED'
-    },
-    { rejectValue: string }
+  {
+    data: Project[];
+    total: number;
+    page: number;
+    limit: number;
+  },
+  {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: "ACTIVE" | "ARCHIVED" | "COMPLETED";
+  },
+  { rejectValue: string }
 >(
-    'project/listProjects',
-    async (params, { rejectWithValue }) => {
-        try {
-            const response = await projectApi.getProjects(params);
-            return response.data.data;
-        } catch (error: unknown) {
-            return rejectWithValue(getErrorMessage(error))
-        }
+  'project/listProjects',
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await projectApi.getProjects(params);
+
+      return {
+        data: response.data.data.data,
+        total: response.data.data.pagination.total,
+        page: response.data.data.pagination.page,
+        limit: response.data.data.pagination.limit,
+      };
+
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error));
     }
-)
+  }
+);
+
+
 
 export const createProject = createAsyncThunk<
     Project,

@@ -2,6 +2,7 @@ import { IProjectRepository } from "../../../domain/repositories/project.reposit
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { UpdateProjectDTO } from "../../dto/project/updateProject.dto";
 import { UpdateProjectResponse } from "../../dto/project/updateProjectResponse.dto";
@@ -31,7 +32,7 @@ export class UpdateProjectUseCase implements IUpdateProjectUseCase {
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        if (user.role !== 'COMPANY_ADMIN') {
+        if (user.role !== Role.COMPANY_ADMIN) {
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
                 HttpStatus.FORBIDDEN

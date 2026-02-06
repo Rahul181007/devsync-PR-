@@ -13,6 +13,7 @@ import { ILoginUserUseCase } from "../../application/interface/auth/ILoginUserUs
 import { IRefreshTokenUseCase } from "../../application/interface/auth/IRefreshTokenUseCase";
 import { ISignupUseCase } from "../../application/interface/auth/ISignupUseCase";
 import { IVerifySignupOtpUseCase } from "../../application/interface/auth/IVerifySignupOtpUseCase";
+import { IResendSignupOtpUseCase } from "../../application/interface/auth/IResendSignupOtpUseCase";
 
 
 export class UserAuthController {
@@ -22,7 +23,8 @@ export class UserAuthController {
         private _signupUseCase: ISignupUseCase,
         private _googleSignupUseCase:IGoogleSignupUseCase,
         private _verifySignupOtpUseCase: IVerifySignupOtpUseCase,
-        private _googleLoginUseCase: IGoogleLoginUseCase
+        private _googleLoginUseCase: IGoogleLoginUseCase,
+        private _resendSignupOtpUseCase:IResendSignupOtpUseCase
 
     ) { }
 
@@ -127,6 +129,18 @@ export class UserAuthController {
         } catch (error: unknown) {
             return handleError(error, res)
         }
+    }
+
+    resendSignUpOtp=async(req:Request,res:Response)=>{
+      try {
+        const {email}=req.body
+        console.log(email)
+
+        await this._resendSignupOtpUseCase.execute(email);
+        return res.status(HttpStatus.OK).json({mmessage:"otp is sended"})
+      } catch (error:unknown) {
+        return handleError(error,res)
+      }
     }
 
     verifySignupOtp = async (req: Request, res: Response) => {

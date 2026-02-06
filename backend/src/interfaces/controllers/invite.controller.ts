@@ -11,6 +11,7 @@ import { IAcceptInviteUseCase } from "../../application/interface/invite/IAccept
 import { ICreateInviteUseCase } from "../../application/interface/invite/ICreateInviteUseCase";
 import { IVerifyInviteUseCase } from "../../application/interface/invite/IVerifyInviteUseCase";
 import { IInviteDeveloperUseCase } from "../../application/interface/invite/IInviteDeveloperUseCase";
+import { Role } from "../../shared/constants/roleenum";
 
 
 
@@ -27,7 +28,7 @@ export class InviteController {
             const input = inviteSchema.parse(req.body);
 
 
-            if (!req.user || req.user.role !== 'SUPER_ADMIN') {
+            if (!req.user || req.user.role !== Role.SUPER_ADMIN) {
                 logger.warn('Create company admin invite failed: forbidden access');
                 return res.status(HttpStatus.FORBIDDEN).json({ message: RESPONSE_MESSAGES.AUTH.FORBIDDEN });
 
@@ -35,7 +36,7 @@ export class InviteController {
 
             const inviter = {
                 id: req.user.id,
-                role: 'SUPER_ADMIN' as const
+                role: Role.SUPER_ADMIN as const
             }
 
             const { companyId } = req.params
@@ -103,7 +104,7 @@ export class InviteController {
         try {
             const parsed = inviteDeveloperSchema.parse(req.body);
 
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Invite developer failed: forbidden access');
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -120,7 +121,7 @@ export class InviteController {
             logger.info('Invite developer requested');
             const inviter = {
                 id: req.user.id,
-                role: 'COMPANY_ADMIN' as const,
+                role: Role.COMPANY_ADMIN as const,
                 companyId: req.user.companyId
             }
             const result = await this._inviteDeveloperUseCase.execute({ email: parsed.email }, inviter)

@@ -4,6 +4,7 @@ import { IInviteRepository } from "../../../domain/repositories/invites.reposito
 import { IMailService } from "../../../domain/service/mail.service";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { InviteTokenUtil } from "../../../shared/utils/inviteToken.util";
 import { CreateInviteInput } from "../../dto/invite/createInvite.dto";
@@ -20,10 +21,10 @@ export class CreateInviteUseCase implements ICreateInviteUseCase{
     ){}
 
     async execute(input:CreateInviteInput,inviter:InviterContext,companyId:string):Promise<CreateInviteResponse>{
-      if(inviter.role!=='SUPER_ADMIN'){
+      if(inviter.role!==Role.SUPER_ADMIN){
         throw new AppError(RESPONSE_MESSAGES.INVITE.ONLY_SUPER_ADMIN,HttpStatus.FORBIDDEN)
       }
-      if(input.role!=='COMPANY_ADMIN'){
+      if(input.role!==Role.COMPANY_ADMIN){
         throw new AppError(RESPONSE_MESSAGES.INVITE.INVALID_ROLE,HttpStatus.BAD_REQUEST)
       }
       const company=await this._companyRepo.findById(companyId);

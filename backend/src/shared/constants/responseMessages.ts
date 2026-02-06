@@ -34,7 +34,8 @@ export const RESPONSE_MESSAGES = {
         EMAIL_NOT_VERIFIED:'Email not verified',
         USE_GOOGLE_LOGIN:'use google login',
         USE_PASSWORD_LOGIN:'user password login',
-        NAME_REQUIRED:"Name is required"
+        NAME_REQUIRED:"Name is required",
+        USER_ALREADY_VERIFIED:"User already verified"
     },
 
     COMPANY: {

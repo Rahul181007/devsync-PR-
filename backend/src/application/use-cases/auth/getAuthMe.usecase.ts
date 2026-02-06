@@ -7,7 +7,7 @@ import { IGetAuthMeUseCase } from "../../interface/auth/IGetAuthMeUseCase";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
-
+import { Role } from "../../../shared/constants/roleenum";
 export class GetAuthMeUseCase implements IGetAuthMeUseCase {
     constructor(
         private _userRepo: IUserRepository,
@@ -17,7 +17,7 @@ export class GetAuthMeUseCase implements IGetAuthMeUseCase {
 
     async execute(userId: string, role: string) {
 
-        if (role === 'SUPER_ADMIN') {
+        if (role === Role.SUPER_ADMIN) {
             const admin = await this._superAdminRepo.findById(userId);
             if (!admin) {
                 throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.UNAUTHORIZED)
@@ -50,7 +50,7 @@ export class GetAuthMeUseCase implements IGetAuthMeUseCase {
         let suspendedCompany = false;
         let onboardingStep: OnboardingStep | null = null
         let companySlug: string | null = null
-        if (user.role === 'COMPANY_ADMIN') {
+        if (user.role === Role.COMPANY_ADMIN) {
             if (!user.companyId) {
                 requiresOnboarding = true;
                 onboardingStep = 'WORKSPACE'

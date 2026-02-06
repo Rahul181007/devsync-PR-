@@ -8,6 +8,7 @@ import { RESPONSE_MESSAGES } from '../../../shared/constants/responseMessages';
 import { HttpStatus } from '../../../shared/constants/httpStatus';
 import { ICompanyRepository } from '../../../domain/repositories/company.repository';
 import { ILoginUserUseCase } from '../../interface/auth/ILoginUserUseCase';
+import { Role } from '../../../shared/constants/roleenum';
 
 export class LoginUserUseCase implements ILoginUserUseCase {
   constructor(
@@ -47,7 +48,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
       );
     }
 
-    if (user.role !== 'COMPANY_ADMIN' && user.role !== 'DEVELOPER') {
+    if (user.role !== Role.COMPANY_ADMIN && user.role !== Role.DEVELOPER) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.INVALID_ROLE,
         HttpStatus.FORBIDDEN

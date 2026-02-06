@@ -3,6 +3,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { IRemoveProjectMemberUseCase } from "../../interface/project/IRemoveProjectMemberUseCase";
 
@@ -25,7 +26,7 @@ export class RemoveProjectMemberUseCase implements IRemoveProjectMemberUseCase{
             throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND)
         }
 
-        if(admin.role!=='COMPANY_ADMIN'){
+        if(admin.role!==Role.COMPANY_ADMIN){
             throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.UNAUTHORIZED)
         }
         const project=await this._projectRepo.findById(projectId);

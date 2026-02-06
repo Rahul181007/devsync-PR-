@@ -15,6 +15,8 @@ import { IGoogleSignupUseCase } from "../application/interface/auth/IGoogleSignu
 import { ILoginUserUseCase } from "../application/interface/auth/ILoginUserUseCase";
 import { ISignupUseCase } from "../application/interface/auth/ISignupUseCase";
 import { IVerifySignupOtpUseCase } from "../application/interface/auth/IVerifySignupOtpUseCase";
+import { IResendSignupOtpUseCase } from "../application/interface/auth/IResendSignupOtpUseCase";
+import { ResendSignupOtpUseCase } from "../application/use-cases/auth/ResendSignupOtpUseCase";
 const userRepository=new UserRepository();
 const companyRepository=new CompanyRepository();
 const passwordHasher=new BcryptPasswordHasher();
@@ -26,6 +28,6 @@ const verifySignupOtpUseCase:IVerifySignupOtpUseCase=new VerifySignupOtpUseCase(
 const loginUserUseCase:ILoginUserUseCase=new LoginUserUseCase(userRepository,passwordHasher,companyRepository);
 const signupUseCase:ISignupUseCase=new SignupUseCase(userRepository,passwordHasher,emailService)
 const googleLoginUseCase:IGoogleLoginUseCase=new GoogleLoginUseCase(userRepository,companyRepository,googleAuthService);
+const resendSignupOtpUseCase:IResendSignupOtpUseCase=new ResendSignupOtpUseCase(userRepository,emailService)
 
-
-export const userAuthController=new UserAuthController(loginUserUseCase,refreshTokenUseCase,signupUseCase,googleSignupUseCase,verifySignupOtpUseCase,googleLoginUseCase)
+export const userAuthController=new UserAuthController(loginUserUseCase,refreshTokenUseCase,signupUseCase,googleSignupUseCase,verifySignupOtpUseCase,googleLoginUseCase,resendSignupOtpUseCase)

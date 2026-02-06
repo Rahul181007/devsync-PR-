@@ -5,6 +5,7 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IMailService } from "../../../domain/service/mail.service";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { CreateProjectResponse } from "../../dto/project/createProjectResponse.dto";
 import { CreateProjectWithMembersDTO } from "../../dto/project/createProjectWithMembers.dto";
@@ -38,7 +39,7 @@ export class CreateProjectUseCase implements ICreateProjectUseCase{
             )
         }
 
-        if(admin.role!=='COMPANY_ADMIN'){
+        if(admin.role!==Role.COMPANY_ADMIN){
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
                 HttpStatus.FORBIDDEN

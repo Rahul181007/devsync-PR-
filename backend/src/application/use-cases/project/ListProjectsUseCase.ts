@@ -4,6 +4,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { ListProjectsQuery } from "../../dto/project/listProjects.dto";
 import { ListProjectsResponse } from "../../dto/project/listProjectsResponse.dto";
@@ -29,7 +30,7 @@ export class ListProjectsUseCase implements IListProjectsUseCase {
             )
         }
 
-        if (user.role === 'COMPANY_ADMIN') {
+        if (user.role === Role.COMPANY_ADMIN) {
             const result = await this._projectRepo.findAllByCompany(companyId, input);
 
             return {
@@ -43,7 +44,7 @@ export class ListProjectsUseCase implements IListProjectsUseCase {
             }
         }
 
-        if (user.role === 'DEVELOPER') {
+        if (user.role === Role.DEVELOPER) {
             const projectIds = await this._projectMemberRepo.findUserProjects(userId);
 
             if (projectIds.length === 0) {

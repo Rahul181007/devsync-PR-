@@ -4,6 +4,7 @@ import { IInviteRepository } from "../../../domain/repositories/invites.reposito
 import { IMailService } from "../../../domain/service/mail.service";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { InviteTokenUtil } from "../../../shared/utils/inviteToken.util";
 import { InviteDeveloperContext } from "../../dto/invite/inviteDeveloperContext.dto";
@@ -21,7 +22,7 @@ export class InviteDeveloperUseCase implements IInviteDeveloperUseCase {
     ) { }
 
     async execute(input: InviteDeveloperInput, inviter: InviteDeveloperContext):Promise<InviteDeveloperResponse> {
-        if (inviter.role !== 'COMPANY_ADMIN') {
+        if (inviter.role !== Role.COMPANY_ADMIN) {
             throw new AppError(RESPONSE_MESSAGES.INVITE.ONLY_COMPANY_ADMIN, HttpStatus.FORBIDDEN)
         }
 
@@ -61,7 +62,7 @@ export class InviteDeveloperUseCase implements IInviteDeveloperUseCase {
         const invite = await this._inviteRepo.create({
             email: input.email,
             companyId: inviter.companyId,
-            role: 'DEVELOPER',
+            role: Role.DEVELOPER,
             invitedBy: inviter.id,
             token,
             expiresAt

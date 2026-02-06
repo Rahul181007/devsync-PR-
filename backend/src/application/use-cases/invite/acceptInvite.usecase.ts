@@ -4,6 +4,7 @@ import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { IPasswordHasher } from "../../../domain/service/password-hasher";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { AcceptInviteInput } from "../../dto/invite/acceptInvite.dto";
 import { AcceptInviteResponse } from "../../dto/invite/acceptInviteResponse.dto";
@@ -69,7 +70,7 @@ export class AcceptInviteUseCase implements IAcceptInviteUseCase {
         if (!user) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.USER_CREATION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR)
         }
-        if (invite.role === 'COMPANY_ADMIN') {
+        if (invite.role === Role.COMPANY_ADMIN) {
             await this._companyRepo.assignOwnerAdmin(invite.companyId, user.id)
         }
 
@@ -78,7 +79,7 @@ export class AcceptInviteUseCase implements IAcceptInviteUseCase {
             userId: user.id,
             companyId: invite.companyId,
             role: invite.role,
-            redirectTo: invite.role === 'COMPANY_ADMIN' ? 'ONBOARDING' : 'DASHBOARD'
+            redirectTo: invite.role === Role.COMPANY_ADMIN ? 'ONBOARDING' : 'DASHBOARD'
         }
     }
 }

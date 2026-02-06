@@ -8,6 +8,7 @@ import { IUnblockCompanyAdminUseCase } from "../../application/interface/user/IU
 import { IListDevelopersUseCase } from "../../application/interface/user/IListDevelopersUseCase";
 import { IBlockDeveloperUseCase } from "../../application/interface/user/IBlockDeveloperUseCase";
 import { IUnblockDeveloperUseCase } from "../../application/interface/user/IUnblockDeveloperUseCase";
+import { Role } from "../../shared/constants/roleenum";
 
 
 export class UserController {
@@ -62,7 +63,7 @@ export class UserController {
     }
     listDevelopers = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('List developers failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -95,7 +96,7 @@ export class UserController {
 
     blockDevelopers = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Block developer failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN
@@ -137,7 +138,7 @@ export class UserController {
 
     unblockDeveloper = async (req: Request, res: Response) => {
         try {
-            if (!req.user || req.user.role !== 'COMPANY_ADMIN') {
+            if (!req.user || req.user.role !== Role.COMPANY_ADMIN) {
                 logger.warn('Unblock developer failed: forbidden access')
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.FORBIDDEN

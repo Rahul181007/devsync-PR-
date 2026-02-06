@@ -3,6 +3,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
+import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import {  AddProjectMemberDTO } from "../../dto/project/addProjectMember.dto";
 import { IAddProjectMemberUseCase } from "../../interface/project/IAddProjectMemberUseCase";
@@ -29,7 +30,7 @@ export class AddProjectMemberUseCase implements IAddProjectMemberUseCase{
             )
         }
 
-        if(admin.role!=='COMPANY_ADMIN'){
+        if(admin.role!==Role.COMPANY_ADMIN){
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
                 HttpStatus.UNAUTHORIZED
@@ -66,7 +67,7 @@ export class AddProjectMemberUseCase implements IAddProjectMemberUseCase{
             )
         }
 
-        if(userToAdd.role!=='DEVELOPER'){
+        if(userToAdd.role!==Role.DEVELOPER){
             throw new AppError(
                 RESPONSE_MESSAGES.PROJECT.DEVELOPER_ONLY_BE_ADDED,
                 HttpStatus.FORBIDDEN
@@ -95,7 +96,7 @@ export class AddProjectMemberUseCase implements IAddProjectMemberUseCase{
         await this._projectMemberRepo.create({
             projectId,
             userId:data.userId,
-            role:'DEVELOPER'
+            role:Role.DEVELOPER
         })
 
 

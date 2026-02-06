@@ -7,6 +7,7 @@ import {
   sendForgotPasswordOtp,
   resetOtpState,
   clearAuthError,
+  sendSignupOtp,
 } from "../auth.slice";
 import { ROUTES } from "../../../shared/constants/routes";
 
@@ -27,7 +28,6 @@ const VerifyOtpPage = () => {
     otpVerified,
     resetRole,
     user,
-    otpSent,
   } = useAppSelector((state) => state.auth);
 
   // ✅ Email source:
@@ -45,11 +45,11 @@ const VerifyOtpPage = () => {
   }, [dispatch]);
 
 
-  useEffect(() => {
-    if (!email || (!otpSent && !resetRole)) {
-      navigate(ROUTES.ROOT, { replace: true });
-    }
-  }, [email, otpSent, resetRole, navigate]);
+ useEffect(() => {
+  if (!email && !resetRole) {
+    navigate(ROUTES.ROOT, { replace: true });
+  }
+}, [email, resetRole, navigate]);
 
 
   useEffect(() => {
@@ -60,9 +60,14 @@ const VerifyOtpPage = () => {
 
   
   const handleResendOtp = () => {
-    if (!resetRole || !email) return;
+    if ( !email) return;
     dispatch(resetOtpState());
-    dispatch(sendForgotPasswordOtp(email));
+    if(resetRole){
+      dispatch(sendForgotPasswordOtp(email));
+    }else{
+      dispatch(sendSignupOtp(email))
+    }
+    
     setTimer(30);
   };
 
@@ -98,11 +103,7 @@ const VerifyOtpPage = () => {
   }, [otpVerified, resetRole, navigate, dispatch, email, otp]);
 
   const handleChangeEmail = () => {
-    if (!resetRole) {
-      navigate(ROUTES.AUTH.COMPANY_SIGNUP, { replace: true });
-      return;
-    }
-
+    dispatch(resetOtpState());
     navigate(
       resetRole === "COMPANY_ADMIN"
         ? ROUTES.AUTH.COMPANY_FORGOT_PASSWORD
@@ -150,8 +151,8 @@ const VerifyOtpPage = () => {
         </form>
 
         <div className="mt-4 text-center space-y-2">
-          {resetRole && (
-            timer > 0 ? (
+          
+            {timer > 0 ? (
               <p className="text-sm text-gray-500">
                 Resend OTP in <b>{timer}s</b>
               </p>
@@ -163,14 +164,17 @@ const VerifyOtpPage = () => {
                 Resend OTP
               </button>
             )
-          )}
+          }
 
-          <button
-            onClick={handleChangeEmail}
-            className="block mx-auto text-sm text-gray-600 hover:underline"
-          >
-            Change email
-          </button>
+{resetRole && (
+  <button
+    onClick={handleChangeEmail}
+    className="block mx-auto text-sm text-gray-600 hover:underline"
+  >
+    Change email
+  </button>
+)}
+
         </div>
       </div>
     </div>

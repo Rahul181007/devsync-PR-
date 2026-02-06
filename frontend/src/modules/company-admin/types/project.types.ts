@@ -17,11 +17,13 @@ export interface Project {
 
 export interface ProjectListData {
     data: {
-        data: Project[];
-        total: number;
-        page: number;
-        limit: number;
-    }
+    data: Project[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+    };
+  };
 
 }
 
