@@ -10,6 +10,8 @@ import { IUpdateTaskStatusUseCase } from "../../application/interface/task/IUpda
 import { IGetDeveloperTasksUseCase } from "../../application/interface/task/IGetDeveloperTasksUseCase";
 import { IUpdateDeveloperTaskStatusUseCase } from "../../application/interface/task/IUpdateDeveloperTaskStatusUseCase";
 import { ISubmitTaskUseCase } from "../../application/interface/task/ISubmitTaskUseCase";
+import { IGetDeveloperTaskDetailUseCase } from "../../application/interface/task/IGetDeveloperTaskDetailUseCase";
+
 
 
 
@@ -23,7 +25,8 @@ export class TaskController {
         private _updateTaskStatusUseCase: IUpdateTaskStatusUseCase,
         private _getDeveloperTasksUseCase: IGetDeveloperTasksUseCase,
         private _updateDeveloperTaskStatusUseCase:IUpdateDeveloperTaskStatusUseCase,
-        private _submitTaskUseCase:ISubmitTaskUseCase
+        private _submitTaskUseCase:ISubmitTaskUseCase,
+        private _getDeveloperTaskDetailUseCase:IGetDeveloperTaskDetailUseCase
     ) { }
 
     createTask = async (req: Request, res: Response) => {
@@ -61,7 +64,7 @@ export class TaskController {
             }
 
             const tasks = await this._getProjectTasks.execute(userId, companyId, projectId);
-
+            console.log("tasks",tasks)
             res.status(HttpStatus.OK).json({
                 success: true,
                 data: tasks
@@ -82,7 +85,7 @@ export class TaskController {
                 })
             }
             const task = await this._getTaskDetail.execute(userId, companyId, projectId, taskId);
-
+            console.log(task)
             res.status(HttpStatus.OK).json({
                 success: true,
                 data: task
@@ -133,6 +136,27 @@ export class TaskController {
                 data:board
             })
 
+        } catch (error:unknown) {
+            return handleError(error,res)
+        }
+    }
+
+    getDeveloperTaskDetail=async(req:Request,res:Response)=>{
+        try {
+            const userId=req.user?.id;
+            const {projectId,taskId}=req.params;
+
+            if(!userId){
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message:RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                })
+            }
+
+            const task =await this._getDeveloperTaskDetailUseCase.execute(userId,projectId,taskId);
+            res.status(HttpStatus.OK).json({
+                success:true,
+                data:task
+            })
         } catch (error:unknown) {
             return handleError(error,res)
         }

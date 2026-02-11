@@ -60,7 +60,8 @@ export class TaskRepository implements ITaskRepository {
 
     async findBacklogTasks(projectId: string): Promise<Task[]> {
         const docs = await TaskModel.find({
-            projectId
+            projectId,
+            sprintId: null
         }).sort({ createdAt: -1 })
 
         return docs.map((doc) => this._toDomain(doc))
@@ -69,7 +70,7 @@ export class TaskRepository implements ITaskRepository {
     async findByProjectId(projectId: string): Promise<Task[]> {
         const docs = await TaskModel.find({
             projectId,
-            sprintId: null
+            
         }).sort({ createdAt: -1 })
         return docs.map((doc) => this._toDomain(doc))
     }
@@ -103,5 +104,5 @@ export class TaskRepository implements ITaskRepository {
         return doc.map((doc) => this._toDomain(doc))
     }
 
-    
+
 }

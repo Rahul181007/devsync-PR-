@@ -1,11 +1,13 @@
 import { ICreateTaskUseCase } from "../application/interface/task/ICreateTaskUseCase";
 import { IGetProjectTasksUseCase } from "../application/interface/task/IGetBacklogTaskUseCase";
+import { IGetDeveloperTaskDetailUseCase } from "../application/interface/task/IGetDeveloperTaskDetailUseCase";
 import { IGetDeveloperTasksUseCase } from "../application/interface/task/IGetDeveloperTasksUseCase";
 import { IGetTaskDetailUseCase } from "../application/interface/task/IGetTaskDetailUseCase";
 import { ISubmitTaskUseCase } from "../application/interface/task/ISubmitTaskUseCase";
 import { IUpdateDeveloperTaskStatusUseCase } from "../application/interface/task/IUpdateDeveloperTaskStatusUseCase";
 import { IUpdateTaskStatusUseCase } from "../application/interface/task/IUpdateTaskStatusUseCase";
 import { CreateTaskUseCase } from "../application/use-cases/task/createTask.usecase";
+import { GetDeveloperTaskDetailUseCase } from "../application/use-cases/task/GetDeveloperTaskDetailUseCase";
 import { GetDeveloperTasksUseCase } from "../application/use-cases/task/GetDeveloperTasksUseCase";
 import { GetProjectTasksUseCase } from "../application/use-cases/task/GetProjectTasksUseCase";
 import { GetTaskDetailUseCase } from "../application/use-cases/task/GetTaskDetailUseCase";
@@ -30,12 +32,13 @@ const updateTaskStatusUseCase:IUpdateTaskStatusUseCase=new UpdateTaskStatusUseCa
 const getDeveloperTasksUseCase:IGetDeveloperTasksUseCase=new GetDeveloperTasksUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository);
 const updateDeveloperTaskUseCase:IUpdateDeveloperTaskStatusUseCase=new UpdateDeveloperTaskStatusUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository);
 const submitTaskUseCase:ISubmitTaskUseCase=new SubmitTaskUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository)
-
+const getDeveloperTaskDetailUseCase:IGetDeveloperTaskDetailUseCase=new GetDeveloperTaskDetailUseCase(userRepository,projectRepository,taskRepository,projectMemberRepository)
 export const taskController=new TaskController(createTaskUseCase,
     getProjectTasksUseCase,
     getTaskDetailUseCase,
     updateTaskStatusUseCase,
     getDeveloperTasksUseCase,
     updateDeveloperTaskUseCase,
-    submitTaskUseCase
+    submitTaskUseCase,
+    getDeveloperTaskDetailUseCase
 )

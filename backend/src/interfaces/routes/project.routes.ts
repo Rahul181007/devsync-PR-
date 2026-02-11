@@ -25,6 +25,7 @@ router.get('/company/projects/:projectId/tasks/:taskId',verifyAccessToken,requir
 router.patch("/company/projects/:projectId/tasks/:taskId/status",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.updateTaskStatus)
 
 router.get("/developer/projects/:projectId/tasks",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.getDeveloperTask);
+router.get("/developer/projects/:projectId/tasks/:taskId",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.getDeveloperTaskDetail)
 router.patch("/developer/projects/:projectId/tasks/:taskId/status",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.updateDeveloperTaskUseCase);
 router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.submitTask)
 export default router;

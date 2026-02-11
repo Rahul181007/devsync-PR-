@@ -43,11 +43,20 @@ export class GetTaskDetailUseCase implements IGetTaskDetailUseCase {
             )
         }
 
-        let assignee = null
+        // ✅ reporter is ALWAYS required
+        const reporterUser = await this._userRepo.findById(task.reporterId);
+        if (!reporterUser) {
+            throw new AppError(
+                RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,
+                HttpStatus.NOT_FOUND
+            )
+        }
+
+
+        let assignee = null;
 
         if (task.assigneeId) {
             const assigneeUser = await this._userRepo.findById(task.assigneeId);
-
             if (assigneeUser) {
                 assignee = {
                     id: assigneeUser.id,
@@ -55,41 +64,33 @@ export class GetTaskDetailUseCase implements IGetTaskDetailUseCase {
                     avatar: assigneeUser.avatarUrl ?? null
                 }
             }
-
-            const reportUser = await this._userRepo.findById(task.reporterId);
-            if (!reportUser) {
-                throw new AppError(
-                    RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,
-                    HttpStatus.NOT_FOUND
-                )
-            }
-            return {
-                id: task.id,
-                code: task.code,
-
-                title: task.title,
-                description: task.description,
-
-                status: task.status,
-                priority: task.priority,
-
-                sprint: task.sprintId ? { id: task.sprintId, name: "Active sprint" } : null,
-
-                assignee,
-
-                reporter: {
-                    id: reportUser.id,
-                    name: reportUser.name
-                },
-                dueDate: task.dueDate,
-                createdAt: task.createdAt,
-                updatedAt: task.updatedAt
-            }
-
         }
-        throw new AppError(
-            RESPONSE_MESSAGES.TASK.NOT_FOUND,
-            HttpStatus.NOT_FOUND
-        );
+
+        return {
+            id: task.id,
+            code: task.code,
+
+            title: task.title,
+            description: task.description,
+
+            status: task.status,
+            priority: task.priority,
+
+            sprint: task.sprintId
+                ? { id: task.sprintId, name: "Active sprint" }
+                : null,
+
+            assignee, 
+
+            reporter: {
+                id: reporterUser.id,
+                name: reporterUser.name
+            },
+
+            dueDate: task.dueDate,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt
+        };
+
     }
 }
