@@ -1,32 +1,55 @@
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchProjectDetail } from "../../store/project.slice";
 import DevProjectMembers from "../../components/project/DevProjectMembers";
+import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
 
-export const DevProjectDetailPage=()=>{
-    const {projectId}=useParams<{projectId:string}>();
-    const dispatch=useAppDispatch();
+/* ================= Types ================= */
 
-    const {selectedProject,loading,error}=useAppSelector((state)=>state.developerProjects);
+type ProjectDetailTab =
+  | "TASKS"
+  | "CHAT"
+  | "FILES"
+  | "COMMENTS"
+  | "AI";
 
-    useEffect(()=>{
-        if(projectId){
-            dispatch(fetchProjectDetail(projectId))
-        }
-    },[dispatch,projectId])
+const TABS: { key: ProjectDetailTab; label: string }[] = [
+  { key: "TASKS", label: "Tasks" },
+  { key: "CHAT", label: "Chat" },
+  { key: "FILES", label: "Files" },
+  { key: "COMMENTS", label: "Comments" },
+  { key: "AI", label: "AI Summary" },
+];
 
-      if (loading) return <p className="p-6">Loading project...</p>;
+/* ================= Page ================= */
+
+export const DevProjectDetailPage = () => {
+  const { projectId } = useParams<{ projectId: string }>();
+  const dispatch = useAppDispatch();
+
+  const { selectedProject, loading, error } = useAppSelector(
+    (state) => state.developerProjects
+  );
+
+  const [activeTab, setActiveTab] = useState<ProjectDetailTab>("TASKS");
+
+  useEffect(() => {
+    if (projectId) {
+      dispatch(fetchProjectDetail(projectId));
+    }
+  }, [dispatch, projectId]);
+
+  if (loading) return <p className="p-6">Loading project...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!selectedProject) return null;
 
   const project = selectedProject;
 
-    return (
+  return (
     <div className="p-6 space-y-6">
-      {/* ================= Project Header Card ================= */}
+      {/* ================= Project Header ================= */}
       <div className="bg-white rounded-xl shadow p-6">
-        {/* Title */}
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             {project.name}
@@ -36,7 +59,6 @@ export const DevProjectDetailPage=()=>{
           </p>
         </div>
 
-        {/* ================= Project Meta ================= */}
         <div className="grid grid-cols-4 gap-6 mt-6 text-sm">
           <div>
             <p className="text-gray-500">Status</p>
@@ -65,6 +87,36 @@ export const DevProjectDetailPage=()=>{
           </div>
         </div>
       </div>
+
+      {/* ================= Tabs ================= */}
+      <div className="border-b flex gap-6 text-sm font-medium">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`pb-2 ${
+              activeTab === tab.key
+                ? "border-b-2 border-blue-600 text-blue-600"
+                : "text-gray-500"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ================= Tab Content ================= */}
+      {activeTab === "TASKS" && projectId && (
+        <DeveloperTaskBoard projectId={projectId} />
+      )}
+
+      {activeTab !== "TASKS" && (
+        <div className="text-sm text-gray-500 py-10 text-center">
+          Coming soon
+        </div>
+      )}
     </div>
   );
 };
+
+export default DevProjectDetailPage;

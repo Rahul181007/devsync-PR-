@@ -87,6 +87,7 @@ export const RESPONSE_MESSAGES = {
         PROJECT_NOT_FOUND:'Project  not found',
         ACCESS_DENIED:'Access denied',
         ARCHIVED:'Archived',
+        COMPLETED:"Completed",
         USER_NOT_IN_COMPANY:'User not in company',
         MEMBER_ALREADY_EXISTS:'Member already exist',
         MEMBER_NOT_FOUND:'Member not found',
@@ -97,6 +98,15 @@ export const RESPONSE_MESSAGES = {
         MEMBER_ADDED:'MEMBER ADDED',
         CANNOT_REMOVE_OWNER:'Cannot remove an owner',
         DEVELOPER_ONLY_BE_ADDED:'Developer can only be added',
+    },
+    TASK:{
+        INVALID_ASSIGNEE:"Invalid assignee",
+        INVALID_DUE_DATE:"Invalid due date",
+        NOT_FOUND:"Task not found",
+        INVALID_STATUS_TRANSITION:'Invalid status transistion',
+        NOT_ASSIGNED_TO_YOU:"Task not assigned to you" ,
+        NOT_IN_SPRINT:"Task not in sprint",
+        NOT_IN_ACTIVE_SPRINT:"Task not in active sprint"
     },
 
     COMMON: {
