@@ -47,9 +47,9 @@ const handleDragEnd = (event: DragEndEvent) => {
 
   if (!fromColumn || fromColumn === toColumn) return;
 
-  // 🚦 RULES
+
   if (fromColumn === "IN_PROGRESS" && toColumn === "SUBMITTED") {
-    // 👉 OPEN SUBMIT MODAL (NO STATUS UPDATE YET)
+
     setSubmitTaskId(taskId);
     return;
   }
@@ -63,11 +63,10 @@ const handleDragEnd = (event: DragEndEvent) => {
     allowedMoves[fromColumn]?.includes(toColumn) ?? false;
 
   if (!isAllowed) {
-    console.warn(`❌ Blocked move: ${fromColumn} → ${toColumn}`);
     return;
   }
 
-  // ✅ NORMAL STATUS UPDATE
+
   dispatch(
     updateDeveloperTaskStatus({
       projectId,

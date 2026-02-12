@@ -12,14 +12,13 @@ interface Props {
 }
 
 const DraggableTaskCard = ({ task, column, onClick }: Props) => {
-  // 🔒 Lock submitted & completed
   const isLocked =
     column === "SUBMITTED" || column === "COMPLETED";
 
   const { attributes, listeners, setNodeRef, transform } =
     useDraggable({
       id: task.id,
-      disabled: isLocked, // 🚀 disables dragging
+      disabled: isLocked,
       data: { column },
     });
 
@@ -33,31 +32,44 @@ const DraggableTaskCard = ({ task, column, onClick }: Props) => {
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...(!isLocked ? listeners : {})}
-      onClick={onClick}
-      className={`bg-white rounded-lg shadow p-3 text-sm
-        ${
-          isLocked
-            ? "opacity-70 cursor-not-allowed"
-            : "cursor-pointer hover:bg-gray-50"
-        }
-      `}
+      className={`bg-white rounded-lg shadow p-3 text-sm ${
+        isLocked
+          ? "opacity-70 cursor-not-allowed"
+          : "cursor-default"
+      }`}
     >
-      <p className="font-medium">{task.title}</p>
 
-      <div className="flex justify-between text-xs text-gray-500 mt-1">
-        <span>{task.priority}</span>
-        <span>
-          {task.dueDate
-            ? new Date(task.dueDate).toLocaleDateString()
-            : "—"}
-        </span>
+      {!isLocked && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-xs text-gray-400 mb-1"
+        >
+          ⠿ Drag
+        </div>
+      )}
+
+     
+      <div
+        onClick={onClick}
+        className="cursor-pointer hover:bg-gray-50 rounded p-1"
+      >
+        <p className="font-medium">{task.title}</p>
+
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <span>{task.priority}</span>
+          <span>
+            {task.dueDate
+              ? new Date(task.dueDate).toLocaleDateString()
+              : "—"}
+          </span>
+        </div>
       </div>
     </div>
   );
 };
 
 export default DraggableTaskCard;
+
 
 
