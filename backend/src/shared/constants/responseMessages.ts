@@ -109,6 +109,13 @@ export const RESPONSE_MESSAGES = {
         NOT_IN_ACTIVE_SPRINT:"Task not in active sprint"
     },
 
+    SPRINT:{
+        ACTIVE_SPRINT_EXISTS:"Active sprint exist",
+        SPRINT_NAME_EXISTS:"Sprint name already exists in this project",
+        SPRINT_DATE_OVERLAP:"Sprint dates overlap with an existing sprint",
+        SPRINT_NOT_FOUND:"Sprint not found"
+    },
+
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",
 

@@ -4,6 +4,7 @@ import { requireRole } from "../middleware/role.middleware";
 import { projectController } from "../../di/project.di";
 import { Role } from "../../shared/constants/roleenum";
 import { taskController } from "../../di/task.di";
+import { sprintController } from "../../di/sprint.di";
 
 
 const router=Router();
@@ -28,4 +29,11 @@ router.get("/developer/projects/:projectId/tasks",verifyAccessToken,requireRole(
 router.get("/developer/projects/:projectId/tasks/:taskId",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.getDeveloperTaskDetail)
 router.patch("/developer/projects/:projectId/tasks/:taskId/status",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.updateDeveloperTaskUseCase);
 router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.submitTask)
+
+
+//sprint-module
+
+router.post("/company/projects/:projectId/sprints",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.createSprint)
+router.get("/company/projects/:projectId/sprints",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.getProjectSprints);
+router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.getSprintDetail)
 export default router;

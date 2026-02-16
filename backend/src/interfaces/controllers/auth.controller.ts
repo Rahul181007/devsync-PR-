@@ -21,7 +21,7 @@ export class AuthController {
 
     loginSuperAdmin = async (req: Request, res: Response) => {
         try {
-            logger.info(`SuperAdmin login attempt:${req.body.email}`);
+            logger.info(`SuperAdmin1 login attempt:${req.body.email}`);
             const parsed = loginSchema.parse(req.body);
 
             const result = await this._loginSuperAdminUseCase.execute(parsed);
