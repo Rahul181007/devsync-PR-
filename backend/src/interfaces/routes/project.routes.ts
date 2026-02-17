@@ -31,9 +31,13 @@ router.patch("/developer/projects/:projectId/tasks/:taskId/status",verifyAccessT
 router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessToken,requireRole(Role.DEVELOPER),taskController.submitTask)
 
 
+router.patch("/company/projects/:projectId/sprint-plan",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.planSprintTasks);
+
+
 //sprint-module
 
 router.post("/company/projects/:projectId/sprints",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.createSprint)
 router.get("/company/projects/:projectId/sprints",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.getProjectSprints);
-router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.getSprintDetail)
+router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.getSprintDetail);
+router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.activateSprint)
 export default router;

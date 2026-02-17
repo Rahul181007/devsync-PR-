@@ -11,6 +11,8 @@ import { IGetDeveloperTasksUseCase } from "../../application/interface/task/IGet
 import { IUpdateDeveloperTaskStatusUseCase } from "../../application/interface/task/IUpdateDeveloperTaskStatusUseCase";
 import { ISubmitTaskUseCase } from "../../application/interface/task/ISubmitTaskUseCase";
 import { IGetDeveloperTaskDetailUseCase } from "../../application/interface/task/IGetDeveloperTaskDetailUseCase";
+import { IPlanSprintTasksUseCase } from "../../application/interface/task/IPlanSprintTasksUseCase";
+import { planSprintSchema } from "../../application/validators/task/planSprint.validator";
 
 
 
@@ -24,9 +26,10 @@ export class TaskController {
         private _getTaskDetail: IGetTaskDetailUseCase,
         private _updateTaskStatusUseCase: IUpdateTaskStatusUseCase,
         private _getDeveloperTasksUseCase: IGetDeveloperTasksUseCase,
-        private _updateDeveloperTaskStatusUseCase:IUpdateDeveloperTaskStatusUseCase,
-        private _submitTaskUseCase:ISubmitTaskUseCase,
-        private _getDeveloperTaskDetailUseCase:IGetDeveloperTaskDetailUseCase
+        private _updateDeveloperTaskStatusUseCase: IUpdateDeveloperTaskStatusUseCase,
+        private _submitTaskUseCase: ISubmitTaskUseCase,
+        private _getDeveloperTaskDetailUseCase: IGetDeveloperTaskDetailUseCase,
+        private _planSprintTasksUseCase: IPlanSprintTasksUseCase,
     ) { }
 
     createTask = async (req: Request, res: Response) => {
@@ -64,7 +67,7 @@ export class TaskController {
             }
 
             const tasks = await this._getProjectTasks.execute(userId, companyId, projectId);
-            console.log("tasks",tasks)
+            console.log("tasks", tasks)
             res.status(HttpStatus.OK).json({
                 success: true,
                 data: tasks
@@ -129,78 +132,109 @@ export class TaskController {
                 })
             }
 
-            const board =await this._getDeveloperTasksUseCase.execute(userId,projectId);
+            const board = await this._getDeveloperTasksUseCase.execute(userId, projectId);
 
             res.status(HttpStatus.OK).json({
-                success:true,
-                data:board
+                success: true,
+                data: board
             })
 
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 
-    getDeveloperTaskDetail=async(req:Request,res:Response)=>{
+    getDeveloperTaskDetail = async (req: Request, res: Response) => {
         try {
-            const userId=req.user?.id;
-            const {projectId,taskId}=req.params;
+            const userId = req.user?.id;
+            const { projectId, taskId } = req.params;
 
-            if(!userId){
-                return res.status(HttpStatus.FORBIDDEN).json({
-                    message:RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
-                })
-            }
-
-            const task =await this._getDeveloperTaskDetailUseCase.execute(userId,projectId,taskId);
-            res.status(HttpStatus.OK).json({
-                success:true,
-                data:task
-            })
-        } catch (error:unknown) {
-            return handleError(error,res)
-        }
-    }
-
-    updateDeveloperTaskUseCase=async(req:Request,res:Response)=>{
-        try {
-           const userId=req.user?.id;
-           const {projectId,taskId}=req.params;
             if (!userId) {
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
                 })
             }
 
-            await this._updateDeveloperTaskStatusUseCase.execute(userId,projectId,taskId,req.body)
-
+            const task = await this._getDeveloperTaskDetailUseCase.execute(userId, projectId, taskId);
             res.status(HttpStatus.OK).json({
-                success:true,
-                message:'Task status updated'
+                success: true,
+                data: task
             })
-
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 
-    submitTask=async(req:Request,res:Response)=>{
-       try {
-        const userId=req.user?.id;
-        const {projectId,taskId}=req.params;
+    updateDeveloperTaskUseCase = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const { projectId, taskId } = req.params;
             if (!userId) {
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
                 })
             }
 
-            await this._submitTaskUseCase.execute(userId,projectId,taskId,req.body)
+            await this._updateDeveloperTaskStatusUseCase.execute(userId, projectId, taskId, req.body)
+
             res.status(HttpStatus.OK).json({
-                success:true,
-                message:"Task submittted successfully"
+                success: true,
+                message: 'Task status updated'
             })
-       } catch (error:unknown) {
-         return handleError(error,res)
-       }
+
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    submitTask = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const { projectId, taskId } = req.params;
+            if (!userId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                })
+            }
+
+            await this._submitTaskUseCase.execute(userId, projectId, taskId, req.body)
+            res.status(HttpStatus.OK).json({
+                success: true,
+                message: "Task submittted successfully"
+            })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    planSprintTasks = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            const { projectId } = req.params;
+
+            if (!userId || !companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
+                });
+            }
+
+            const parsed = planSprintSchema.parse(req.body);
+
+            await this._planSprintTasksUseCase.execute(
+                userId,
+                companyId,
+                projectId,
+                parsed
+            );
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: "Tasks successfully planned for sprint",
+            });
+
+        } catch (error: unknown) {
+            return handleError(error, res);
+        }
     }
 }
