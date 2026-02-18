@@ -5,7 +5,7 @@ import { fetchProjectDetail } from "../../store/project.slice";
 import DevProjectMembers from "../../components/project/DevProjectMembers";
 import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
 
-/* ================= Types ================= */
+
 
 type ProjectDetailTab =
   | "TASKS"
@@ -45,6 +45,10 @@ export const DevProjectDetailPage = () => {
   if (!selectedProject) return null;
 
   const project = selectedProject;
+const isOverdue =
+  project.endDate &&
+  new Date(project.endDate) < new Date() &&
+  project.status !== "COMPLETED";
 
   return (
     <div className="p-6 space-y-6">
@@ -57,6 +61,14 @@ export const DevProjectDetailPage = () => {
           <p className="text-gray-600 mt-1">
             {project.description || "—"}
           </p>
+
+                {isOverdue && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600 font-medium">
+            ⚠ This project has exceeded its planned end date.
+          </p>
+        </div>
+      )}
         </div>
 
         <div className="grid grid-cols-4 gap-6 mt-6 text-sm">

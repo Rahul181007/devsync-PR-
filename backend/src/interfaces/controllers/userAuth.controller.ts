@@ -16,6 +16,7 @@ import { IVerifySignupOtpUseCase } from "../../application/interface/auth/IVerif
 import { IResendSignupOtpUseCase } from "../../application/interface/auth/IResendSignupOtpUseCase";
 
 
+
 export class UserAuthController {
     constructor(
         private _loginUserUseCase: ILoginUserUseCase,
@@ -30,9 +31,9 @@ export class UserAuthController {
 
     login = async (req: Request, res: Response) => {
         try {
-
             const parsed = loginSchema.parse(req.body);
-            logger.info(`User login attempted ${parsed.email}`);
+            
+            logger.info(`User1 login attempted ${parsed.email}`);
             const result = await this._loginUserUseCase.execute(parsed);
 
             logger.info(`user login successful ${result.email}`)
