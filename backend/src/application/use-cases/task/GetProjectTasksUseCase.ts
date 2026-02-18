@@ -66,10 +66,12 @@ export class GetProjectTasksUseCase implements IGetProjectTasksUseCase{
 
             return {
                 id:task.id,
+                code:task.code,
                 title:task.title,
                 status:task.status,
                 priority:task.priority,
                 dueDate:task.dueDate,
+                sprintId: task.sprintId ? task.sprintId.toString() : null,
                 assignee
             }
         })

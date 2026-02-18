@@ -7,6 +7,7 @@ import developerReducer from '../modules/company-admin/store/developer.slice'
 import developerProjectsReducer from '../modules/developer/store/project.slice'
 import companyAdminTaskReducer from '../modules/company-admin/store/task.slice'
 import developerTaskReducer from '../modules/developer/store/task.slice'
+import companyAdminSprintReducer from '../modules/company-admin/store/sprint.slice'
 export const store=configureStore({
     reducer:{
         auth:authReducer,
@@ -16,7 +17,8 @@ export const store=configureStore({
         companyAdminDevelopers:developerReducer,
          developerProjects: developerProjectsReducer,
          companyAdminTask:companyAdminTaskReducer,
-         developerTask:developerTaskReducer
+         developerTask:developerTaskReducer,
+         companyAdminSprint:companyAdminSprintReducer
     }
 })
 

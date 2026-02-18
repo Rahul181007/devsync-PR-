@@ -99,7 +99,8 @@ export const RESPONSE_MESSAGES = {
         MEMBER_ADDED: 'MEMBER ADDED',
         CANNOT_REMOVE_OWNER: 'Cannot remove an owner',
         DEVELOPER_ONLY_BE_ADDED: 'Developer can only be added',
-        COMPANY_ID_NOT_MATCHING:'project company id is not matching'
+        COMPANY_ID_NOT_MATCHING:'project company id is not matching',
+        PROJECT_NOT_ACTIVE:"Project not active"
     },
     TASK: {
         INVALID_ASSIGNEE: "Invalid assignee",

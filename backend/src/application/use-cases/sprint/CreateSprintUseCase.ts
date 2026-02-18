@@ -56,6 +56,7 @@ export class CreateSprintUseCase implements ICreateSprintUseCase{
         }
         const overlapping=existingSprints.find(
             (s)=>
+                s.status !== "COMPLETED" &&
                 s.startDate<=data.endDate &&
                 s.endDate>=data.startDate
         )

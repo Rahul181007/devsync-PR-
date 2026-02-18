@@ -81,23 +81,20 @@ if (projectIds && projectIds.length > 0) {
         const doc=await ProjectModel.findById(id);
         return doc?this._toDomain(doc):null
     }
-    async update(projectId: string, data: Partial<Project>): Promise<Project|null> {
-       const doc=await ProjectModel.findByIdAndUpdate(
-        projectId,{
-            name:data.name,
-            slug:data.slug,
-            description:data.description,
-            status:data.status,
-            startDate:data.startDate,
-            endDate:data.endDate
-        },
-        {new:true}
-       ) 
-       if(!doc){
-        return null
-       }
-       return this._toDomain(doc)
-    }  
+async update(projectId: string, data: Partial<Project>): Promise<Project | null> {
+  const doc = await ProjectModel.findByIdAndUpdate(
+    projectId,
+    { $set: data },
+    { new: true }
+  );
+
+  if (!doc) {
+    return null;
+  }
+
+  return this._toDomain(doc);
+}
+ 
     async delete(projectId: string): Promise<void> {
         await ProjectModel.findByIdAndDelete(projectId)
     }

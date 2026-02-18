@@ -6,6 +6,7 @@ import ProjectMembers from "../../components/project/ProjectMembers";
 import { ProjectMembersModal } from "../../components/project/ProjectMembersModal";
 import { EditProjectModal } from "../../components/project/EditProjectModal";
 import ProjectTasksPage from "./ProjectTasksPage";
+import { SprintBoard } from "../../components/sprint/SprintBoard";
 
 /* ================= Types ================= */
 type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT";
@@ -37,6 +38,10 @@ export const ProjectDetailPage = () => {
   if (!selectedProject) return null;
 
   const project = selectedProject;
+const isOverdue =
+  project.endDate &&
+  new Date(project.endDate) < new Date() &&
+  project.status !== "COMPLETED";
 
   return (
     <div className="p-6 space-y-6">
@@ -50,6 +55,14 @@ export const ProjectDetailPage = () => {
             <p className="text-gray-600 mt-1">
               {project.description || "—"}
             </p>
+
+                  {isOverdue && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600 font-medium">
+            ⚠ This project has exceeded its planned end date.
+          </p>
+        </div>
+      )}
           </div>
 
           <div className="flex gap-2">
@@ -137,9 +150,7 @@ export const ProjectDetailPage = () => {
       )}
 
       {activeTab === "SPRINT" && (
-        <div className="p-6 text-gray-500">
-          Sprint coming soon
-        </div>
+        <SprintBoard projectId={project.id} />
       )}
 
       {/* ================= Modals ================= */}

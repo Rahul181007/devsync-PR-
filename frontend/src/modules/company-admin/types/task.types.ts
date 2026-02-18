@@ -10,11 +10,13 @@ export interface TaskAssignee{
 
 export interface TaskListItem {
   id: string;
+  code :string;
   title: string;
   status: TaskStatus;
   priority: TaskPriority;
   dueDate: string | null; 
   assignee: TaskAssignee | null;
+  sprintId: string | null;
 }
 
 export interface TaskSubmission {
