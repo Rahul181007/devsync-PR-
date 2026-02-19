@@ -139,6 +139,13 @@ export const RESPONSE_MESSAGES = {
         NOT_BELONG_TO_COMPANY: "CompanyAdmin does not belong to this company"
     },
 
+    STANDUP:{
+       ALREADY_SUBMITTED:"Standup already submitted",
+        CREATED: "Standup submitted successfully",
+        NOT_FOUND:"Standup not found",
+        UPDATED:"Standup updated successfully"
+    },
+
 
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",

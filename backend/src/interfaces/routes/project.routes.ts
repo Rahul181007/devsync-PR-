@@ -5,6 +5,7 @@ import { projectController } from "../../di/project.di";
 import { Role } from "../../shared/constants/roleenum";
 import { taskController } from "../../di/task.di";
 import { sprintController } from "../../di/sprint.di";
+import { standupController } from "../../di/standup.di";
 
 
 const router=Router();
@@ -42,4 +43,9 @@ router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,re
 router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.activateSprint)
 router.patch("/company/projects/:projectId/sprints/:sprintId/complete",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.completeSprint)
 
+
+//standup-module
+router.post ('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.createStandup)
+router.get("/developer/projects/:projectId/standups",verifyAccessToken,requireRole(Role.DEVELOPER),standupController.getMyCurrentSprintStandups)
+router.put('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.updateStandup)
 export default router;
