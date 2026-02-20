@@ -7,9 +7,11 @@ import { ProjectMembersModal } from "../../components/project/ProjectMembersModa
 import { EditProjectModal } from "../../components/project/EditProjectModal";
 import ProjectTasksPage from "./ProjectTasksPage";
 import { SprintBoard } from "../../components/sprint/SprintBoard";
+import CompanyStandupDashboard from "../../components/standup/CompanyStandupDashboard";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 /* ================= Types ================= */
-type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT";
+type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP";
 
 export const ProjectDetailPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -33,7 +35,12 @@ export const ProjectDetailPage = () => {
     }
   }, [dispatch, projectId]);
 
-  if (loading) return <p className="p-6">Loading project...</p>;
+ if (loading)
+  return (
+    <div className="p-6 flex justify-center">
+      <Spinner size="lg" />
+    </div>
+  );
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!selectedProject) return null;
 
@@ -121,7 +128,7 @@ const isOverdue =
 
       {/* ================= Tabs ================= */}
       <div className="border-b flex gap-6 px-2">
-        {(["TASKS", "CHAT", "SPRINT"] as ProjectDetailTab[]).map(
+        {(["TASKS", "CHAT", "SPRINT","STANDUP"] as ProjectDetailTab[]).map(
           (tab) => (
             <button
               key={tab}
@@ -152,6 +159,10 @@ const isOverdue =
       {activeTab === "SPRINT" && (
         <SprintBoard projectId={project.id} />
       )}
+
+      {activeTab === "STANDUP" && (
+  <CompanyStandupDashboard projectId={project.id} />
+)}
 
       {/* ================= Modals ================= */}
       <ProjectMembersModal

@@ -52,5 +52,6 @@ router.put('/developer/projects/:projectId/standups',verifyAccessToken,requireRo
 
 //standup-module- companyadmin
 router.get('/company/projects/:projectId/standups/today',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintTodaySummary);
-router.get("/company/projects/:projectId/standups/history",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary)
+router.get("/company/projects/:projectId/standups/history",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary);
+router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getStandupDetail)
 export default router;

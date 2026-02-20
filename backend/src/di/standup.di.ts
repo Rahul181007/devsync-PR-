@@ -2,11 +2,13 @@ import { ICreateStandupUseCase } from "../application/interface/standup/ICreateS
 import { IGetMyCurrentSprintStandupsUseCase } from "../application/interface/standup/IGetMyCurrentSprintStandupsUseCase";
 import { IGetSprintHistorySummaryUseCase } from "../application/interface/standup/IGetSprintHistorySummaryUseCase";
 import { IGetSprintTodayStandupSummaryUseCase } from "../application/interface/standup/IGetSprintTodayStandupSummaryUseCase";
+import { IGetStandupDetailForCompanyUseCase } from "../application/interface/standup/IGetStandupDetailForCompanyUseCase";
 import { IUpdateStandupUseCase } from "../application/interface/standup/IUpdateStandupUseCase";
 import { CreateStandupUseCase } from "../application/use-cases/standup/CreateStandupUseCase";
 import { GetMyCurrentSprintStandupsUseCase } from "../application/use-cases/standup/GetMyCurrentSprintStandupsUseCase";
 import { GetSprintHistorySummaryUseCase } from "../application/use-cases/standup/GetSprintHistorySummaryUseCase";
 import { GetSprintTodayStandupSummaryUseCase } from "../application/use-cases/standup/GetSprintTodayStandupSummaryUseCase";
+import { GetStandupDetailForCompanyUseCase } from "../application/use-cases/standup/GetStandupDetailForCompanyUseCase";
 import { UpdateStandupUseCase } from "../application/use-cases/standup/UpdateStandupUseCase";
 import { ProjectRepository } from "../infrastructure/repositories/project.repository";
 import { ProjectMemberRepository } from "../infrastructure/repositories/projectMember.repository";
@@ -39,10 +41,13 @@ const getSprintHistorySummaryUseCase:IGetSprintHistorySummaryUseCase=new GetSpri
     projectMemberRepo
 )
 
+const getStandupDetailUseCase:IGetStandupDetailForCompanyUseCase=new GetStandupDetailForCompanyUseCase(standupRepo,projectRepo,userRepo)
+
 export const standupController = new StandupController(
     createStandupUseCase,
     getMyCurrentSprintStandupsUseCase,
     updateStandupUseCase,
     getSprintTodayStandupSummaryUseCase,
-    getSprintHistorySummaryUseCase
+    getSprintHistorySummaryUseCase,
+    getStandupDetailUseCase
 )

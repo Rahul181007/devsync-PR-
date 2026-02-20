@@ -9,6 +9,7 @@ import { IUpdateStandupUseCase } from "../../application/interface/standup/IUpda
 import { updateStandupSchema } from "../../application/validators/standup/updateStandup.validator";
 import { IGetSprintTodayStandupSummaryUseCase } from "../../application/interface/standup/IGetSprintTodayStandupSummaryUseCase";
 import { IGetSprintHistorySummaryUseCase } from "../../application/interface/standup/IGetSprintHistorySummaryUseCase";
+import { IGetStandupDetailForCompanyUseCase } from "../../application/interface/standup/IGetStandupDetailForCompanyUseCase";
 
 export class StandupController {
     constructor(
@@ -16,7 +17,8 @@ export class StandupController {
         private _getMyCurrentSprintStandupsUseCase: IGetMyCurrentSprintStandupsUseCase,
         private _updateStandupUseCase: IUpdateStandupUseCase,
         private _getSprintTodayStandupSummaryUseCase: IGetSprintTodayStandupSummaryUseCase,
-        private _getSprintHistorySummaryUseCase: IGetSprintHistorySummaryUseCase
+        private _getSprintHistorySummaryUseCase: IGetSprintHistorySummaryUseCase,
+        private _getStandupDetailUseCase:IGetStandupDetailForCompanyUseCase,
     ) { }
 
     createStandup = async (req: Request, res: Response) => {
@@ -153,6 +155,30 @@ export class StandupController {
   } catch (error: unknown) {
     return handleError(error, res);
   }
+
+
 };
+  getStandupDetail=async(req:Request,res:Response)=>{
+   try {
+     const userId=req.user?.id;
+    const companyId=req.user?.companyId;
+    const {projectId,standupId}=req.params;
+
+        if (!userId || !companyId) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+      });
+    }
+
+    const result =await this._getStandupDetailUseCase.execute(userId,companyId,projectId,standupId)
+    res.status(HttpStatus.OK).json({
+        success:true,
+        data:result
+    })
+   } catch (error:unknown) {
+     return handleError(error,res) 
+   }
+  }
+
 
 }

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { getProjectTasks } from "../../store/task.slice";
 import { TaskDetailModal } from "../../components/task/TaskDetailModal";
 import { CreateTaskModal } from "../../components/task/CreateTaskModal";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 interface ProjectTasksPageProps {
     projectId: string;
@@ -49,8 +50,8 @@ const ProjectTasksPage = ({ projectId }: ProjectTasksPageProps) => {
 
                 {/* Loading */}
                 {loading && (
-                    <div className="py-6 text-center text-sm text-gray-500">
-                        Loading tasks...
+                    <div className="p-6 flex justify-center">
+                        <Spinner size="lg" />
                     </div>
                 )}
 

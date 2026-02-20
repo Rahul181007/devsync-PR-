@@ -9,6 +9,7 @@ import {
 import { CreateSprintModal } from "./CreateSprintModal";
 import toast from "react-hot-toast";
 import { PlanSprintModal } from "./PlanSprintModal";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 interface Props {
     projectId: string;
@@ -301,9 +302,9 @@ export const SprintBoard = ({ projectId }: Props) => {
                 )}
 
                 {loading && (
-                    <p className="text-sm text-gray-500 mt-4">
-                        Loading...
-                    </p>
+                    <div className="p-6 flex justify-center">
+                        <Spinner size="lg" />
+                    </div>
                 )}
             </div>
 

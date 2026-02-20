@@ -13,6 +13,7 @@ import DroppableColumn from "../../components/task/DroppableColumn";
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
 import SubmitTaskModal from "./SubmitTaskModal";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 interface DeveloperTaskBoardProps {
   projectId: string;
@@ -95,13 +96,12 @@ const handleDragEnd = (event: DragEndEvent) => {
     }
   }, [dispatch, projectId, selectedTaskId]);
 
-  if (loading) {
-    return (
-      <div className="py-10 text-center text-sm text-gray-500">
-        Loading tasks…
-      </div>
-    );
-  }
+if (loading)
+  return (
+    <div className="p-6 flex justify-center">
+      <Spinner size="lg" />
+    </div>
+  );
 
   if (error) {
     return (

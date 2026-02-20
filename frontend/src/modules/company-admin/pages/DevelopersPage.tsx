@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/hook"
 import { clearDeveloperError, fetchDevelopers } from "../store/developer.slice";
 import { DeveloperTable } from "../components/DeveloperTable";
 import { InviteDeveloperModal } from "../components/InviteDeveloperModal";
+import Spinner from "../../../shared/components/LoadingSpinner";
 
 type DeveloperStatusFilter = "ACTIVE" | "BLOCKED" | "";
 export const DevelopersPage = () => {
@@ -142,11 +143,8 @@ export const DevelopersPage = () => {
         </div>
 
         {loading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading developers...</p>
-            </div>
+          <div className="p-6 flex justify-center">
+            <Spinner size="lg" />
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { clearSelectedTask, getTaskDetail, updateTaskStatus } from "../../store/task.slice";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 interface TaskDetailModalProps {
     isOpen: boolean;
@@ -18,17 +19,17 @@ export const TaskDetailModal = ({
     const dispatch = useAppDispatch();
     const { selectedTask, loading } = useAppSelector((state) => state.companyAdminTask);
 
-useEffect(() => {
-  if (isOpen && taskId) {
-    dispatch(getTaskDetail({ projectId, taskId }))
-  }
-}, [dispatch, isOpen, projectId, taskId])
+    useEffect(() => {
+        if (isOpen && taskId) {
+            dispatch(getTaskDetail({ projectId, taskId }))
+        }
+    }, [dispatch, isOpen, projectId, taskId])
 
-useEffect(() => {
-  if (!isOpen) {
-    dispatch(clearSelectedTask())
-  }
-}, [dispatch, isOpen])
+    useEffect(() => {
+        if (!isOpen) {
+            dispatch(clearSelectedTask())
+        }
+    }, [dispatch, isOpen])
 
     const handleMarkCompleted = () => {
         if (!taskId) return;
@@ -61,7 +62,9 @@ useEffect(() => {
 
                 {/* Loading */}
                 {loading && (
-                    <p className="text-sm text-gray-500">Loading task...</p>
+                    <div className="p-6 flex justify-center">
+                        <Spinner size="lg" />
+                    </div>
                 )}
 
                 {!loading && selectedTask && (
@@ -91,15 +94,15 @@ useEffect(() => {
                                 <p className="text-gray-500">Priority</p>
                                 <p className="font-medium">{selectedTask.priority}</p>
                             </div>
-                             {/* Sprint */}
-<div>
-  <p className="text-gray-500">Sprint</p>
-  <p className="font-medium">
-    {selectedTask.sprint
-      ? selectedTask.sprint.name
-      : "Backlog"}
-  </p>
-</div>
+                            {/* Sprint */}
+                            <div>
+                                <p className="text-gray-500">Sprint</p>
+                                <p className="font-medium">
+                                    {selectedTask.sprint
+                                        ? selectedTask.sprint.name
+                                        : "Backlog"}
+                                </p>
+                            </div>
 
                             <div>
                                 <p className="text-gray-500">Assignee</p>

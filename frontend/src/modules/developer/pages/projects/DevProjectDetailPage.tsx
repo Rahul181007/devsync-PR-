@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { fetchProjectDetail } from "../../store/project.slice";
 import DevProjectMembers from "../../components/project/DevProjectMembers";
 import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
+import DevStandupPanel from "../../components/standup/DevStandupPanel";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 
 
@@ -12,7 +14,9 @@ type ProjectDetailTab =
   | "CHAT"
   | "FILES"
   | "COMMENTS"
-  | "AI";
+  | "AI"
+  | "STANDUP";
+
 
 const TABS: { key: ProjectDetailTab; label: string }[] = [
   { key: "TASKS", label: "Tasks" },
@@ -20,6 +24,7 @@ const TABS: { key: ProjectDetailTab; label: string }[] = [
   { key: "FILES", label: "Files" },
   { key: "COMMENTS", label: "Comments" },
   { key: "AI", label: "AI Summary" },
+  { key: "STANDUP", label: "StandUp" },
 ];
 
 /* ================= Page ================= */
@@ -40,7 +45,12 @@ export const DevProjectDetailPage = () => {
     }
   }, [dispatch, projectId]);
 
-  if (loading) return <p className="p-6">Loading project...</p>;
+ if (loading)
+  return (
+    <div className="p-6 flex justify-center">
+      <Spinner size="lg" />
+    </div>
+  );
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!selectedProject) return null;
 
@@ -122,11 +132,17 @@ const isOverdue =
         <DeveloperTaskBoard projectId={projectId} />
       )}
 
-      {activeTab !== "TASKS" && (
-        <div className="text-sm text-gray-500 py-10 text-center">
-          Coming soon
-        </div>
-      )}
+      {activeTab === "STANDUP" && projectId && (
+  <DevStandupPanel projectId={projectId} />
+)}
+
+
+{activeTab !== "TASKS" && activeTab !== "STANDUP" && (
+  <div className="text-sm text-gray-500 py-10 text-center">
+    Coming soon
+  </div>
+)}
+
     </div>
   );
 };

@@ -8,6 +8,8 @@ import developerProjectsReducer from '../modules/developer/store/project.slice'
 import companyAdminTaskReducer from '../modules/company-admin/store/task.slice'
 import developerTaskReducer from '../modules/developer/store/task.slice'
 import companyAdminSprintReducer from '../modules/company-admin/store/sprint.slice'
+import devStandupReducer from "../modules/developer/store/standup.slice"
+import companyStandupReducer from '../modules/company-admin/store/standup.slice'
 export const store=configureStore({
     reducer:{
         auth:authReducer,
@@ -18,7 +20,9 @@ export const store=configureStore({
          developerProjects: developerProjectsReducer,
          companyAdminTask:companyAdminTaskReducer,
          developerTask:developerTaskReducer,
-         companyAdminSprint:companyAdminSprintReducer
+         companyAdminSprint:companyAdminSprintReducer,
+         devStandup:devStandupReducer,
+         companyStandup: companyStandupReducer,
     }
 })
 

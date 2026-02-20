@@ -121,4 +121,10 @@ async findByUserWithFilters(
       const docs=await StandupModel.find({sprintId,standupDate})
       return docs.map((doc)=>this._toDomain(doc))
   }
+
+  async findById(id: string): Promise<Standup | null> {
+  const doc = await StandupModel.findById(id);
+  if (!doc) return null;
+  return this._toDomain(doc);
+}
 }
