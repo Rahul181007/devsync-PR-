@@ -7,12 +7,16 @@ import { handleError } from "../../shared/utils/handleError";
 import { IGetMyCurrentSprintStandupsUseCase } from "../../application/interface/standup/IGetMyCurrentSprintStandupsUseCase";
 import { IUpdateStandupUseCase } from "../../application/interface/standup/IUpdateStandupUseCase";
 import { updateStandupSchema } from "../../application/validators/standup/updateStandup.validator";
+import { IGetSprintTodayStandupSummaryUseCase } from "../../application/interface/standup/IGetSprintTodayStandupSummaryUseCase";
+import { IGetSprintHistorySummaryUseCase } from "../../application/interface/standup/IGetSprintHistorySummaryUseCase";
 
 export class StandupController {
     constructor(
         private _createStandupUseCase: ICreateStandupUseCase,
         private _getMyCurrentSprintStandupsUseCase: IGetMyCurrentSprintStandupsUseCase,
-        private _updateStandupUseCase: IUpdateStandupUseCase
+        private _updateStandupUseCase: IUpdateStandupUseCase,
+        private _getSprintTodayStandupSummaryUseCase: IGetSprintTodayStandupSummaryUseCase,
+        private _getSprintHistorySummaryUseCase: IGetSprintHistorySummaryUseCase
     ) { }
 
     createStandup = async (req: Request, res: Response) => {
@@ -76,7 +80,7 @@ export class StandupController {
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
                 });
             }
-            
+
             const parsed = updateStandupSchema.parse(req.body);
 
             await this._updateStandupUseCase.execute(
@@ -86,12 +90,69 @@ export class StandupController {
                 parsed
             )
 
-                return res.status(HttpStatus.OK).json({
-      success: true,
-      message: RESPONSE_MESSAGES.STANDUP.UPDATED
-    });
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: RESPONSE_MESSAGES.STANDUP.UPDATED
+            });
         } catch (error: unknown) {
-    return handleError(error, res);
+            return handleError(error, res);
         }
     }
+
+    getSprintTodaySummary = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            const { projectId } = req.params;
+            if (!userId || !companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                });
+            }
+
+            const data = await this._getSprintTodayStandupSummaryUseCase.execute(
+                userId,
+                companyId,
+                projectId
+            )
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                data:data
+            });
+
+        } catch (error:unknown) {
+            return handleError(error,res)
+        }
+    }
+
+    getSprintHistorySummary = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const companyId = req.user?.companyId;
+    const { projectId } = req.params;
+
+    if (!userId || !companyId) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+      });
+    }
+
+    const data =
+      await this._getSprintHistorySummaryUseCase.execute(
+        userId,
+        companyId,
+        projectId
+      );
+
+    return res.status(HttpStatus.OK).json({
+      success: true,
+      data
+    });
+
+  } catch (error: unknown) {
+    return handleError(error, res);
+  }
+};
+
 }

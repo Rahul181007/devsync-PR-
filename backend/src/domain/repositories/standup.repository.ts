@@ -31,4 +31,9 @@ export interface IStandupRepository{
 ): Promise<Standup[]>
 
     update(standup:Standup):Promise<Standup>
+
+    findBySprintAndDate(
+  sprintId: string,
+  standupDate: Date
+): Promise<Standup[]>;
 }

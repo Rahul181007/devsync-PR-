@@ -46,4 +46,6 @@ export interface IUserRepository {
   otp: string | null,
   otpExpiresAt: Date | null
 ): Promise<void>;
+
+findByIds(userIds: string[]): Promise<User[]>;
 }

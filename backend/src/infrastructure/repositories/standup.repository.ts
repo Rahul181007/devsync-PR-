@@ -116,4 +116,9 @@ async findByUserWithFilters(
 
     return this._toDomain(doc);
   }
+
+  async findBySprintAndDate(sprintId: string, standupDate: Date): Promise<Standup[]> {
+      const docs=await StandupModel.find({sprintId,standupDate})
+      return docs.map((doc)=>this._toDomain(doc))
+  }
 }

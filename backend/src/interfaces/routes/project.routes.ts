@@ -44,8 +44,13 @@ router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAcc
 router.patch("/company/projects/:projectId/sprints/:sprintId/complete",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.completeSprint)
 
 
-//standup-module
+//standup-module-developer
 router.post ('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.createStandup)
 router.get("/developer/projects/:projectId/standups",verifyAccessToken,requireRole(Role.DEVELOPER),standupController.getMyCurrentSprintStandups)
 router.put('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.updateStandup)
+
+
+//standup-module- companyadmin
+router.get('/company/projects/:projectId/standups/today',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintTodaySummary);
+router.get("/company/projects/:projectId/standups/history",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary)
 export default router;
