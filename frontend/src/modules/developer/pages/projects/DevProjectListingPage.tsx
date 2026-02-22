@@ -6,6 +6,7 @@ import { useDebounce } from "../../../../core/hooks/useDebounce";
 import { fetchProject } from "../../store/project.slice";
 import { ProjectTable } from "../../components/project/ProjectTable";
 import { ProjectStats } from "../../components/project/ProjectStats";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
 export const DevProjectListingPage=()=>{
     const dispatch=useAppDispatch();
@@ -83,7 +84,12 @@ export const DevProjectListingPage=()=>{
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {/* Loading */}
-      {loading && <p>Loading projects...</p>}
+      {loading &&                         <div className="p-12 flex justify-center items-center">
+                            <div className="text-center">
+                                <Spinner size="lg" />
+                                <p className="mt-2 text-sm text-gray-500">Loading tasks...</p>
+                            </div>
+                        </div>}
 
       {/* Table */}
       {!loading && (

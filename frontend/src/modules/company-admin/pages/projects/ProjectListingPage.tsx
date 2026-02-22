@@ -14,7 +14,7 @@ export const ProjectListingPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { companySlug } = useParams()
-  const { projects, loading, total, limit, error } = useAppSelector(state => state.project)
+  const { projects, loading, total, limit} = useAppSelector(state => state.project)
 
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<ProjectStatus | "">("");
@@ -100,8 +100,7 @@ export const ProjectListingPage = () => {
       {/* Stats */}
       <ProjectStats projects={projects} />
 
-      {/* Error */}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+
 
       {/* Loading */}
       {loading &&
