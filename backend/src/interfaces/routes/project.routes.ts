@@ -5,6 +5,7 @@ import { projectController } from "../../di/project.di";
 import { Role } from "../../shared/constants/roleenum";
 import { taskController } from "../../di/task.di";
 import { sprintController } from "../../di/sprint.di";
+import { standupController } from "../../di/standup.di";
 
 
 const router=Router();
@@ -42,4 +43,15 @@ router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,re
 router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.activateSprint)
 router.patch("/company/projects/:projectId/sprints/:sprintId/complete",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),sprintController.completeSprint)
 
+
+//standup-module-developer
+router.post ('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.createStandup)
+router.get("/developer/projects/:projectId/standups",verifyAccessToken,requireRole(Role.DEVELOPER),standupController.getMyCurrentSprintStandups)
+router.put('/developer/projects/:projectId/standups',verifyAccessToken,requireRole(Role.DEVELOPER),standupController.updateStandup)
+
+
+//standup-module- companyadmin
+router.get('/company/projects/:projectId/standups/today',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintTodaySummary);
+router.get("/company/projects/:projectId/standups/history",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary);
+router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getStandupDetail)
 export default router;

@@ -385,8 +385,10 @@ const authSlice = createSlice({
                 state.error = action.payload as string
             })
 
-            .addCase(logout.fulfilled, () => {
-                return initialState
+            .addCase(logout.fulfilled, (state) => {
+                state.user = null;
+                state.isAuthenticated = false;
+                state.isAuthChecked = true;
             })
 
             // forgot password

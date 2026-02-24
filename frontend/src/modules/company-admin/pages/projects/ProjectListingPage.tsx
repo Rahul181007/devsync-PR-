@@ -8,40 +8,41 @@ import { ProjectTable } from "../../components/project/ProjectTable";
 import { ProjectStats } from "../../components/project/ProjectStats";
 import { useNavigate, useParams } from "react-router-dom";
 import DeleteProjectModal from "../../components/project/DeleteProjectModal";
+import Spinner from "../../../../shared/components/LoadingSpinner";
 
-export const ProjectListingPage=()=>{
-    const dispatch=useAppDispatch();
-    const navigate=useNavigate();
-    const {companySlug}=useParams()
-    const {projects,loading,total,limit,error}=useAppSelector(state=>state.project)
+export const ProjectListingPage = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { companySlug } = useParams()
+  const { projects, loading, total, limit} = useAppSelector(state => state.project)
 
-    const [search,setSearch]=useState('');
-    const [status,setStatus]=useState<ProjectStatus|"">("");
-    const [currentPage,setCurrentPage]=useState(1);
-    const [openCreate,setOpenCreate]=useState(false)
-    const [deleteTarget,setDeleteTarget]=useState<{id:string;name:string}|null>(null)
-    const debouncedSearch=useDebounce(search,500)
+  const [search, setSearch] = useState('');
+  const [status, setStatus] = useState<ProjectStatus | "">("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openCreate, setOpenCreate] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+  const debouncedSearch = useDebounce(search, 500)
 
 
-    useEffect(()=>{
-        dispatch(listProjects({
-            page:currentPage,
-            limit,
-            search:debouncedSearch||undefined,
-            status:status||undefined
-        }))
-    },[dispatch,currentPage,debouncedSearch,status,limit])
+  useEffect(() => {
+    dispatch(listProjects({
+      page: currentPage,
+      limit,
+      search: debouncedSearch || undefined,
+      status: status || undefined
+    }))
+  }, [dispatch, currentPage, debouncedSearch, status, limit])
 
-    const totalPages=Math.ceil(total/limit)
-    console.log("pagination debug →", {
-  total,
-  limit,
-  totalPages,
-  currentPage,
-});
- 
+  const totalPages = Math.ceil(total / limit)
+  console.log("pagination debug →", {
+    total,
+    limit,
+    totalPages,
+    currentPage,
+  });
 
-   return (
+
+  return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="mb-8">
@@ -52,7 +53,7 @@ export const ProjectListingPage=()=>{
               Manage all your company projects
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <div className="relative">
               <input
@@ -71,7 +72,7 @@ export const ProjectListingPage=()=>{
                 </svg>
               </div>
             </div>
-            
+
             <select
               value={status}
               onChange={(e) => {
@@ -85,7 +86,7 @@ export const ProjectListingPage=()=>{
               <option value="COMPLETED">Completed</option>
               <option value="ARCHIVED">Archived</option>
             </select>
-            
+
             <button
               onClick={() => setOpenCreate(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
@@ -99,11 +100,13 @@ export const ProjectListingPage=()=>{
       {/* Stats */}
       <ProjectStats projects={projects} />
 
-      {/* Error */}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+
 
       {/* Loading */}
-      {loading && <p>Loading projects...</p>}
+      {loading &&
+        <div className="p-6 flex justify-center">
+          <Spinner size="lg" />
+        </div>}
 
       {/* Table */}
       {!loading && (
@@ -112,10 +115,10 @@ export const ProjectListingPage=()=>{
           onView={(projectId) =>
             navigate(`/company/${companySlug}/projects/${projectId}`)
           }
-          onDelete={(id)=>{
-            const project=projects.find((p)=>p.id===id)
-            if(project){
-                setDeleteTarget({id,name:project.name})
+          onDelete={(id) => {
+            const project = projects.find((p) => p.id === id)
+            if (project) {
+              setDeleteTarget({ id, name: project.name })
             }
           }
           }
@@ -123,7 +126,7 @@ export const ProjectListingPage=()=>{
       )}
 
       {/* Pagination */}
-      {totalPages >=1 && (
+      {totalPages >= 1 && (
         <div className="flex gap-2 mt-6">
           <button
             disabled={currentPage === 1}

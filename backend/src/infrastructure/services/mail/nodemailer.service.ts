@@ -4,7 +4,7 @@ import { IMailService } from '../../../domain/service/mail.service';
 
 export class NodemailerService implements IMailService {
     private _transporter = nodemailer.createTransport({
-        host: env.Mail_HOST,
+        host: env.MAIL_HOST,
         port: Number(env.MAIL_PORT),
         secure: false,
         auth: {

@@ -118,6 +118,14 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
        await this.updateById(userId,{otp,otpExpiresAt})
    }
 
+   async findByIds(userIds: string[]): Promise<User[]> {
+  const docs = await UserModel.find({
+    _id: { $in: userIds }
+  });
+
+  return docs.map(doc => this._toDomain(doc));
+}
+
 
 
 }
