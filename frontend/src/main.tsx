@@ -5,6 +5,7 @@ import './styles/tailwind.css'
 import { Provider } from 'react-redux'
 import { store } from './store/index.ts'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { registerSW } from 'virtual:pwa-register'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -15,3 +16,11 @@ createRoot(document.getElementById('root')!).render(
 
   </StrictMode>,
 )
+registerSW({
+  onNeedRefresh() {
+    console.log('New DevSync version available.')
+  },
+  onOfflineReady() {
+    console.log('DevSync is ready to work offline.')
+  }
+})
