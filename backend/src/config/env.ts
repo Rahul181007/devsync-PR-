@@ -1,31 +1,48 @@
 import dotenv from "dotenv";
+import { z } from "zod";
+
 dotenv.config();
 
-export const env = {
-  PORT: process.env.PORT || 4000,
-  MONGO_URL: process.env.MONGO_URL || "",
+/* ================= Schema ================= */
 
-  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
-  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET as string,
+const envSchema = z.object({
+  PORT: z.string().default("4000"),
 
-  ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN as string,
-  REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
-  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+  MONGO_URL: z.string().min(1, "MONGO_URL missing"),
 
-  Mail_HOST: process.env.MAIL_HOST,
-  MAIL_PORT: process.env.MAIL_PORT,
-  MAIL_USER: process.env.MAIL_USER,
-  MAIL_PASS: process.env.MAIL_PASS,
-  MAIL_FROM: process.env.MAIL_FROM,
+  JWT_ACCESS_SECRET: z.string().min(10),
+  JWT_REFRESH_SECRET: z.string().min(10),
 
-  //s3 bucket
-  AWS_REGION: process.env.AWS_REGION as string,
-  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
-  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID as string,
-  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY as string,
+  ACCESS_TOKEN_EXPIRES_IN: z.string(),
+  REFRESH_TOKEN_EXPIRES_IN: z.string(),
 
-  //google Auth
-  GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID
+  FRONTEND_URL: z.string().default("http://localhost:5173"),
 
-};
+  MAIL_HOST: z.string(),
+  MAIL_PORT: z.string(),
+  MAIL_USER: z.string(),
+  MAIL_PASS: z.string(),
+  MAIL_FROM: z.string(),
+
+  AWS_REGION: z.string(),
+  AWS_BUCKET_NAME: z.string(),
+  AWS_ACCESS_KEY_ID: z.string(),
+  AWS_SECRET_ACCESS_KEY: z.string(),
+
+  GOOGLE_CLIENT_ID: z.string(),
+});
+
+/* ================= Validation ================= */
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  console.error("❌ ENV VALIDATION ERROR");
+  console.error(parsed.error.format());
+  process.exit(1);
+}
+
+/* ================= Export ================= */
+
+export const env = parsed.data;
 

@@ -67,18 +67,7 @@ const DroppableColumn = ({
         }
       `}
     >
-      {/* Column Header */}
-      <div className={`p-3 rounded-t-xl border-b border-gray-200 ${config.bgColor}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full ${config.dotColor}`} />
-            <h3 className={`text-sm font-semibold ${config.color}`}>
-              {title.replace("_", " ")}
-            </h3>
-          </div>
-          <span className="text-xs text-gray-400">{config.icon}</span>
-        </div>
-      </div>
+
 
       {/* Children Container */}
       <div className="p-3 min-h-[200px]">
