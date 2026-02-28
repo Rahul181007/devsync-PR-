@@ -7,6 +7,7 @@ import { taskController } from "../../di/task.di";
 import { sprintController } from "../../di/sprint.di";
 import { standupController } from "../../di/standup.di";
 import { chatController } from "../../di/chat.di";
+import { aiController } from "../../di/ai.di";
 
 
 const router=Router();
@@ -58,5 +59,9 @@ router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken
 
 
 //chat module
-router.get('/projects/:projectId/chat',verifyAccessToken,chatController.getProjectMessage)
+router.get('/projects/:projectId/chat',verifyAccessToken,chatController.getProjectMessage);
+
+// ai module
+router.get("/projects/:projectId/ai-summary",verifyAccessToken,aiController.getProjectAISummary);
+
 export default router;

@@ -149,6 +149,10 @@ export const RESPONSE_MESSAGES = {
         REPLY_MESSAGE_NOT_FOUND:"Reply message not found"
     },
 
+    AI: {
+  SUMMARY_GENERATED: "AI summary generated successfully",
+},
+
 
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",
