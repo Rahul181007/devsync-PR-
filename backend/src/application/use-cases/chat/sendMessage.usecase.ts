@@ -65,6 +65,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         const created = await this._chatRepo.create({
             projectId,
             senderId: userId,
+            senderName:user.name,
             message: data.message,
             replyToMessageId: data.replyToMessageId ?? null
         })

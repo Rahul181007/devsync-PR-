@@ -9,7 +9,7 @@ import ProjectTasksPage from "./ProjectTasksPage";
 import { SprintBoard } from "../../components/sprint/SprintBoard";
 import CompanyStandupDashboard from "../../components/standup/CompanyStandupDashboard";
 import Spinner from "../../../../shared/components/LoadingSpinner";
-import ProjectChat from "../../../chat/components/chat/ProjectChat";
+import ProjectChat from "../../../chat/components/ProjectChat";
 
 /* ================= Types ================= */
 type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP";

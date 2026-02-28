@@ -39,7 +39,7 @@ const chatSlice=createSlice({
     initialState,
     reducers:{
         addMessage(state,action){
-            state.messages.push(action.payload)
+            state.messages = [...state.messages, action.payload];
         },
         clearChat(state){
             state.messages=[]

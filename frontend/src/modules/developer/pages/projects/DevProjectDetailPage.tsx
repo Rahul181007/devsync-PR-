@@ -6,7 +6,7 @@ import DevProjectMembers from "../../components/project/DevProjectMembers";
 import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
 import DevStandupPanel from "../../components/standup/DevStandupPanel";
 import Spinner from "../../../../shared/components/LoadingSpinner";
-import ProjectChat from "../../../chat/components/chat/ProjectChat";
+import ProjectChat from "../../../chat/components/ProjectChat";
 
 
 

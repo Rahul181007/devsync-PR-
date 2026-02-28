@@ -17,6 +17,7 @@ export class ChatRepository implements IChatRepository{
             doc._id.toString(),
             doc.projectId.toString(),
             doc.senderId.toString(),
+            doc.senderName,
             doc.message,
             doc.replyToMessageId?doc.replyToMessageId.toString():null,
             doc.createdAt,
@@ -24,15 +25,18 @@ export class ChatRepository implements IChatRepository{
         )
     }
 
-    async create(data: Partial<ChatMessage>): Promise<ChatMessage> {
-        const doc=await ChatMessageModel.create({
-            projectId:data.projectId,
-            senderId:data.senderId,
-            message:data.message,
-            replyToMessageId:data.replyToMessageId?? undefined
-        })
-        return this._toDomain(doc)
-    }
+async create(data: Partial<ChatMessage>): Promise<ChatMessage> {
+
+    const doc = await ChatMessageModel.create({
+        projectId: data.projectId,
+        senderId: data.senderId,
+        senderName:data.senderName,
+        message: data.message,
+        replyToMessageId: data.replyToMessageId ?? undefined
+    });
+
+ return this._toDomain(doc);
+}
 
     async findByProjectId(projectId: string, options: findMessageOptions): Promise<ChatMessage[]> {
         const query:ChatQuery={

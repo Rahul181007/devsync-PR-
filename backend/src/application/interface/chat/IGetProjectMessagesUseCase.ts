@@ -1,4 +1,5 @@
-import { ChatMessage } from "../../../domain/entities/chat .entity";
+
+import { ChatMessageResponseDTO } from "../../dto/chat/getChatMessageResponse.dto";
 import { GetProjectMessagesRequestDTO } from "../../dto/chat/getProjectMessagesRequest.dto";
 
 export interface IGetProjectMessageUseCase{
@@ -7,5 +8,5 @@ export interface IGetProjectMessageUseCase{
         companyId:string,
         projectId:string,
         query:GetProjectMessagesRequestDTO
-    ):Promise<ChatMessage[]>
+    ):Promise<ChatMessageResponseDTO[]>
 }
