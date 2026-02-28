@@ -43,6 +43,7 @@ interface AuthState {
 
 const initialState: AuthState = {
     user: null,
+
     loading: false,
     error: null,
     isAuthenticated: false,
@@ -301,6 +302,7 @@ const authSlice = createSlice({
 
             })
             .addCase(userLogin.fulfilled, (state, action) => {
+                console.log("Login payload:", action.payload);
                 state.loading = false;
                 state.isAuthChecked = true;
 
@@ -311,6 +313,7 @@ const authSlice = createSlice({
                 state.suspendedCompany = false;
                 state.onboardingStep = null;
                 const payload = action.payload;
+
 
                 const user = {
                     id: payload.id,

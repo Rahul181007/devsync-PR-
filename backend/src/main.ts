@@ -6,6 +6,8 @@ import router from './router'
 import { env } from './config/env';
 import { connectDB } from './infrastructure/db/mongo';
 import cookieParser from 'cookie-parser';
+import { createServer } from 'http';
+import { initSocketServer } from './infrastructure/websocket/socket.server';
 
 const app=express()
 
@@ -22,12 +24,15 @@ app.use(compression());
 
 app.use('/api',router);
 
+// 🔥 Create HTTP server
+const httpServer = createServer(app);
 
+// 🔥 Initialize socket
+initSocketServer(httpServer);
 
-
-connectDB().then(()=>{
-  app.listen(env.PORT,()=>{
-    console.log(`Server running on port ${env.PORT}`)
-  })
-})
+connectDB().then(() => {
+  httpServer.listen(env.PORT, () => {
+    console.log(`Server running on port ${env.PORT}`);
+  });
+});
 

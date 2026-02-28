@@ -12,7 +12,7 @@ import developerTaskReducer from '../modules/developer/store/task.slice';
 import companyAdminSprintReducer from '../modules/company-admin/store/sprint.slice';
 import devStandupReducer from "../modules/developer/store/standup.slice";
 import companyStandupReducer from '../modules/company-admin/store/standup.slice';
-
+import companyChatReducer from '../modules/chat/store/chat.slice'
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -27,6 +27,7 @@ const appReducer = combineReducers({
   companyAdminSprint: companyAdminSprintReducer,
   devStandup: devStandupReducer,
   companyStandup: companyStandupReducer,
+  companyChat:companyChatReducer
 });
 
 /* ================= RootState ================= */

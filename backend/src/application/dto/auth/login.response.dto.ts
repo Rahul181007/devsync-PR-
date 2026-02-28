@@ -8,8 +8,8 @@ export interface LoginResponseDTO{
     companyId?:string|null;
     companySlug?:string|null;
     onboardingStep?:OnboardingStep,
-    accessToken?:string;
-    refreshToken?:string;
+    accessToken:string;
+    refreshToken:string;
 
     requiresOnboarding?:boolean;
     waitingForApproval?:boolean;

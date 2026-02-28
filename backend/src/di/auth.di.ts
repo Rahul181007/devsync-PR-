@@ -10,7 +10,7 @@ import { ILoginSuperAdminUseCase } from "../application/interface/auth/ILoginSup
 
 
 const superAdminRepo=new SuperAdminRepository();
-const userRepository=new UserRepository();
+const userRepository=new UserRepository(); 
 const companyRepository=new CompanyRepository()
 const loginUseCase:ILoginSuperAdminUseCase= new LoginSuperAdminUseCase(superAdminRepo);
 const getAuthMeUseCase:IGetAuthMeUseCase=new GetAuthMeUseCase(userRepository,companyRepository,superAdminRepo)

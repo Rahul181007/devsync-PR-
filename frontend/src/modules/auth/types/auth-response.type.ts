@@ -16,4 +16,5 @@ export interface LoginPayload {
  suspendedCompany?:boolean
 
     onboardingStep?: OnboardingStep;
+    
 }
