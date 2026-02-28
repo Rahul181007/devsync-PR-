@@ -6,6 +6,7 @@ import { Role } from "../../shared/constants/roleenum";
 import { taskController } from "../../di/task.di";
 import { sprintController } from "../../di/sprint.di";
 import { standupController } from "../../di/standup.di";
+import { chatController } from "../../di/chat.di";
 
 
 const router=Router();
@@ -54,4 +55,8 @@ router.put('/developer/projects/:projectId/standups',verifyAccessToken,requireRo
 router.get('/company/projects/:projectId/standups/today',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintTodaySummary);
 router.get("/company/projects/:projectId/standups/history",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary);
 router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),standupController.getStandupDetail)
+
+
+//chat module
+router.get('/projects/:projectId/chat',verifyAccessToken,chatController.getProjectMessage)
 export default router;

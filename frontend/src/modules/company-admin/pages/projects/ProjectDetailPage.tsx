@@ -9,6 +9,7 @@ import ProjectTasksPage from "./ProjectTasksPage";
 import { SprintBoard } from "../../components/sprint/SprintBoard";
 import CompanyStandupDashboard from "../../components/standup/CompanyStandupDashboard";
 import Spinner from "../../../../shared/components/LoadingSpinner";
+import ProjectChat from "../../../chat/components/chat/ProjectChat";
 
 /* ================= Types ================= */
 type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP";
@@ -152,7 +153,7 @@ const isOverdue =
 
       {activeTab === "CHAT" && (
         <div className="p-6 text-gray-500">
-          Chat coming soon
+          <ProjectChat projectId={project.id} />
         </div>
       )}
 

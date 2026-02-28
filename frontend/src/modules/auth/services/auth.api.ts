@@ -25,9 +25,17 @@ export interface LoginResponse {
     role: 'SUPER_ADMIN' | 'COMPANY_ADMIN' | 'DEVELOPER';
     companyId?: string | null;
     companySlug?: string | null;
+
+    accessToken: string;     // ✅ ADD
+    refreshToken: string;    // ✅ ADD
+
     requiresOnboarding?: boolean;
     waitingForApproval?: boolean;
     onboardingStep?: OnboardingStep;
+
+    rejectedCompany?: boolean;
+    rejectionReason?: string | null;
+    suspendedCompany?: boolean;
   };
 }
 

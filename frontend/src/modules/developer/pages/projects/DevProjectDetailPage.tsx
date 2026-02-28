@@ -6,6 +6,7 @@ import DevProjectMembers from "../../components/project/DevProjectMembers";
 import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
 import DevStandupPanel from "../../components/standup/DevStandupPanel";
 import Spinner from "../../../../shared/components/LoadingSpinner";
+import ProjectChat from "../../../chat/components/chat/ProjectChat";
 
 
 
@@ -128,18 +129,35 @@ const isOverdue =
       </div>
 
       {/* ================= Tab Content ================= */}
-      {activeTab === "TASKS" && projectId && (
-        <DeveloperTaskBoard projectId={projectId} />
-      )}
+ {/* ================= Tab Content ================= */}
 
-      {activeTab === "STANDUP" && projectId && (
+{activeTab === "TASKS" && projectId && (
+  <DeveloperTaskBoard projectId={projectId} />
+)}
+
+{activeTab === "CHAT" && projectId && (
+  <ProjectChat projectId={projectId} />
+)}
+
+{activeTab === "STANDUP" && projectId && (
   <DevStandupPanel projectId={projectId} />
 )}
 
-
-{activeTab !== "TASKS" && activeTab !== "STANDUP" && (
+{activeTab === "FILES" && (
   <div className="text-sm text-gray-500 py-10 text-center">
-    Coming soon
+    Files coming soon
+  </div>
+)}
+
+{activeTab === "COMMENTS" && (
+  <div className="text-sm text-gray-500 py-10 text-center">
+    Comments coming soon
+  </div>
+)}
+
+{activeTab === "AI" && (
+  <div className="text-sm text-gray-500 py-10 text-center">
+    AI Summary coming soon
   </div>
 )}
 

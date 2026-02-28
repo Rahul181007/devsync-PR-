@@ -145,6 +145,9 @@ export const RESPONSE_MESSAGES = {
         NOT_FOUND:"Standup not found",
         UPDATED:"Standup updated successfully"
     },
+    CHAT:{
+        REPLY_MESSAGE_NOT_FOUND:"Reply message not found"
+    },
 
 
     COMMON: {
