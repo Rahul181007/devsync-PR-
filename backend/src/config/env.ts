@@ -30,7 +30,7 @@ const envSchema = z.object({
   AWS_SECRET_ACCESS_KEY: z.string(),
 
   GOOGLE_CLIENT_ID: z.string(),
-
+  GEMINI_API_KEY:z.string(),
 
 });
 
