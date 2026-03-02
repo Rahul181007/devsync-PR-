@@ -10,9 +10,10 @@ import { SprintBoard } from "../../components/sprint/SprintBoard";
 import CompanyStandupDashboard from "../../components/standup/CompanyStandupDashboard";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import ProjectChat from "../../../chat/components/ProjectChat";
+import ProjectAISummary from "../../../ai/components/ProjectAISummary";
 
 /* ================= Types ================= */
-type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP";
+type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP"| "AI";
 
 export const ProjectDetailPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -129,7 +130,7 @@ const isOverdue =
 
       {/* ================= Tabs ================= */}
       <div className="border-b flex gap-6 px-2">
-        {(["TASKS", "CHAT", "SPRINT","STANDUP"] as ProjectDetailTab[]).map(
+        {(["TASKS", "CHAT", "SPRINT","STANDUP","AI"] as ProjectDetailTab[]).map(
           (tab) => (
             <button
               key={tab}
@@ -163,6 +164,11 @@ const isOverdue =
 
       {activeTab === "STANDUP" && (
   <CompanyStandupDashboard projectId={project.id} />
+
+)}
+
+{activeTab === "AI" && (
+  <ProjectAISummary projectId={project.id} />
 )}
 
       {/* ================= Modals ================= */}

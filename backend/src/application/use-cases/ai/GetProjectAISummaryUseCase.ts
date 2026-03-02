@@ -9,6 +9,7 @@ import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { ProjectAISummaryDTO } from "../../dto/ai/projectAISummary.dto";
 import { IGetProjectAISummaryUseCase } from "../../interface/ai/IGetProjectAISummaryUseCase";
+import { HumanSummaryGenerator } from "../../service/ai/humanSummaryGenerator";
 
 export class GetProjectAISummaryUseCase implements IGetProjectAISummaryUseCase {
     constructor(
@@ -16,7 +17,8 @@ export class GetProjectAISummaryUseCase implements IGetProjectAISummaryUseCase {
         private _taskRepo: ITaskRepository,
         private _userRepo: IUserRepository,
         private _projectMemberRepo: IProjectMemberRepository,
-        private _projectAIService: IProjectAIService
+        private _projectAIService: IProjectAIService,
+        private _humanSummaryGenerator: HumanSummaryGenerator
     ) { }
 
     async execute(userId: string, companyId: string, projectId: string): Promise<ProjectAISummaryDTO> {
@@ -69,20 +71,17 @@ export class GetProjectAISummaryUseCase implements IGetProjectAISummaryUseCase {
             tasks = tasks.filter((task) => task.assigneeId === userId)
         }
 
-        const aiSummary = this._projectAIService.generateSummary({
+        const metrics = this._projectAIService.generateSummary({
             tasks,
             currentDate: new Date()
         })
 
+  const summary = this._humanSummaryGenerator.generate(metrics);
+
+
         return {
-            health: aiSummary.health,
-            totalTasks: aiSummary.totalTasks,
-            completedTasks: aiSummary.completedTasks,
-            pendingTasks: aiSummary.pendingTasks,
-            overdueTasks: aiSummary.overdueTasks,
-            upcomingTasks: aiSummary.upcomingTasks,
-            velocity: aiSummary.velocity,
-            summary: aiSummary.summary
+           ...metrics,
+           summary,
         }
     }
 }

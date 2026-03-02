@@ -6,6 +6,7 @@ import { ProjectMemberRepository } from "../infrastructure/repositories/projectM
 import { TaskRepository } from "../infrastructure/repositories/task.repository";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
 import { AIController } from "../interfaces/controllers/ai.controller";
+import { HumanSummaryGenerator } from "../application/service/ai/humanSummaryGenerator";
 
 // Repositories
 const projectRepository = new ProjectRepository();
@@ -16,12 +17,15 @@ const projectMemberRepository = new ProjectMemberRepository();
 // Domain Service
 const projectAIService = new ProjectAIService();
 
+const humanSummaryGenerator = new HumanSummaryGenerator();
 export const getProjectAISummaryUseCase:IGetProjectAISummaryUseCase=new GetProjectAISummaryUseCase(
     projectRepository,
     taskRepository,
     userRepository,
     projectMemberRepository,
-    projectAIService
+    projectAIService,
+    humanSummaryGenerator
+
 )
 
 export const aiController=new AIController(

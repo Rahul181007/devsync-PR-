@@ -7,6 +7,7 @@ import DeveloperTaskBoard from "../../components/task/DeveloperTaskBoard";
 import DevStandupPanel from "../../components/standup/DevStandupPanel";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import ProjectChat from "../../../chat/components/ProjectChat";
+import ProjectAISummary from "../../../ai/components/ProjectAISummary";
 
 
 
@@ -155,10 +156,8 @@ const isOverdue =
   </div>
 )}
 
-{activeTab === "AI" && (
-  <div className="text-sm text-gray-500 py-10 text-center">
-    AI Summary coming soon
-  </div>
+{activeTab === "AI" && projectId && (
+  <ProjectAISummary projectId={projectId} />
 )}
 
     </div>
