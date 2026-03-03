@@ -2,6 +2,7 @@ import { ICompanyRepository } from "../../../domain/repositories/company.reposit
 import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { ISuperAdminRepository } from "../../../domain/repositories/superAdmin.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -63,17 +64,29 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
 
         const superAdmin = await this._superAdminRepo.findActive();
 
-if (superAdmin) {
-  await this._notificationRepo.create({
-    userId: superAdmin.id,
-    type: "COMPANY_SUBMITTED_FOR_APPROVAL",
-    title: "New Company Awaiting Approval",
-    message: `Company "${newCompany.name}" has been submitted for approval.`,
-    metadata: {
-      companyId: newCompany.id
-    }
-  });
-}
+        if (superAdmin) {
+            const notification = await this._notificationRepo.create({
+                userId: superAdmin.id,
+                type: "COMPANY_SUBMITTED_FOR_APPROVAL",
+                title: "New Company Awaiting Approval",
+                message: `Company "${newCompany.name}" has been submitted for approval.`,
+                metadata: {
+                    companyId: newCompany.id
+                }
+            });
+
+            const io = getSocketInstance();
+
+            io.to(`user:${superAdmin.id}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
+            });
+        }
         await this._userRepo.assignCompany(user.id, newCompany.id)
         await this._userRepo.updateStatus(user.id, "ACTIVE")
 

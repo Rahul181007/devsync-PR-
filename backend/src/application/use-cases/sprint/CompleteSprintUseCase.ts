@@ -4,6 +4,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -87,7 +88,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         const developers = users.filter(u => u.role === Role.DEVELOPER);
 
         for (const dev of developers) {
-            await this._notificationRepository.create({
+            const notification=await this._notificationRepository.create({
                 userId: dev.id,
                 type: "SPRINT_COMPLETED",
                 title: "Sprint Completed",
@@ -96,6 +97,18 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
                     sprintId: sprint.id,
                     projectId
                 }
+            });
+
+                        const io = getSocketInstance();
+
+            io.to(`user:${dev.id}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
             });
         }
     }

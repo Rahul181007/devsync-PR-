@@ -3,6 +3,7 @@ import { IProjectRepository } from "../../../domain/repositories/project.reposit
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -82,7 +83,7 @@ export class SubmitTaskUseCase implements ISubmitTaskUseCase {
     const companyAdmin = await this._userRepo.findCompanyAdminByCompany(user.companyId);
 
     if (companyAdmin) {
-      await this._notificationRepo.create({
+      const notification=await this._notificationRepo.create({
         userId: companyAdmin.id,
         type: "TASK_SUBMITTED",
         title: "Task Submitted",
@@ -92,6 +93,18 @@ export class SubmitTaskUseCase implements ISubmitTaskUseCase {
           projectId: projectId
         }
       })
+            const io = getSocketInstance();
+
+            io.to(`user:${companyAdmin.id}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
+            });
+      
     }
 
 

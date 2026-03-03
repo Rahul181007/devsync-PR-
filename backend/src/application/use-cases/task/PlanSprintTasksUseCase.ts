@@ -4,6 +4,7 @@ import { IProjectMemberRepository } from "../../../domain/repositories/projectMe
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -95,7 +96,7 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
             await this._taskRepo.update(task)
 
             try {
-                await this._notificationRepo.create({
+                const notification=await this._notificationRepo.create({
                     userId: item.developerId,
                     type: "TASK_ASSIGNED",
                     title: "New Task Assigned",
@@ -106,6 +107,19 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
                         taskId: task.id
                     }
                 });
+
+
+                            const io = getSocketInstance();
+                
+                            io.to(`user:${item.developerId}`).emit("new_notification", {
+                                id: notification.id,
+                                type: notification.type,
+                                title: notification.title,
+                                message: notification.message,
+                                metadata: notification.metadata,
+                                isRead: false,
+                                createdAt: notification.createdAt,
+                            });
             } catch (error) {
                 console.error("Task assignment notification failed:", error);
             }

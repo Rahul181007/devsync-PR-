@@ -31,7 +31,7 @@ export class NotificationRepository implements INotificationRepository {
     async findByUserId(userId: string): Promise<Notification[]> {
         const docs=await NotificationModel.find({
             userId,
-
+            isRead: false
         }).sort({createdAt:-1})
 
         return docs.map(doc=>this._toDomain(doc))

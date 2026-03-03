@@ -57,7 +57,7 @@ export class NotificationController {
         }
     }
 
-    getUreadCount=async(req:Request,res:Response)=>{
+    getUnreadCount=async(req:Request,res:Response)=>{
         try {
             const userId=req.user?.id;
             if(!userId){
