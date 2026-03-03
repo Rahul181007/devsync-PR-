@@ -1,4 +1,6 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
+import { ISuperAdminRepository } from "../../../domain/repositories/superAdmin.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
@@ -11,7 +13,9 @@ import { ICreateWorkspaceUseCase } from "../../interface/company/ICreateWorkspac
 export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
     constructor(
         private _companyRepo: ICompanyRepository,
-        private _userRepo: IUserRepository
+        private _userRepo: IUserRepository,
+        private _superAdminRepo: ISuperAdminRepository,
+        private _notificationRepo: INotificationRepository
     ) { }
 
     private _generateSlug(name: string): string {
@@ -22,7 +26,7 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
             .replace(/\s+/g, "-")
     }
 
-    async execute(userId: string, data: CreateWorkspaceDTO):Promise<CreateWorkspaceResponse> {
+    async execute(userId: string, data: CreateWorkspaceDTO): Promise<CreateWorkspaceResponse> {
         const normalizedName = data.name.trim();
         const normalizedDomain = data.domain
             ? data.domain.trim().toLowerCase()
@@ -53,16 +57,30 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
             createdBy: 'self',
             adminEmail: user.email,
             status: 'PENDING',
-             onboardingStep: 'BRANDING',
+            onboardingStep: 'BRANDING',
             ownerAdminId: user.id,
         })
+
+        const superAdmin = await this._superAdminRepo.findActive();
+
+if (superAdmin) {
+  await this._notificationRepo.create({
+    userId: superAdmin.id,
+    type: "COMPANY_SUBMITTED_FOR_APPROVAL",
+    title: "New Company Awaiting Approval",
+    message: `Company "${newCompany.name}" has been submitted for approval.`,
+    metadata: {
+      companyId: newCompany.id
+    }
+  });
+}
         await this._userRepo.assignCompany(user.id, newCompany.id)
-        await this._userRepo.updateStatus(user.id,"ACTIVE")
+        await this._userRepo.updateStatus(user.id, "ACTIVE")
 
         return {
-            userId:user.id,
-            companyId:newCompany.id,
-            role:user.role
+            userId: user.id,
+            companyId: newCompany.id,
+            role: user.role
         }
     }
 }

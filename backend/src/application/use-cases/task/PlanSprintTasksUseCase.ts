@@ -1,3 +1,4 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
@@ -16,7 +17,8 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
         private _sprintRepo: ISprintRepository,
         private _projectRepo: IProjectRepository,
         private _projectMemberRepo: IProjectMemberRepository,
-        private _userRepo: IUserRepository
+        private _userRepo: IUserRepository,
+        private _notificationRepo: INotificationRepository
     ) { }
 
     async execute(userId: string, companyId: string, projectId: string, data: PlanSprintRequestDTO): Promise<void> {
@@ -91,6 +93,22 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
             task.assigneeId = item.developerId
 
             await this._taskRepo.update(task)
+
+            try {
+                await this._notificationRepo.create({
+                    userId: item.developerId,
+                    type: "TASK_ASSIGNED",
+                    title: "New Task Assigned",
+                    message: `You have been assigned task "${task.title}" in sprint "${sprint.name}".`,
+                    metadata: {
+                        projectId,
+                        sprintId: sprint.id,
+                        taskId: task.id
+                    }
+                });
+            } catch (error) {
+                console.error("Task assignment notification failed:", error);
+            }
         }
     }
 }

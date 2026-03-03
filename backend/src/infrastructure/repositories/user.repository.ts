@@ -125,7 +125,15 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
 
   return docs.map(doc => this._toDomain(doc));
 }
+async findCompanyAdminByCompany(companyId: string): Promise<User | null> {
+  const doc = await this.model.findOne({
+    companyId,
+    role: "COMPANY_ADMIN",
+    status: "ACTIVE"
+  });
 
+  return doc ? this._toDomain(doc) : null;
+}
 
 
 }

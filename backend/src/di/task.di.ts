@@ -16,6 +16,7 @@ import { PlanSprintTaskUseCase } from "../application/use-cases/task/PlanSprintT
 import { SubmitTaskUseCase } from "../application/use-cases/task/SubmitTaskUseCase";
 import { UpdateDeveloperTaskStatusUseCase } from "../application/use-cases/task/UpdateDeveloperTaskStatusUseCase";
 import { UpdateTaskStatusUseCase } from "../application/use-cases/task/UpdateTaskStatusUseCase";
+import { NotificationRepository } from "../infrastructure/repositories/notification.repository";
 import { ProjectRepository } from "../infrastructure/repositories/project.repository";
 import { ProjectMemberRepository } from "../infrastructure/repositories/projectMember.repository";
 import { SprintRepository } from "../infrastructure/repositories/sprint.repository";
@@ -28,6 +29,7 @@ const projectMemberRepository=new ProjectMemberRepository();
 const userRepository=new UserRepository();
 const taskRepository = new TaskRepository();
 const sprintRepository=new SprintRepository()
+const notificationRepository=new NotificationRepository()
 
 const createTaskUseCase:ICreateTaskUseCase=new CreateTaskUseCase(taskRepository,userRepository,projectRepository,projectMemberRepository)
 const getProjectTasksUseCase:IGetProjectTasksUseCase=new GetProjectTasksUseCase(userRepository,taskRepository,projectRepository)
@@ -35,12 +37,13 @@ const getTaskDetailUseCase:IGetTaskDetailUseCase=new GetTaskDetailUseCase(userRe
 const updateTaskStatusUseCase:IUpdateTaskStatusUseCase=new UpdateTaskStatusUseCase(userRepository,taskRepository,projectRepository);
 const getDeveloperTasksUseCase:IGetDeveloperTasksUseCase=new GetDeveloperTasksUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository);
 const updateDeveloperTaskUseCase:IUpdateDeveloperTaskStatusUseCase=new UpdateDeveloperTaskStatusUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository);
-const submitTaskUseCase:ISubmitTaskUseCase=new SubmitTaskUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository)
+const submitTaskUseCase:ISubmitTaskUseCase=new SubmitTaskUseCase(userRepository,taskRepository,projectRepository,projectMemberRepository,notificationRepository)
 const getDeveloperTaskDetailUseCase:IGetDeveloperTaskDetailUseCase=new GetDeveloperTaskDetailUseCase(userRepository,projectRepository,taskRepository,projectMemberRepository);
 const planSprintTasksUSeCase:IPlanSprintTasksUseCase=new PlanSprintTaskUseCase(
     taskRepository,
     sprintRepository,
-    projectRepository,projectMemberRepository,userRepository
+    projectRepository,projectMemberRepository,userRepository,
+    notificationRepository
 )
 export const taskController=new TaskController(createTaskUseCase,
     getProjectTasksUseCase,

@@ -6,7 +6,7 @@ import companyRoutes from './interfaces/routes/company.routes'
 import inviteRoutes from './interfaces/routes/invite.routes'
 import userMangementRoutes from './interfaces/routes/user.routes'
 import projectRoutes from './interfaces/routes/project.routes';
-
+import notificationRoutes from './interfaces/routes/notification.routes';
 const router =Router();
 
 router.use("/auth", authRoutes);
@@ -14,7 +14,9 @@ router.use('/auth',userRoutes)
 router.use("/auth", passwordResetRoutes);
 
 router.use('/',companyRoutes);
-router.use('/',inviteRoutes)
-router.use('/',userMangementRoutes)
-router.use('/',projectRoutes)
+router.use('/',inviteRoutes);
+router.use('/',userMangementRoutes);
+router.use('/',projectRoutes);
+router.use("/",notificationRoutes);
+
 export default router

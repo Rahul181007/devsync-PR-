@@ -1,4 +1,6 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
@@ -6,7 +8,9 @@ import { ISuspendCompanyUseCase } from "../../interface/company/ISuspendCompanyU
 
 export class SuspendCompanyUseCase implements ISuspendCompanyUseCase{
     constructor(
-        private _companyRepo:ICompanyRepository
+        private _companyRepo:ICompanyRepository,
+              private _userRepo:IUserRepository,
+              private _notificationRepo:INotificationRepository
     ){}
 
     async execute(companyId:string):Promise<void>{
@@ -18,5 +22,18 @@ export class SuspendCompanyUseCase implements ISuspendCompanyUseCase{
             throw new AppError(RESPONSE_MESSAGES.COMPANY.COMPANY_NOT_SUSPENDED,HttpStatus.BAD_REQUEST)
         }
         await this._companyRepo.updateStatus(company.id,'SUSPENDED')
+        const companyAdmin = await this._userRepo.findCompanyAdminByCompany(company.id);
+
+if (companyAdmin) {
+    await this._notificationRepo.create({
+        userId: companyAdmin.id,
+        type: "COMPANY_SUSPENDED",
+        title: "Company Suspended",
+        message: `Your company "${company.name}" has been suspended.`,
+        metadata: {
+            companyId: company.id
+        }
+    });
+}
     }
 }

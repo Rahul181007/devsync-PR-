@@ -1,4 +1,6 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
+import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
@@ -13,7 +15,9 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         private _sprintRepo: ISprintRepository,
         private _projectRepo: IProjectRepository,
         private _taskRepo: ITaskRepository,
-        private _userRepo: IUserRepository
+        private _userRepo: IUserRepository,
+        private _projectMemberRepository: IProjectMemberRepository,
+        private _notificationRepository: INotificationRepository
     ) { }
 
     async execute(userId: string, companyid: string, projectId: string, sprintId: string): Promise<void> {
@@ -73,5 +77,26 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         await this._projectRepo.update(projectId, {
             currentSprintId: null
         })
+
+        const members = await this._projectMemberRepository.findMembersByProject(projectId);
+
+        const memberIds = members.map(m => m.userId);
+
+        const users = await this._userRepo.findByIds(memberIds);
+
+        const developers = users.filter(u => u.role === Role.DEVELOPER);
+
+        for (const dev of developers) {
+            await this._notificationRepository.create({
+                userId: dev.id,
+                type: "SPRINT_COMPLETED",
+                title: "Sprint Completed",
+                message: `Sprint "${sprint.name}" has been completed.`,
+                metadata: {
+                    sprintId: sprint.id,
+                    projectId
+                }
+            });
+        }
     }
 }
