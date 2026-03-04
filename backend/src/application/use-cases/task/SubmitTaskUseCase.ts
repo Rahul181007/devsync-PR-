@@ -1,7 +1,9 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -14,7 +16,8 @@ export class SubmitTaskUseCase implements ISubmitTaskUseCase {
     private _userRepo: IUserRepository,
     private _taskRepo: ITaskRepository,
     private _projectRepo: IProjectRepository,
-    private _projectMembarRepo: IProjectMemberRepository
+    private _projectMembarRepo: IProjectMemberRepository,
+    private _notificationRepo: INotificationRepository
   ) { }
 
   async execute(userId: string, projectId: string, taskId: string, data: SubmitTaskDTO): Promise<void> {
@@ -76,5 +79,34 @@ export class SubmitTaskUseCase implements ISubmitTaskUseCase {
     }
 
     await this._taskRepo.update(task)
+
+    const companyAdmin = await this._userRepo.findCompanyAdminByCompany(user.companyId);
+
+    if (companyAdmin) {
+      const notification=await this._notificationRepo.create({
+        userId: companyAdmin.id,
+        type: "TASK_SUBMITTED",
+        title: "Task Submitted",
+        message: `Task "${task.title}" has been submitted by ${user.name}.`,
+        metadata: {
+          taskId: task.id,
+          projectId: projectId
+        }
+      })
+            const io = getSocketInstance();
+
+            io.to(`user:${companyAdmin.id}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
+            });
+      
+    }
+
+
   }
 }

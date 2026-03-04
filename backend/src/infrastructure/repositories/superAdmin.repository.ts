@@ -48,4 +48,25 @@ export class SuperAdminRepository extends BaseRepository<SuperAdminDocument> imp
             doc.lastLoginAt??null
         )        
     }
+
+    async findActive(): Promise<SuperAdmin | null> {
+  const doc = await this.model.findOne({
+    status: "ACTIVE"
+  });
+
+  if (!doc) return null;
+
+  return new SuperAdmin(
+    doc._id.toString(),
+    doc.name,
+    doc.email,
+    doc.passwordHash,
+    "SUPER_ADMIN",
+    doc.avatarUrl ?? null,
+    doc.status as SuperAdminStatus,
+    doc.createdAt,
+    doc.updatedAt,
+    doc.lastLoginAt ?? null
+  );
+}
 }

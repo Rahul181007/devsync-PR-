@@ -24,23 +24,27 @@ import { IUpdateCompanyBrandingUseCase } from "../application/interface/company/
 import { IRejectCompanyUseCase } from "../application/interface/company/IRejectCompanyUseCase";
 import { IReapplyCompanyUseCase } from "../application/interface/company/IReapplyCompanyUseCase";
 import { IUnsuspendCompanyUseCase } from "../application/interface/company/IUnsuspendCompanyUseCase";
+import { NotificationRepository } from "../infrastructure/repositories/notification.repository";
+import { SuperAdminRepository } from "../infrastructure/repositories/superAdmin.repository";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
 const inviteRepository=new InviteRepository()
 const fileStorage=new S3FileStorage()
+const notificationRepository=new NotificationRepository();
+const superadminRepo=new SuperAdminRepository();
 
 const createCompanyUseCase:ICreateCompanyUseCase=new CreateCompanyUseCase(companyRepository);
 const listCompaniesUseCase:IListCompaniesUseCase=new ListCompaniesUseCase(companyRepository,inviteRepository,userRepository);
-const approveCompanyUseCase:IApproveCompanyUseCase=new ApproveCompanyUseCase(companyRepository);
-const suspendCompanyUseCase:ISuspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository);
-const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository)
+const approveCompanyUseCase:IApproveCompanyUseCase=new ApproveCompanyUseCase(companyRepository,userRepository,notificationRepository);
+const suspendCompanyUseCase:ISuspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository,userRepository,notificationRepository);
+const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository,superadminRepo,notificationRepository)
 const getCompanyByIdUseCase:IGetCompanyByIdUseCase= new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
 const getMyCompanyUseCase:IGetMyCompanyUseCase=new GetMyCompanyUseCase(companyRepository)
 const updateCompanyBrandingUseCase:IUpdateCompanyBrandingUseCase=new UpdateCompanyBrandingUseCase(companyRepository,fileStorage);
-const rejectCompanyUseCase:IRejectCompanyUseCase=new RejectCompanyUseCase(companyRepository)
-const reapplyCompanyUseCase:IReapplyCompanyUseCase=new ReapplyCompanyUseCase(companyRepository);
-const unsuspendCompanyUseCase:IUnsuspendCompanyUseCase=new UnsuspendCompanyUseCase(companyRepository)
+const rejectCompanyUseCase:IRejectCompanyUseCase=new RejectCompanyUseCase(companyRepository,userRepository,notificationRepository)
+const reapplyCompanyUseCase:IReapplyCompanyUseCase=new ReapplyCompanyUseCase(companyRepository,superadminRepo,notificationRepository);
+const unsuspendCompanyUseCase:IUnsuspendCompanyUseCase=new UnsuspendCompanyUseCase(companyRepository,userRepository,notificationRepository)
 
 export const companyController=new CompanyController(
     createCompanyUseCase,

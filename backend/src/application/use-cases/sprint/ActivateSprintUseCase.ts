@@ -1,7 +1,10 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
+import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -13,7 +16,9 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
         private _sprintRepo: ISprintRepository,
         private _projectRepo: IProjectRepository,
         private _taskRepo: ITaskRepository,
-        private _userRepo: IUserRepository
+        private _userRepo: IUserRepository,
+        private _projectMemberRepo: IProjectMemberRepository,
+        private _notificationRepo: INotificationRepository
     ) { }
 
     async execute(userId: string, companyId: string, projectId: string, sprintId: string): Promise<void> {
@@ -76,5 +81,37 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
 
         project.currentSprintId = sprintId;
         await this._projectRepo.update(projectId, { currentSprintId: sprintId })
+
+        const members = await this._projectMemberRepo.findMembersByProject(projectId);
+        const memberIds = members.map(m => m.userId);
+
+        const users = await this._userRepo.findByIds(memberIds);
+
+        const developers = users.filter(u => u.role === Role.DEVELOPER);
+
+        for (const dev of developers) {
+            const notification=await this._notificationRepo.create({
+                userId: dev.id,
+                type: "SPRINT_STARTED",
+                title: "Sprint Started",
+                message: `Sprint "${sprint.name}" has started.`,
+                metadata: {
+                    sprintId: sprint.id,
+                    projectId
+                }
+            });
+
+                        const io = getSocketInstance();
+
+            io.to(`user:${dev.id}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
+            });
+        }
     }
 }

@@ -1,4 +1,7 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
+import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
@@ -7,7 +10,9 @@ import { IRejectCompanyUseCase } from "../../interface/company/IRejectCompanyUse
 
 export class RejectCompanyUseCase implements IRejectCompanyUseCase{
     constructor(
-      private _companyRepo:ICompanyRepository
+      private _companyRepo:ICompanyRepository,
+      private _userRepo:IUserRepository,
+      private _notificationRepo:INotificationRepository
     ){}
 
     async execute(input: RejectCompanyInput):Promise<void>{
@@ -30,6 +35,32 @@ export class RejectCompanyUseCase implements IRejectCompanyUseCase{
         company.reviewedAt=new Date();
         company.approvedBy=rejectedBy
 
-        await this._companyRepo.save(company)
+        await this._companyRepo.save(company);
+
+        const companyAdmin=await this._userRepo.findCompanyAdminByCompany(company.id);
+
+     if (companyAdmin) {
+  const notification=  await this._notificationRepo.create({
+        userId: companyAdmin.id,
+        type: "COMPANY_REJECTED",
+        title: "Company Rejected",
+        message: `Your company "${company.name}" has been rejected. Reason: ${reason}`,
+        metadata: {
+            companyId: company.id
+        }
+    });
+
+                const io = getSocketInstance();
+    
+                io.to(`user:${companyAdmin.id}`).emit("new_notification", {
+                    id: notification.id,
+                    type: notification.type,
+                    title: notification.title,
+                    message: notification.message,
+                    metadata: notification.metadata,
+                    isRead: false,
+                    createdAt: notification.createdAt,
+                });
+}
     }
 }

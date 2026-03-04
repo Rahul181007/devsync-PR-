@@ -152,6 +152,9 @@ export const RESPONSE_MESSAGES = {
     AI: {
   SUMMARY_GENERATED: "AI summary generated successfully",
 },
+NOTIFICATION:{
+    NOT_FOUND:"Notification not found"
+},
 
 
     COMMON: {

@@ -1,8 +1,10 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ISprintRepository } from "../../../domain/repositories/sprint.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -16,7 +18,8 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
         private _sprintRepo: ISprintRepository,
         private _projectRepo: IProjectRepository,
         private _projectMemberRepo: IProjectMemberRepository,
-        private _userRepo: IUserRepository
+        private _userRepo: IUserRepository,
+        private _notificationRepo: INotificationRepository
     ) { }
 
     async execute(userId: string, companyId: string, projectId: string, data: PlanSprintRequestDTO): Promise<void> {
@@ -91,6 +94,35 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
             task.assigneeId = item.developerId
 
             await this._taskRepo.update(task)
+
+            try {
+                const notification=await this._notificationRepo.create({
+                    userId: item.developerId,
+                    type: "TASK_ASSIGNED",
+                    title: "New Task Assigned",
+                    message: `You have been assigned task "${task.title}" in sprint "${sprint.name}".`,
+                    metadata: {
+                        projectId,
+                        sprintId: sprint.id,
+                        taskId: task.id
+                    }
+                });
+
+
+                            const io = getSocketInstance();
+                
+                            io.to(`user:${item.developerId}`).emit("new_notification", {
+                                id: notification.id,
+                                type: notification.type,
+                                title: notification.title,
+                                message: notification.message,
+                                metadata: notification.metadata,
+                                isRead: false,
+                                createdAt: notification.createdAt,
+                            });
+            } catch (error) {
+                console.error("Task assignment notification failed:", error);
+            }
         }
     }
 }
