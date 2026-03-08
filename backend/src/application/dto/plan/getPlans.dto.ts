@@ -1,6 +1,6 @@
 export interface GetPlansDTO {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   search?: string;
-  isActive?: boolean;
+  status?: "all" | "active" | "inactive";
 }

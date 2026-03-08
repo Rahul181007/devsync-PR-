@@ -38,31 +38,39 @@ export class PlanRepository implements IPlanRepository{
         return this._toDomain(doc)
     }
 
-    async findAll(query: ListPlanQuery): Promise<{ items: Plan[]; total: number; }> {
-        const {page,limit,search,isActive}=query;
-        const filter:Record<string,unknown>={};
+async findAll(query: ListPlanQuery): Promise<{ items: Plan[]; total: number }> {
 
-        if(isActive!==undefined){
-            filter.isActive=isActive
-        }
+  const { page = 1, limit = 10, search, status } = query;
 
-        if(search){
-            filter.$or=[
-                {name:{$regex:search,$options:"i"}},
-                {slug:{$regex:search,$options:"i"}}
-            ]
-        }
+  const filter:Record<string,unknown> = {};
 
-        const items=await PlanModel.find(filter).skip((page-1)*limit).limit(limit).sort({createdAt:-1})
+  // Status filter
+  if (status && status !== "all") {
+    filter.isActive = status === "active";
+  }
 
-        const total=await PlanModel.countDocuments(filter)
+  // Search filter
+  if (search && search.trim() !== "") {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { slug: { $regex: search, $options: "i" } }
+    ];
+  }
 
-        return {
-            items:items.map((plan)=>this._toDomain(plan)),
-            total
-        }
+  const items = await PlanModel
+    .find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .sort({ createdAt: -1 })
+    .lean();
 
-    }
+  const total = await PlanModel.countDocuments(filter);
+
+  return {
+    items: items.map((plan) => this._toDomain(plan)),
+    total
+  };
+}
 
     async findById(planId: string): Promise<Plan | null> {
         const plan=await PlanModel.findById(planId);
@@ -86,5 +94,15 @@ export class PlanRepository implements IPlanRepository{
             limits:plan.limits,
             isActive:plan.isActive
         },{new:true})
+    }
+
+    async findDefaultPlan(): Promise<Plan | null> {
+        const planDoc=await PlanModel.findOne({
+            isDefault:true,
+            isActive:true,
+        })
+        if(!planDoc)return null
+
+        return this._toDomain(planDoc)
     }
 }

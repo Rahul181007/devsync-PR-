@@ -36,6 +36,17 @@ const Sidebar = () => {
         >
           Companies
         </NavLink>
+
+                <NavLink
+          to="/super-admin/plans"
+          className={({ isActive }) =>
+            `block px-3 py-2 rounded ${
+              isActive ? "bg-slate-700" : "hover:bg-slate-800"
+            }`
+          }
+        >
+          Plans
+        </NavLink>
         <button
           onClick={handleLogout}
           className="w-full text-left px-3 py-2 rounded hover:bg-slate-800 text-red-400"

@@ -27,8 +27,13 @@ export class GetPlanUseCase implements IGetPlanUseCase{
         if(superAdmin.role!==Role.SUPER_ADMIN){
             throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.FORBIDDEN)
         }
-
-        const plan =await this._planRepo.findAll(query);
+            const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const search = query.search ?? "";
+    const status = query.status ?? "all";
+        const plan =await this._planRepo.findAll({
+            page,limit,search,status
+        });
         return plan
     }
 }

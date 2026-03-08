@@ -38,6 +38,10 @@ export class UpdatePlanUseCase implements IUpdatePlanUseCase {
                 HttpStatus.NOT_FOUND
             )
         }
+
+        if (!plan.isActive) {
+            plan.isActive = true;
+        }
         if (data.name) {
             plan.name = data.name;
         }

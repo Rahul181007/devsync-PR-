@@ -9,11 +9,12 @@ export interface IPlanDocument extends Document {
     currency: 'USD' | 'INR' | 'EUR';
     features: string[];
     limits: {
-    maxProjects: number;
-    maxDeveloper: number;
-    maxStorageGb: number;
+        maxProjects: number;
+        maxDeveloper: number;
+        maxStorageGb: number;
     },
     isActive: boolean;
+    isDefault: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -73,7 +74,13 @@ const planSchema = new Schema<IPlanDocument>(
         isActive: {
             type: Boolean,
             default: true
+        },
+
+        isDefault: {
+            type: Boolean,
+            default: false
         }
+
     },
     { timestamps: true }
 )

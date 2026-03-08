@@ -1,10 +1,10 @@
 import { Plan } from "../entities/plan.entity";
 
-export interface ListPlanQuery{
-    page:number;
-    limit:number;
-    search?:string;
-    isActive?:boolean
+ export interface ListPlanQuery {
+  page: number
+  limit: number
+  search?: string
+  status?: "all" | "active" | "inactive"
 }
 
 export interface CreatePlanData{
@@ -36,5 +36,5 @@ export interface IPlanRepository {
 
     save(plan:Plan):Promise<void>;
     delete(planId:string):Promise<void>;
-
+    findDefaultPlan(): Promise<Plan | null>;
 }

@@ -56,7 +56,7 @@ export class PlanController {
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 10,
                 search: req.query.search,
-                isActive: req.query.isActive
+                 status: req.query.status
             });
 
             const plans = await this._getPlansUseCase.execute(
