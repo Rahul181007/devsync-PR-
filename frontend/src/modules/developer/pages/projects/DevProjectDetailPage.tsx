@@ -14,8 +14,6 @@ import ProjectAISummary from "../../../ai/components/ProjectAISummary";
 type ProjectDetailTab =
   | "TASKS"
   | "CHAT"
-  | "FILES"
-  | "COMMENTS"
   | "AI"
   | "STANDUP";
 
@@ -23,8 +21,6 @@ type ProjectDetailTab =
 const TABS: { key: ProjectDetailTab; label: string }[] = [
   { key: "TASKS", label: "Tasks" },
   { key: "CHAT", label: "Chat" },
-  { key: "FILES", label: "Files" },
-  { key: "COMMENTS", label: "Comments" },
   { key: "AI", label: "AI Summary" },
   { key: "STANDUP", label: "StandUp" },
 ];
@@ -144,17 +140,7 @@ const isOverdue =
   <DevStandupPanel projectId={projectId} />
 )}
 
-{activeTab === "FILES" && (
-  <div className="text-sm text-gray-500 py-10 text-center">
-    Files coming soon
-  </div>
-)}
 
-{activeTab === "COMMENTS" && (
-  <div className="text-sm text-gray-500 py-10 text-center">
-    Comments coming soon
-  </div>
-)}
 
 {activeTab === "AI" && projectId && (
   <ProjectAISummary projectId={projectId} />

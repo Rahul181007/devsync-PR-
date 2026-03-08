@@ -99,8 +99,8 @@ export const RESPONSE_MESSAGES = {
         MEMBER_ADDED: 'MEMBER ADDED',
         CANNOT_REMOVE_OWNER: 'Cannot remove an owner',
         DEVELOPER_ONLY_BE_ADDED: 'Developer can only be added',
-        COMPANY_ID_NOT_MATCHING:'project company id is not matching',
-        PROJECT_NOT_ACTIVE:"Project not active"
+        COMPANY_ID_NOT_MATCHING: 'project company id is not matching',
+        PROJECT_NOT_ACTIVE: "Project not active"
     },
     TASK: {
         INVALID_ASSIGNEE: "Invalid assignee",
@@ -124,37 +124,46 @@ export const RESPONSE_MESSAGES = {
         TASK_ALREADY_ASSIGNED: "Task is already assigned to a sprint",
         SPRINT_COMPLETED: "Cannot modify completed sprint",
         SPRINT_NOT_BELONG_PROJECT: "Sprint Not belong to project",
-        SPRINT_NOT_PLANNABLE:"Sprint not planable",
-        SPRINT_EMPTY:"sprint is empty",
-        SPRINT_ACTIVATED:"Sprint activated successfully",
-        SPRINT_NOT_ACTIVE:"Sprint not active",
+        SPRINT_NOT_PLANNABLE: "Sprint not planable",
+        SPRINT_EMPTY: "sprint is empty",
+        SPRINT_ACTIVATED: "Sprint activated successfully",
+        SPRINT_NOT_ACTIVE: "Sprint not active",
     },
     DEVELOPER: {
         NOT_BELONG_TO_COMPANY: "Developer does not belong to this company",
         BLOCKED: "Developer is blocked",
         UNBLOCKED: "Developer is unblocked",
-        NOT_BELONG_TO_PROJECT:"Developer does not belong to this project"
+        NOT_BELONG_TO_PROJECT: "Developer does not belong to this project"
     },
-    COMPANYADMIN:{
+    COMPANYADMIN: {
         NOT_BELONG_TO_COMPANY: "CompanyAdmin does not belong to this company"
     },
 
-    STANDUP:{
-       ALREADY_SUBMITTED:"Standup already submitted",
+    STANDUP: {
+        ALREADY_SUBMITTED: "Standup already submitted",
         CREATED: "Standup submitted successfully",
-        NOT_FOUND:"Standup not found",
-        UPDATED:"Standup updated successfully"
+        NOT_FOUND: "Standup not found",
+        UPDATED: "Standup updated successfully"
     },
-    CHAT:{
-        REPLY_MESSAGE_NOT_FOUND:"Reply message not found"
+    CHAT: {
+        REPLY_MESSAGE_NOT_FOUND: "Reply message not found"
     },
 
     AI: {
-  SUMMARY_GENERATED: "AI summary generated successfully",
-},
-NOTIFICATION:{
-    NOT_FOUND:"Notification not found"
-},
+        SUMMARY_GENERATED: "AI summary generated successfully",
+    },
+    NOTIFICATION: {
+        NOT_FOUND: "Notification not found"
+    },
+
+    PLAN: {
+        ALREADY_EXISTS: "Plan already exist",
+        SLUG_ALREADY_EXISTS: "Plan slug already exist",
+        CREATED: "Plan created successfully",
+        UPDATED: "Plan updated successfully",
+        DELETED: "Plan deleted successfully",
+        NOT_FOUND:"Plan not found"
+    },
 
 
     COMMON: {

@@ -39,6 +39,7 @@ import { ProjectListingPage } from "../modules/company-admin/pages/projects/Proj
 import ProjectDetailPage from "../modules/company-admin/pages/projects/ProjectDetailPage";
 import { DevProjectListingPage } from "../modules/developer/pages/projects/DevProjectListingPage";
 import { DevProjectDetailPage } from "../modules/developer/pages/projects/DevProjectDetailPage";
+import PlanListPage from "../modules/super-admin/pages/plan/PlanLIstPage";
 
 
 const AppRouter = () => {
@@ -77,6 +78,7 @@ const AppRouter = () => {
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="companies/:companyId" element={<CompanyDetailPage />} />
+            <Route path="plans" element={<PlanListPage/>} />
           </Route>
         </Route>
 
