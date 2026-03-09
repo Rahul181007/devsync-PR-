@@ -5,11 +5,15 @@ import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { CreateCompanyResponse } from "../../dto/company/createCompanyResponse.dto";
 import { ICreateCompanyUseCase } from "../../interface/company/ICreateCompanyUseCase";
+import { IPlanRepository } from "../../../domain/repositories/plan.repository";
+import { ISubscriptionRepository } from "../../../domain/repositories/subscription.repository";
 
 
 export class CreateCompanyUseCase implements ICreateCompanyUseCase{
     constructor(
         private _companyRepo:ICompanyRepository,
+        private _planRepo:IPlanRepository,
+        private _subscriptionRepo:ISubscriptionRepository
     ){}
     // local created we will replace it as utility function after the if we want to re use it
      private _generateSlug(name:string):string{
@@ -54,7 +58,25 @@ export class CreateCompanyUseCase implements ICreateCompanyUseCase{
         onboardingStep:'BRANDING',
         adminEmail:normalizedAdminEmail??null
        })
-       console.log(newCompany)
+       const freePlan=await this._planRepo.findDefaultPlan();
+       if(!freePlan){
+          throw new AppError(RESPONSE_MESSAGES.PLAN.NOT_FOUND,HttpStatus.NOT_FOUND);
+       }
+
+       const subscription=await this._subscriptionRepo.create({
+        companyId:newCompany.id,
+        planId:freePlan.id,
+        status:"ACTIVE",
+        billingCycle:"MONTHLY",
+        startDate:new Date(),
+        endDate:null,
+        renewsAt:null
+       })
+
+       await this._companyRepo.updateSubscription(newCompany.id,{
+        currentPlanId:freePlan.id,
+        subscriptionId:subscription.id
+       })
        return {
         id:newCompany.id,
         name:newCompany.name,

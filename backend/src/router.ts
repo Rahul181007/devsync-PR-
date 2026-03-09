@@ -8,7 +8,7 @@ import userMangementRoutes from './interfaces/routes/user.routes'
 import projectRoutes from './interfaces/routes/project.routes';
 import notificationRoutes from './interfaces/routes/notification.routes';
 import planRoutes from './interfaces/routes/plan.routes'
-
+import subscriptionRoutes from "./interfaces/routes/subscription.routes"
 const router =Router();
 
 router.use("/auth", authRoutes);
@@ -21,5 +21,6 @@ router.use('/',userMangementRoutes);
 router.use('/',projectRoutes);
 router.use("/",notificationRoutes);
 router.use("/",planRoutes)
+router.use("/",subscriptionRoutes)
 
 export default router

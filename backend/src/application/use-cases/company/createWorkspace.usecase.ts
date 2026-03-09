@@ -1,5 +1,7 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
 import { INotificationRepository } from "../../../domain/repositories/notification.repository";
+import { IPlanRepository } from "../../../domain/repositories/plan.repository";
+import { ISubscriptionRepository } from "../../../domain/repositories/subscription.repository";
 import { ISuperAdminRepository } from "../../../domain/repositories/superAdmin.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
@@ -16,7 +18,9 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
         private _companyRepo: ICompanyRepository,
         private _userRepo: IUserRepository,
         private _superAdminRepo: ISuperAdminRepository,
-        private _notificationRepo: INotificationRepository
+        private _notificationRepo: INotificationRepository,
+        private _planRepo: IPlanRepository,
+        private _subscriptionRepo: ISubscriptionRepository
     ) { }
 
     private _generateSlug(name: string): string {
@@ -60,6 +64,29 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
             status: 'PENDING',
             onboardingStep: 'BRANDING',
             ownerAdminId: user.id,
+        })
+
+        const freePlan = await this._planRepo.findDefaultPlan();
+        if (!freePlan) {
+            throw new AppError(
+                RESPONSE_MESSAGES.PLAN.NOT_FOUND,
+                HttpStatus.NOT_FOUND
+            );
+        }
+
+        const subscription=await this._subscriptionRepo.create({
+            companyId:newCompany.id,
+            planId:freePlan.id,
+            status:"ACTIVE",
+            billingCycle:"MONTHLY",
+            startDate:new Date(),
+            endDate:null,
+            renewsAt:null
+        })
+
+        await this._companyRepo.updateSubscription(newCompany.id,{
+            currentPlanId:freePlan.id,
+            subscriptionId:subscription.id
         })
 
         const superAdmin = await this._superAdminRepo.findActive();

@@ -38,4 +38,12 @@ export interface ICompanyRepository{
     updateOnboardingStep(companyId:string,step:OnboardingStep):Promise<void>
 
     save(company: Company): Promise<void>;
+
+    updateSubscription(
+  companyId: string,
+  data: {
+    currentPlanId: string;
+    subscriptionId: string;
+  }
+): Promise<void>;
 }

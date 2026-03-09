@@ -26,6 +26,8 @@ import { IReapplyCompanyUseCase } from "../application/interface/company/IReappl
 import { IUnsuspendCompanyUseCase } from "../application/interface/company/IUnsuspendCompanyUseCase";
 import { NotificationRepository } from "../infrastructure/repositories/notification.repository";
 import { SuperAdminRepository } from "../infrastructure/repositories/superAdmin.repository";
+import { PlanRepository } from "../infrastructure/repositories/plan.repository";
+import { SubscriptionRepository } from "../infrastructure/repositories/subscription.repository";
 
 const companyRepository=new CompanyRepository();
 const userRepository=new UserRepository();
@@ -33,12 +35,14 @@ const inviteRepository=new InviteRepository()
 const fileStorage=new S3FileStorage()
 const notificationRepository=new NotificationRepository();
 const superadminRepo=new SuperAdminRepository();
+const planRepo=new PlanRepository();
+const subscriptionRepository=new SubscriptionRepository()
 
-const createCompanyUseCase:ICreateCompanyUseCase=new CreateCompanyUseCase(companyRepository);
+const createCompanyUseCase:ICreateCompanyUseCase=new CreateCompanyUseCase(companyRepository,planRepo,subscriptionRepository);
 const listCompaniesUseCase:IListCompaniesUseCase=new ListCompaniesUseCase(companyRepository,inviteRepository,userRepository);
 const approveCompanyUseCase:IApproveCompanyUseCase=new ApproveCompanyUseCase(companyRepository,userRepository,notificationRepository);
 const suspendCompanyUseCase:ISuspendCompanyUseCase=new SuspendCompanyUseCase(companyRepository,userRepository,notificationRepository);
-const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository,superadminRepo,notificationRepository)
+const createWorkspaceUseCase=new CreateWorkspaceUseCase(companyRepository,userRepository,superadminRepo,notificationRepository,planRepo,subscriptionRepository)
 const getCompanyByIdUseCase:IGetCompanyByIdUseCase= new GetCompanyIdUseCase(companyRepository,userRepository,inviteRepository)
 const getMyCompanyUseCase:IGetMyCompanyUseCase=new GetMyCompanyUseCase(companyRepository)
 const updateCompanyBrandingUseCase:IUpdateCompanyBrandingUseCase=new UpdateCompanyBrandingUseCase(companyRepository,fileStorage);
