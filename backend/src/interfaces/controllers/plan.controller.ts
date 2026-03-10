@@ -19,7 +19,7 @@ export class PlanController {
         private _getPlanByIdUseCase: IGetPlanByIdUseCase,
         private _updatePlanUseCase: IUpdatePlanUseCase,
         private _deletePlanUseCase: IDeletePlanUseCase,
-        private _getAvailablePlanUseCase:IGetAvailablePlansUseCase
+        private _getAvailablePlanUseCase: IGetAvailablePlansUseCase
     ) { }
 
     createPlan = async (req: Request, res: Response) => {
@@ -58,7 +58,7 @@ export class PlanController {
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 10,
                 search: req.query.search,
-                 status: req.query.status
+                status: req.query.status
             });
 
             const plans = await this._getPlansUseCase.execute(
@@ -139,24 +139,24 @@ export class PlanController {
         }
     }
 
-    availablePlans=async(req:Request,res:Response)=>{
+    availablePlans = async (req: Request, res: Response) => {
         try {
-            const userId=req.user?.id;
-            const companyId=req.user?.companyId;
-                        if (!userId || !companyId) {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            if (!userId || !companyId) {
                 return res.status(HttpStatus.FORBIDDEN).json({
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
                 })
             }
 
-            const plans=await this._getAvailablePlanUseCase.execute(userId,companyId);
+            const plans = await this._getAvailablePlanUseCase.execute(userId, companyId);
 
             return res.status(HttpStatus.OK).json({
-                success:true,
-                data:plans
+                success: true,
+                data: plans
             })
-        } catch (error:unknown) {
-            return handleError(error,res)
+        } catch (error: unknown) {
+            return handleError(error, res)
         }
     }
 }

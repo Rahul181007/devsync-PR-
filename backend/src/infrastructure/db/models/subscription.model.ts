@@ -13,49 +13,49 @@ export interface ISubscriptionDocument extends Document {
 }
 
 
-const subscriptionSchema=new Schema<ISubscriptionDocument>(
+const subscriptionSchema = new Schema<ISubscriptionDocument>(
     {
-        companyId:{
-            type:Schema.Types.ObjectId,
-            ref:"Company",
-            required:true
+        companyId: {
+            type: Schema.Types.ObjectId,
+            ref: "Company",
+            required: true
         },
 
-        planId:{
-            type:Schema.Types.ObjectId,
-            ref:"Plan",
-            required:true
+        planId: {
+            type: Schema.Types.ObjectId,
+            ref: "Plan",
+            required: true
         },
 
-        status:{
-            type:String,
-                  enum: ["ACTIVE", "CANCELLED", "EXPIRED", "PENDING"],
-      default: "ACTIVE"
+        status: {
+            type: String,
+            enum: ["ACTIVE", "CANCELLED", "EXPIRED", "PENDING"],
+            default: "ACTIVE"
         },
-        billingCycle:{
-            type:String,
-                  enum: ["MONTHLY", "YEARLY"],
-      default: "MONTHLY"
+        billingCycle: {
+            type: String,
+            enum: ["MONTHLY", "YEARLY"],
+            default: "MONTHLY"
         },
-    startDate: {
-      type: Date,
-      required: true
+        startDate: {
+            type: Date,
+            required: true
+        },
+
+        endDate: {
+            type: Date,
+            default: null
+        },
+
+        renewsAt: {
+            type: Date,
+            default: null
+        }
     },
-
-    endDate: {
-      type: Date,
-      default: null
-    },
-
-    renewsAt: {
-      type: Date,
-      default: null
-    }
-  },
-  { timestamps: true }
+    { timestamps: true }
 )
 
 export const SubscriptionModel = mongoose.model<ISubscriptionDocument>(
-  "Subscription",
-  subscriptionSchema
+    "Subscription",
+    subscriptionSchema
 );

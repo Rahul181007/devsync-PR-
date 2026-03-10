@@ -31,6 +31,8 @@ const envSchema = z.object({
 
   GOOGLE_CLIENT_ID: z.string(),
   GEMINI_API_KEY:z.string(),
+  RAZORPAY_KEY_ID:z.string(),
+RAZORPAY_KEY_SECRET:z.string(),
 
 });
 

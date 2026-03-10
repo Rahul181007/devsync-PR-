@@ -1,0 +1,29 @@
+import { Router } from "express";
+import { verifyAccessToken } from "../middleware/auth.middleware";
+import { requireRole } from "../middleware/role.middleware";
+import { Role } from "../../shared/constants/roleenum";
+import { paymentController } from "../../di/payment.di";
+
+const router = Router();
+router.post(
+  "/company/payment/create",
+  verifyAccessToken,
+  requireRole(Role.COMPANY_ADMIN),
+  paymentController.createPayment
+);
+
+router.post(
+  "/company/payment/verify",
+  verifyAccessToken,
+  requireRole(Role.COMPANY_ADMIN),
+  paymentController.verifyPayment
+);
+
+
+router.get(
+  "/company/payments",
+  verifyAccessToken,
+  requireRole(Role.COMPANY_ADMIN),
+  paymentController.getPaymentHistory
+);
+export default router;
