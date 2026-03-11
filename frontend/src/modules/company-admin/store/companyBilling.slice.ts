@@ -102,6 +102,22 @@ void,
 )
 
 
+export const downloadInvoice = createAsyncThunk<
+Blob,
+string,
+{ rejectValue: string }
+>(
+  "companyBilling/downloadInvoice",
+  async (invoiceId, { rejectWithValue }) => {
+    try {
+      const res = await billingApi.downloadInvoice(invoiceId);
+      return res.data;
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  }
+);
+
 const companyBillingSlice=createSlice({
     name:"companyBilling",
     initialState,

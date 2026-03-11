@@ -39,5 +39,14 @@ export const billingApi = {
             "/company/payment/verify",
             data
         )
+    },
+
+        downloadInvoice(invoiceId: string) {
+        return http.get(
+            `/company/invoice/${invoiceId}`,
+            {
+                responseType: "blob"
+            }
+        )
     }
 }
