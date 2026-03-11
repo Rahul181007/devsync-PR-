@@ -10,6 +10,7 @@ import { IGetPlanByIdUseCase } from "../../application/interface/plan/IGetPlanBy
 import { IUpdatePlanUseCase } from "../../application/interface/plan/IUpdatePlanUseCase";
 import { updatePlanSchema } from "../../application/validators/plan/updatePlan.validator";
 import { IDeletePlanUseCase } from "../../application/interface/plan/IDeletePlanUseCase";
+import { IGetAvailablePlansUseCase } from "../../application/interface/plan/IGetAvailablePlansUseCase";
 
 export class PlanController {
     constructor(
@@ -18,6 +19,7 @@ export class PlanController {
         private _getPlanByIdUseCase: IGetPlanByIdUseCase,
         private _updatePlanUseCase: IUpdatePlanUseCase,
         private _deletePlanUseCase: IDeletePlanUseCase,
+        private _getAvailablePlanUseCase: IGetAvailablePlansUseCase
     ) { }
 
     createPlan = async (req: Request, res: Response) => {
@@ -56,7 +58,7 @@ export class PlanController {
                 page: req.query.page ? Number(req.query.page) : 1,
                 limit: req.query.limit ? Number(req.query.limit) : 10,
                 search: req.query.search,
-                 status: req.query.status
+                status: req.query.status
             });
 
             const plans = await this._getPlansUseCase.execute(
@@ -132,6 +134,27 @@ export class PlanController {
                 success: true,
                 message: RESPONSE_MESSAGES.PLAN.DELETED
             });
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
+    }
+
+    availablePlans = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            if (!userId || !companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+                })
+            }
+
+            const plans = await this._getAvailablePlanUseCase.execute(userId, companyId);
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                data: plans
+            })
         } catch (error: unknown) {
             return handleError(error, res)
         }

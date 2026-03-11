@@ -10,8 +10,8 @@ export interface IPlanDocument extends Document {
     features: string[];
     limits: {
         maxProjects: number;
-        maxDeveloper: number;
-        maxStorageGb: number;
+        maxDevelopers: number;
+        maxStorageGB: number;
     },
     isActive: boolean;
     isDefault: boolean;

@@ -124,4 +124,11 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             reviewedAt:company.reviewedAt??null
         })
     }
+
+    async updateSubscription(companyId: string, data: { currentPlanId: string; subscriptionId: string; }): Promise<void> {
+        await this.updateById(companyId,{
+            currentPlanId:data.currentPlanId,
+            subscriptionId:data.subscriptionId
+        })
+    }
 }

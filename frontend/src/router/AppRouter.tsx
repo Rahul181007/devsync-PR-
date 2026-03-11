@@ -40,6 +40,11 @@ import ProjectDetailPage from "../modules/company-admin/pages/projects/ProjectDe
 import { DevProjectListingPage } from "../modules/developer/pages/projects/DevProjectListingPage";
 import { DevProjectDetailPage } from "../modules/developer/pages/projects/DevProjectDetailPage";
 import PlanListPage from "../modules/super-admin/pages/plan/PlanLIstPage";
+import BillingPage from "../modules/company-admin/pages/billing/BillingPage";
+import InvoicePage from "../modules/company-admin/pages/billing/InvoicePage";
+import PaymentMethodPage from "../modules/company-admin/pages/billing/PaymentMethodPage";
+import PaymentFailedPage from "../modules/company-admin/pages/billing/PaymentFailedPage";
+import PaymentSuccessPage from "../modules/company-admin/pages/billing/PaymentSuccessPage";
 
 
 const AppRouter = () => {
@@ -116,6 +121,11 @@ const AppRouter = () => {
             <Route path="users" element={<DevelopersPage />} />
             <Route path='projects'element={<ProjectListingPage/>} />
             <Route path="projects/:projectId" element={<ProjectDetailPage />} />
+            <Route path='billing'element={<BillingPage/>} />
+            <Route path="billing/invoice" element={<InvoicePage />} />
+            <Route path="billing/payment-method" element={<PaymentMethodPage />} />
+            <Route path="billing/failed" element={<PaymentFailedPage />} />
+            <Route path="billing/success" element={<PaymentSuccessPage />} />
           </Route>
         </Route>
 

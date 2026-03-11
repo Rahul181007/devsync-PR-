@@ -165,6 +165,16 @@ export const RESPONSE_MESSAGES = {
         NOT_FOUND:"Plan not found"
     },
 
+    SUBSCRIPTION:{
+     ALREADY_ACTIVE:"Company already has an active subscription",
+     NOT_FOUND:"Subscription not found",
+     ALREADY_SUBSCRIBED:"You are already subscribed to this plan"
+    },
+    PAYMENT:{
+        NOT_FOUND:"Payment not found",
+        INVALID_SIGNATURE:"invalid signature"
+    },
+
 
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",

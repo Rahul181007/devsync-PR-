@@ -2,8 +2,8 @@ export type PlanCurrency = 'USD' | 'INR' | 'EUR';
 
 export interface PlanLimits {
     maxProjects: number;
-    maxDeveloper: number;
-    maxStorageGb: number;
+    maxDevelopers: number;
+    maxStorageGB: number;
 
 }
 

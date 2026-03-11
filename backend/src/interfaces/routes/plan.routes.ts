@@ -11,4 +11,7 @@ router.get("/superadmin/plans",verifyAccessToken,requireRole(Role.SUPER_ADMIN),p
 router.get("/superadmin/plans/:planId",verifyAccessToken,requireRole(Role.SUPER_ADMIN),planController.getPlanBYId);
 router.put( "/superadmin/plans/:planId",verifyAccessToken,requireRole(Role.SUPER_ADMIN),planController.updatePlan)
 router.delete("/superadmin/plans/:planId",verifyAccessToken,requireRole(Role.SUPER_ADMIN),planController.deletePlan);
+
+//company
+router.get("/company/plans",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),planController.availablePlans)
 export default router;

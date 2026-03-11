@@ -37,4 +37,5 @@ export interface IPlanRepository {
     save(plan:Plan):Promise<void>;
     delete(planId:string):Promise<void>;
     findDefaultPlan(): Promise<Plan | null>;
+    findAvailablePlans(): Promise<Plan[]>;
 }

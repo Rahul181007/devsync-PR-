@@ -1,59 +1,78 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import type { Plan } from "../../typess/plan.types";
 
 interface PlanFormProps {
-    defaultValues?: Partial<Plan>;
-    onSubmit: (data: PlanFormValues) => void;
-    loading?: boolean;
-    onClose: () => void;
-    
+  defaultValues?: Partial<Plan>;
+  onSubmit: (data: PlanFormValues) => void;
+  loading?: boolean;
+  onClose: () => void;
 }
 
 export interface PlanFormValues {
-    name: string;
-    description: string;
-    pricePerMonth: number;
-    pricePerYear: number;
-    currency: "USD" | "INR" | "EUR";
-    features: string[];
-    limits: {
-        maxProjects: number;
-        maxDevelopers: number;
-        maxStorageGB: number;
-    }
+  name: string;
+  description: string;
+  pricePerMonth: number;
+  pricePerYear: number;
+  currency: "USD" | "INR" | "EUR";
+  features: { value: string }[];
+  limits: {
+    maxProjects: number;
+    maxDevelopers: number;
+    maxStorageGB: number;
+  };
 }
 
-const PlanForm = ({ defaultValues, onSubmit, loading ,onClose}: PlanFormProps) => {
-  const { register, handleSubmit, formState: { errors } } = useForm<PlanFormValues>({
+const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) => {
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<PlanFormValues>({
     defaultValues: {
       name: defaultValues?.name ?? "",
       description: defaultValues?.description ?? "",
       pricePerMonth: defaultValues?.pricePerMonth ?? 0,
       pricePerYear: defaultValues?.pricePerYear ?? 0,
       currency: defaultValues?.currency ?? "USD",
-      features: defaultValues?.features ?? [],
+      features:
+        defaultValues?.features?.map((f) => ({ value: f })) ?? [{ value: "" }],
       limits: {
-        maxProjects: defaultValues?.limits?.maxProjects ?? 0,
-        maxDevelopers: defaultValues?.limits?.maxDevelopers ?? 0,
-        maxStorageGB: defaultValues?.limits?.maxStorageGB ?? 0
+        maxProjects: defaultValues?.limits?.maxProjects ,
+        maxDevelopers: defaultValues?.limits?.maxDevelopers ,
+        maxStorageGB: defaultValues?.limits?.maxStorageGB
       }
     }
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "features"
+  });
+
   const isInactive = defaultValues && !defaultValues.isActive;
 
+  const handleFormSubmit = (data: PlanFormValues) => {
+    const payload = {
+      ...data,
+      features: data.features.map((f) => f.value)
+    };
+    onSubmit(payload as unknown as PlanFormValues);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      
-      {/* Reactivation Notice */}
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
+
       {isInactive && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex gap-3">
             <div className="text-yellow-600 text-xl">⚠️</div>
             <div>
-              <h4 className="text-sm font-medium text-yellow-800">Reactivating this plan</h4>
+              <h4 className="text-sm font-medium text-yellow-800">
+                Reactivating this plan
+              </h4>
               <p className="text-xs text-yellow-700 mt-1">
-                This plan is currently inactive. Saving changes will reactivate it and make it available for selection.
+                This plan is currently inactive. Saving changes will reactivate it.
               </p>
             </div>
           </div>
@@ -63,11 +82,11 @@ const PlanForm = ({ defaultValues, onSubmit, loading ,onClose}: PlanFormProps) =
       {/* Plan Name */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Plan Name <span className="text-red-500">*</span>
+          Plan Name
         </label>
         <input
           {...register("name", { required: "Plan name is required" })}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
           placeholder="e.g., Pro Plan"
         />
         {errors.name && (
@@ -83,68 +102,45 @@ const PlanForm = ({ defaultValues, onSubmit, loading ,onClose}: PlanFormProps) =
         <textarea
           {...register("description")}
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-          placeholder="Describe what this plan offers..."
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
         />
       </div>
 
       {/* Price Section */}
       <div className="grid grid-cols-2 gap-4">
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Monthly Price <span className="text-red-500">*</span>
+            Monthly Price
           </label>
-          <div className="relative">
-            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-            <input
-              type="number"
-              step="0.01"
-              {...register("pricePerMonth", { 
-                valueAsNumber: true,
-                required: "Monthly price is required",
-                min: { value: 0, message: "Price cannot be negative" }
-              })}
-              className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="0.00"
-            />
-          </div>
-          {errors.pricePerMonth && (
-            <p className="mt-1 text-xs text-red-500">{errors.pricePerMonth.message}</p>
-          )}
+          <input
+            type="number"
+            {...register("pricePerMonth", { valueAsNumber: true })}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
+          />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Yearly Price <span className="text-red-500">*</span>
+            Yearly Price
           </label>
-          <div className="relative">
-            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-            <input
-              type="number"
-              step="0.01"
-              {...register("pricePerYear", { 
-                valueAsNumber: true,
-                required: "Yearly price is required",
-                min: { value: 0, message: "Price cannot be negative" }
-              })}
-              className="w-full border border-gray-300 rounded-lg pl-8 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="0.00"
-            />
-          </div>
-          {errors.pricePerYear && (
-            <p className="mt-1 text-xs text-red-500">{errors.pricePerYear.message}</p>
-          )}
+          <input
+            type="number"
+            {...register("pricePerYear", { valueAsNumber: true })}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
+          />
         </div>
+
       </div>
 
       {/* Currency */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Currency <span className="text-red-500">*</span>
+          Currency
         </label>
         <select
-          {...register("currency", { required: "Currency is required" })}
-          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
+          {...register("currency")}
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
         >
           <option value="USD">USD ($)</option>
           <option value="INR">INR (₹)</option>
@@ -152,73 +148,92 @@ const PlanForm = ({ defaultValues, onSubmit, loading ,onClose}: PlanFormProps) =
         </select>
       </div>
 
-      {/* Limits Section */}
+      {/* Features */}
+      <div className="border-t border-gray-200 pt-4">
+        <h3 className="text-sm font-medium text-gray-700 mb-3">Plan Features</h3>
+
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex gap-2 mb-2">
+
+            <input
+              {...register(`features.${index}.value`)}
+              className="flex-1 border border-gray-300 rounded-lg px-3 py-2"
+              placeholder="Enter feature"
+            />
+
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              className="text-red-500 text-sm"
+            >
+              Remove
+            </button>
+
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() => append({ value: "" })}
+          className="text-blue-600 text-sm mt-2"
+        >
+          + Add Feature
+        </button>
+      </div>
+
+      {/* Limits */}
       <div className="border-t border-gray-200 pt-4">
         <h3 className="text-sm font-medium text-gray-700 mb-3">Plan Limits</h3>
+
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Max Projects
-            </label>
-            <input
-              type="number"
-              {...register("limits.maxProjects", { valueAsNumber: true })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="10"
-            />
-          </div>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Max Developers
-            </label>
-            <input
-              type="number"
-              {...register("limits.maxDevelopers", { valueAsNumber: true })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="5"
-            />
-          </div>
+          <input
+            type="number"
+            {...register("limits.maxProjects", { valueAsNumber: true })}
+            className="border border-gray-300 rounded-lg px-3 py-2"
+            placeholder="Max Projects"
+          />
 
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
-              Max Storage (GB)
-            </label>
-            <input
-              type="number"
-              {...register("limits.maxStorageGB", { valueAsNumber: true })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="100"
-            />
-          </div>
+          <input
+            type="number"
+            {...register("limits.maxDevelopers", { valueAsNumber: true })}
+            className="border border-gray-300 rounded-lg px-3 py-2"
+            placeholder="Max Developers"
+          />
+
+          <input
+            type="number"
+            {...register("limits.maxStorageGB", { valueAsNumber: true })}
+            className="border border-gray-300 rounded-lg px-3 py-2"
+            placeholder="Max Storage"
+          />
+
         </div>
+
         <p className="text-xs text-gray-400 mt-2">Use -1 for unlimited</p>
       </div>
 
-      {/* Action Buttons */}
+      {/* Buttons */}
       <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+
         <button
           type="button"
           onClick={onClose}
-          className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all"
+          className="px-5 py-2.5 text-sm text-gray-700 border rounded-lg"
         >
           Cancel
         </button>
+
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+          className="px-5 py-2.5 text-sm text-white bg-blue-600 rounded-lg"
         >
-          {loading ? (
-            <>
-              <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              {isInactive ? "Reactivating..." : "Saving..."}
-            </>
-          ) : (
-            isInactive ? "Reactivate Plan" : "Save Plan"
-          )}
+          {loading ? "Saving..." : "Save Plan"}
         </button>
+
       </div>
+
     </form>
   );
 };
