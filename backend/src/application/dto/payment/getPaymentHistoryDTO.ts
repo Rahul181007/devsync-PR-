@@ -5,6 +5,7 @@ export interface GetPaymentHistoryDTO {
 
 export interface GetPaymentHistoryResponseDTO {
     id: string
+     invoiceId: string | null
     amount: number
     currency: string
     billingCycle: "MONTHLY" | "YEARLY"

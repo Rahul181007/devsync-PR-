@@ -50,7 +50,7 @@ export interface Plan {
 
 export interface PaymentHistory {
   id: string;
-
+invoiceId: string | null
   amount: number;
   currency: string;
 

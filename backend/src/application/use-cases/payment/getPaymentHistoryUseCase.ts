@@ -1,4 +1,5 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { IInvoiceRepositoru } from "../../../domain/repositories/invoice.repository";
 import { IPaymentRepository } from "../../../domain/repositories/payment.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
@@ -12,7 +13,8 @@ export class GetPaymentHistoryUseCase implements IGetPaymentHistoryUseCase{
     constructor(
         private _userRepo:IUserRepository,
         private _companyRepo:ICompanyRepository,
-        private _paymentRepo:IPaymentRepository
+        private _paymentRepo:IPaymentRepository,
+        private _invoiceRepo:IInvoiceRepositoru,
     ){}
 
     async execute(data: GetPaymentHistoryDTO): Promise<GetPaymentHistoryResponseDTO[]> {
@@ -35,13 +37,22 @@ export class GetPaymentHistoryUseCase implements IGetPaymentHistoryUseCase{
 
         const payments=await this._paymentRepo.findByCompanyId(company.id);
 
-        return payments.map((payment)=>({
-            id:payment.id,
-            amount: payment.amount,
-            currency: payment.currency,
-            billingCycle: payment.billingCycle,
-            status: payment.status,
-            createdAt: payment.createdAt
-        }))
+return Promise.all(
+  payments.map(async (payment) => {
+
+    const invoice = await this._invoiceRepo.findByPaymentId(payment.id);
+
+    return {
+      id: payment.id,
+      invoiceId: invoice?.id ?? null,
+      amount: payment.amount,
+      currency: payment.currency,
+      billingCycle: payment.billingCycle,
+      status: payment.status,
+      createdAt: payment.createdAt
+    }
+
+  })
+)
     }
 }

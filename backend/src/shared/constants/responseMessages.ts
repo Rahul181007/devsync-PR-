@@ -175,6 +175,10 @@ export const RESPONSE_MESSAGES = {
         INVALID_SIGNATURE:"invalid signature"
     },
 
+    INVOICE:{
+      NOT_FOUND:"Invoice not found"
+    },
+
 
     COMMON: {
         INTERNAL_ERROR: "Something went wrong",

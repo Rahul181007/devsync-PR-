@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import type { BillingCycle, Plan } from "../../types/billing.types"
-import { useState } from "react";
-import { Calendar, CreditCard, Download, FileText, Clock, CheckCircle, DollarSign, Building2, Hash, Receipt, ArrowLeft } from "lucide-react";
+import { Calendar, CreditCard, FileText, Clock, CheckCircle, DollarSign, Building2, Receipt, ArrowLeft } from "lucide-react";
 
 interface LocationState{
     plan:Plan;
@@ -13,7 +12,7 @@ const InvoicePage = () => {
     const navigate=useNavigate();
 
     const {plan,billingCycle}=location.state as LocationState
-    const [invoiceId] = useState(() => `INV-${Date.now().toString().slice(-8)}`);
+
 
   const price =
     billingCycle === "MONTHLY"
@@ -65,7 +64,7 @@ const InvoicePage = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              Invoice {invoiceId}
+              Order Summary
             </h1>
             <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
               <Clock className="w-3.5 h-3.5" />
@@ -80,10 +79,7 @@ const InvoicePage = () => {
           </div>
         </div>
         
-        <button className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-indigo-200 hover:text-indigo-600 transition-all duration-200 shadow-sm hover:shadow group">
-          <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-          Download PDF
-        </button>
+
       </div>
 
       {/* Main Content Grid */}
@@ -99,23 +95,13 @@ const InvoicePage = () => {
                 <div className="p-1.5 bg-indigo-100 rounded-lg">
                   <FileText className="w-4 h-4 text-indigo-600" />
                 </div>
-                <h2 className="text-sm font-semibold text-gray-900">Invoice Information</h2>
+                <h2 className="text-sm font-semibold text-gray-900">Order Information</h2>
               </div>
             </div>
             
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-gray-100 rounded-lg">
-                      <Hash className="w-4 h-4 text-gray-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Invoice ID</p>
-                      <p className="text-sm font-medium text-gray-900">{invoiceId}</p>
-                    </div>
-                  </div>
-                  
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-gray-100 rounded-lg">
                       <Building2 className="w-4 h-4 text-gray-600" />

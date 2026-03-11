@@ -1,4 +1,5 @@
 import { ICompanyRepository } from "../../../domain/repositories/company.repository";
+import { IInvoiceRepositoru } from "../../../domain/repositories/invoice.repository";
 import { IPaymentRepository } from "../../../domain/repositories/payment.repository";
 import { ISubscriptionRepository } from "../../../domain/repositories/subscription.repository";
 import { IPaymentService } from "../../../domain/service/payment.service";
@@ -13,7 +14,8 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         private _paymentRepo: IPaymentRepository,
         private _subscriptionRepo: ISubscriptionRepository,
         private _companyRepo: ICompanyRepository,
-        private _razorpayService: IPaymentService
+        private _razorpayService: IPaymentService,
+        private _invoiceRepo: IInvoiceRepositoru
     ) { }
 
     async execute(data: VerifyPaymentDTO): Promise<void> {
@@ -91,6 +93,27 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
             currentPlanId: payment.planId
         });
         await this._paymentRepo.markSuccess(data.orderId, data.paymentId);
+
+        const TAX_RATE = 0.18;
+
+        const total = payment.amount;
+
+        const subtotal = Number((total / (1 + TAX_RATE)).toFixed(2));
+        const tax = Number((total - subtotal).toFixed(2));
+
+        const invoiceNumber = `INV-${Date.now()}`;
+
+        await this._invoiceRepo.create({
+            companyId: payment.companyId,
+            paymentId: payment.id,
+            planId: payment.planId,
+            billingCycle: payment.billingCycle,
+            subtotal,
+            tax,
+            total,
+            currency: payment.currency,
+            invoiceNumber
+        })
     }
 
 
