@@ -38,7 +38,9 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
         if (user.companyId != company.id) {
             throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.FORBIDDEN)
         }
+        console.log("Selected planId:", data.planId);
         const plan = await this._planRepo.findById(data.planId);
+
         if (!plan) {
             throw new AppError(
                 RESPONSE_MESSAGES.PLAN.NOT_FOUND,
@@ -46,6 +48,7 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
             )
 
         }
+        console.log("Fetched planId:", plan.id);
 
         const currentSubscription =
             await this._subscriptionRepo.findActiveByCompany(company.id);
@@ -57,15 +60,58 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
             );
         }
 
+        console.log("Billing cycle:", data.billingCycle);
+console.log("Plan price month:", plan.pricePerMonth);
+console.log("Plan price year:", plan.pricePerYear);
+
         const baseAmount =
             data.billingCycle === "MONTHLY"
                 ? plan.pricePerMonth
                 : plan.pricePerYear;
 
-        const amount = baseAmount * 100;
+        const TAX_RATE = 0.18;
+        const tax = baseAmount * TAX_RATE;
+        const totalAmount = baseAmount + tax;
 
-        const receipt = `devsync_${company.id}_${Date.now()}`;
+        const amount = Math.round(totalAmount * 100)
 
+        const pendingPayment = await this._paymentRepo.findPendingPayment(
+            company.id,
+            plan.id,
+            data.billingCycle
+        );
+
+        const FIVE_MINUTES = 1 * 60 * 1000;
+
+        if (pendingPayment) {
+
+            const age = Date.now() - new Date(pendingPayment.createdAt).getTime();
+
+            if (age < FIVE_MINUTES) {
+
+                // reuse existing order
+                return {
+                    orderId: pendingPayment.orderId,
+                    amount: pendingPayment.amount,
+                    razorpayAmount: Math.round(pendingPayment.amount * 100),
+                    currency: pendingPayment.currency,
+                    keyId: env.RAZORPAY_KEY_ID
+                };
+
+            }
+
+            // payment expired → mark FAILED
+            await this._paymentRepo.markFailed(pendingPayment.orderId);
+        }
+
+        const receipt = `devsync_${Date.now()}`;
+
+        console.log({
+  baseAmount,
+  tax,
+  totalAmount,
+  razorpayAmount: amount
+});
         const order = await this._razorpayService.createOrder(
             amount,
             plan.currency,
@@ -78,14 +124,15 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
             billingCycle: data.billingCycle,
             orderId: order.id,
             paymentId: null,
-            amount: baseAmount,
+            amount: totalAmount,
             currency: plan.currency,
             status: "PENDING",
         })
 
         return {
             orderId: order.id,
-            amount,
+            amount: totalAmount,
+            razorpayAmount: amount,
             currency: plan.currency,
             keyId: env.RAZORPAY_KEY_ID
         }

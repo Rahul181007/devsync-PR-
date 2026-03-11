@@ -34,7 +34,10 @@ export class GetAvailablePlansUseCase implements IGetAvailablePlansUseCase {
         }
 
         const plans = await this._planRepo.findAvailablePlans();
-        const upgradePlans = plans.filter(plan => plan.id !== company.currentPlanId);
+        const upgradePlans = plans.filter(plan =>
+  plan.id !== company.currentPlanId &&
+  plan.pricePerMonth > 0
+)
         return upgradePlans.map((plan) => ({
             id: plan.id,
             name: plan.name,

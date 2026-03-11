@@ -15,4 +15,9 @@ export interface IPaymentRepository {
     markSuccess(orderId: string, paymentId: string): Promise<void>;
     markFailed(orderId: string): Promise<void>
     findByCompanyId(companyId: string): Promise<Payment[]>
+    findPendingPayment(
+        companyId: string,
+        planId: string,
+        billingCycle: "MONTHLY" | "YEARLY"
+    ): Promise<Payment | null>;
 }

@@ -49,7 +49,7 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
                 HttpStatus.BAD_REQUEST
             )
         }
-        await this._paymentRepo.markSuccess(data.orderId, data.paymentId);
+
 
         const currentSubscription = await this._subscriptionRepo.findActiveByCompany(payment.companyId);
 
@@ -79,11 +79,18 @@ export class VerifyPaymentUseCase implements IVerifyPaymentUseCase {
         });
 
         const company = await this._companyRepo.findById(payment.companyId);
-
-        if (company) {
-            company.subscriptionId = newSubscription.id;
-            await this._companyRepo.save(company);
+        if (!company) {
+            throw new AppError(
+                RESPONSE_MESSAGES.COMPANY.NOT_FOUND,
+                HttpStatus.NOT_FOUND
+            );
         }
+
+        await this._companyRepo.updateSubscription(payment.companyId, {
+            subscriptionId: newSubscription.id,
+            currentPlanId: payment.planId
+        });
+        await this._paymentRepo.markSuccess(data.orderId, data.paymentId);
     }
 
 

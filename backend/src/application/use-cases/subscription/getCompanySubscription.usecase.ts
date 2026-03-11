@@ -39,17 +39,7 @@ export class GetCompanySubscriptionUseCase implements IGetCompanySubscriptionUse
                 HttpStatus.FORBIDDEN
             )
         }
-
-        if (!company.subscriptionId) {
-            throw new AppError(
-                RESPONSE_MESSAGES.SUBSCRIPTION.NOT_FOUND,
-                HttpStatus.NOT_FOUND
-            )
-        }
-
-
-
-        const subscription = await this._subscriptionRepo.findById(company.subscriptionId);
+        const subscription = await this._subscriptionRepo.findActiveByCompany(company.id);
 
         if (!subscription) {
             throw new AppError(

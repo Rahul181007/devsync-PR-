@@ -15,7 +15,8 @@ import companyStandupReducer from '../modules/company-admin/store/standup.slice'
 import companyChatReducer from '../modules/chat/store/chat.slice';
 import aiReducer from "../modules/ai/store/ai.slice";
 import notificationReducer from "../modules/notification/store/notification.slice"
-import planReducer from "../modules/super-admin/store/plan.slice"
+import planReducer from "../modules/super-admin/store/plan.slice";
+import billingReducer from "../modules/company-admin/store/companyBilling.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -33,7 +34,8 @@ const appReducer = combineReducers({
   companyChat:companyChatReducer,
   ai:aiReducer,
   notification:notificationReducer,
-  plans:planReducer
+  plans:planReducer,
+  companyBiiling:billingReducer
 });
 
 /* ================= RootState ================= */

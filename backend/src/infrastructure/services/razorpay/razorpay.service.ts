@@ -20,7 +20,7 @@ export class RazorpayService implements IPaymentService {
     notes?: Record<string, string>
   ) {
     return this._razorpay.orders.create({
-      amount: amount * 100,
+      amount: amount ,
       currency,
       receipt,
       notes,

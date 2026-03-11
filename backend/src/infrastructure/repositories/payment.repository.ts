@@ -59,9 +59,27 @@ export class PaymentRepository implements IPaymentRepository {
     }
 
     async findByCompanyId(companyId: string): Promise<Payment[]> {
-        const docs=await PaymentModel.find({companyId}).sort({createdAt:-1})
+        const docs = await PaymentModel.find({ companyId }).sort({ createdAt: -1 })
 
-        return docs.map((doc)=>this._toDomain(doc))
+        return docs.map((doc) => this._toDomain(doc))
+    }
+
+    async findPendingPayment(
+        companyId: string,
+        planId: string,
+        billingCycle: "MONTHLY" | "YEARLY"
+    ): Promise<Payment | null> {
+
+        const doc = await PaymentModel.findOne({
+            companyId,
+            planId,
+            billingCycle,
+            status: "PENDING"
+        }).sort({ createdAt: -1 });
+
+        if (!doc) return null;
+
+        return this._toDomain(doc);
     }
 }
 
