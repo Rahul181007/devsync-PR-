@@ -1,6 +1,14 @@
 import { AuthProvider, User, UserRole } from "../entities/user.entity";
 import { UserStatus } from "../entities/user.entity";
 
+
+export interface DeveloperListItem {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  role: UserRole;
+}
 export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>;
 
@@ -39,7 +47,7 @@ export interface IUserRepository {
         limit: number;
         search?: string;
         status?: UserStatus
-    }): Promise<{ items: User[]; total: number }>
+    }): Promise<{ items: DeveloperListItem[]; total: number }>
 
     updateOtp(
   userId: string,

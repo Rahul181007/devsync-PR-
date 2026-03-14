@@ -1,4 +1,4 @@
-import { IUserRepository } from "../../domain/repositories/user.repository";
+import { DeveloperListItem, IUserRepository } from "../../domain/repositories/user.repository";
 import { User, UserStatus } from "../../domain/entities/user.entity";
 import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
@@ -88,7 +88,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
     async updateStatus(userId: string, status: UserStatus): Promise<void> {
         await this.updateById(userId, { status })
     }
-    async findDevelopersByCompany(companyId: string, options: { page: number; limit: number; search?: string; status?: UserStatus; }): Promise<{ items: User[]; total: number; }> {
+    async findDevelopersByCompany(companyId: string, options: { page: number; limit: number; search?: string; status?: UserStatus; }): Promise<{ items: DeveloperListItem[]; total: number; }> {
         const { page, limit, status, search } = options;
         const filter: Record<string, unknown> = {
             companyId,
@@ -100,7 +100,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         if (search) {
             filter.$or = [{ name: { $regex: search, $options: 'i' } }, { email: { $regex: search, $options: 'i' } }]
         }
-        const [items, total] = await Promise.all([
+        const [docs, total] = await Promise.all([
             this.model
                 .find(filter)
                 .skip((page - 1) * limit)
@@ -108,32 +108,39 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
                 .sort({ createdAt: -1 }),
             this.model.countDocuments(filter)
         ]);
+        const items: DeveloperListItem[] = docs.map((doc) => ({
+            id: doc._id.toString(),
+            name: doc.name,
+            email: doc.email,
+            status: doc.status,
+            role: doc.role
+        }))
 
         return {
-            items: items.map(val => this._toDomain(val)),
+            items,
             total
         }
     }
-   async updateOtp(userId: string, otp: string | null, otpExpiresAt: Date | null): Promise<void> {
-       await this.updateById(userId,{otp,otpExpiresAt})
-   }
+    async updateOtp(userId: string, otp: string | null, otpExpiresAt: Date | null): Promise<void> {
+        await this.updateById(userId, { otp, otpExpiresAt })
+    }
 
-   async findByIds(userIds: string[]): Promise<User[]> {
-  const docs = await UserModel.find({
-    _id: { $in: userIds }
-  });
+    async findByIds(userIds: string[]): Promise<User[]> {
+        const docs = await UserModel.find({
+            _id: { $in: userIds }
+        });
 
-  return docs.map(doc => this._toDomain(doc));
-}
-async findCompanyAdminByCompany(companyId: string): Promise<User | null> {
-  const doc = await this.model.findOne({
-    companyId,
-    role: "COMPANY_ADMIN",
-    status: "ACTIVE"
-  });
+        return docs.map(doc => this._toDomain(doc));
+    }
+    async findCompanyAdminByCompany(companyId: string): Promise<User | null> {
+        const doc = await this.model.findOne({
+            companyId,
+            role: "COMPANY_ADMIN",
+            status: "ACTIVE"
+        });
 
-  return doc ? this._toDomain(doc) : null;
-}
+        return doc ? this._toDomain(doc) : null;
+    }
 
 
 }

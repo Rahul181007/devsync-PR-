@@ -6,18 +6,19 @@ import FeaturesSection from '../components/FeaturesSection';
 import HowItWorksSection from "../components/HowItWorksSection";
 import TechStackSection from "../components/TechStackSection";
 import CTASection from "../components/CTASection";
-import Footer from "../components/Footer";
+
 
 const LandingPage = () => {
   return (
     <LandingLayout>
+
       <HeroSection />
       <RolesSection />
       <FeaturesSection />
       <HowItWorksSection />
       <TechStackSection />
       <CTASection />
-      <Footer />
+
     </LandingLayout>
   );
 };

@@ -13,7 +13,7 @@ import ProjectChat from "../../../chat/components/ProjectChat";
 import ProjectAISummary from "../../../ai/components/ProjectAISummary";
 
 /* ================= Types ================= */
-type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP"| "AI";
+type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP" | "AI";
 
 export const ProjectDetailPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -37,20 +37,20 @@ export const ProjectDetailPage = () => {
     }
   }, [dispatch, projectId]);
 
- if (loading)
-  return (
-    <div className="p-6 flex justify-center">
-      <Spinner size="lg" />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="p-6 flex justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!selectedProject) return null;
 
   const project = selectedProject;
-const isOverdue =
-  project.endDate &&
-  new Date(project.endDate) < new Date() &&
-  project.status !== "COMPLETED";
+  const isOverdue =
+    project.endDate &&
+    new Date(project.endDate) < new Date() &&
+    project.status !== "COMPLETED";
 
   return (
     <div className="p-6 space-y-6">
@@ -65,13 +65,13 @@ const isOverdue =
               {project.description || "—"}
             </p>
 
-                  {isOverdue && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600 font-medium">
-            ⚠ This project has exceeded its planned end date.
-          </p>
-        </div>
-      )}
+            {isOverdue && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600 font-medium">
+                  ⚠ This project has exceeded its planned end date.
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2">
@@ -104,14 +104,18 @@ const isOverdue =
           <div>
             <p className="text-gray-500">Start Date</p>
             <p className="font-medium">
-              {project.startDate ?? "—"}
+              {project.startDate
+                ? new Date(project.startDate).toISOString().split("T")[0]
+                : "—"}
             </p>
           </div>
 
           <div>
             <p className="text-gray-500">End Date</p>
             <p className="font-medium">
-              {project.endDate ?? "—"}
+              {project.endDate
+                ? new Date(project.endDate).toISOString().split("T")[0]
+                : "—"}
             </p>
           </div>
 
@@ -130,16 +134,15 @@ const isOverdue =
 
       {/* ================= Tabs ================= */}
       <div className="border-b flex gap-6 px-2">
-        {(["TASKS", "CHAT", "SPRINT","STANDUP","AI"] as ProjectDetailTab[]).map(
+        {(["TASKS", "CHAT", "SPRINT", "STANDUP", "AI"] as ProjectDetailTab[]).map(
           (tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === tab
+              className={`pb-2 text-sm font-medium ${activeTab === tab
                   ? "border-b-2 border-blue-600 text-blue-600"
                   : "text-gray-500 hover:text-gray-700"
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -163,13 +166,13 @@ const isOverdue =
       )}
 
       {activeTab === "STANDUP" && (
-  <CompanyStandupDashboard projectId={project.id} />
+        <CompanyStandupDashboard projectId={project.id} />
 
-)}
+      )}
 
-{activeTab === "AI" && (
-  <ProjectAISummary projectId={project.id} />
-)}
+      {activeTab === "AI" && (
+        <ProjectAISummary projectId={project.id} />
+      )}
 
       {/* ================= Modals ================= */}
       <ProjectMembersModal

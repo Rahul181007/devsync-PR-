@@ -30,7 +30,7 @@ export class ListDeveloperUsecase implements IListDevelopersUseCase{
             search:query.search,
             status:query.status
         })
-
+        console.log("hello",items)
         return{
             items,
             pagination:{

@@ -7,7 +7,7 @@ import { ROUTES } from "../../../shared/constants/routes";
 import GoogleLoginButton from "./GoogleLoginButton";
 
 interface LoginFormProps {
-    title: string;
+    title: string; 
     subtitle?: string;
     loading: boolean;
     error?: string | null;
