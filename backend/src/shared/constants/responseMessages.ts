@@ -112,7 +112,8 @@ export const RESPONSE_MESSAGES = {
         NOT_IN_ACTIVE_SPRINT: "Task not in active sprint",
         TASK_NOT_BELONG_PROJECT: "Task not belong to project",
         ALREADY_ASSIGNED_TO_SPRINT: "Task is already assigned to a sprint",
-        ASSIGNED_USER: "Assigned user must be a developer"
+        ASSIGNED_USER: "Assigned user must be a developer",
+        DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date"
     },
 
     SPRINT: {
@@ -128,6 +129,11 @@ export const RESPONSE_MESSAGES = {
         SPRINT_EMPTY: "sprint is empty",
         SPRINT_ACTIVATED: "Sprint activated successfully",
         SPRINT_NOT_ACTIVE: "Sprint not active",
+        INVALID_DATE_RANGE:"Invalid date range",
+        INVALID_SPRINT_START_DATE:"Invalid sprint start date",
+        INVALID_SPRINT_END_DATE:"Invalid  sprint end date",
+        SPRINT_CANNOT_START_YET:"Sprint cannot start yet",
+        SPRINT_ALREADY_EXPIRED:"sprint already expired"
     },
     DEVELOPER: {
         NOT_BELONG_TO_COMPANY: "Developer does not belong to this company",
@@ -143,7 +149,8 @@ export const RESPONSE_MESSAGES = {
         ALREADY_SUBMITTED: "Standup already submitted",
         CREATED: "Standup submitted successfully",
         NOT_FOUND: "Standup not found",
-        UPDATED: "Standup updated successfully"
+        UPDATED: "Standup updated successfully",
+        OUTSIDE_SPRINT_RANGE:"Outside sprint date range"
     },
     CHAT: {
         REPLY_MESSAGE_NOT_FOUND: "Reply message not found"

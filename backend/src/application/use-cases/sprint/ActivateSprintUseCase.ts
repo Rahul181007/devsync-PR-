@@ -59,6 +59,24 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
             throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_PLANNABLE, HttpStatus.BAD_REQUEST)
         }
 
+        if (project.startDate && sprint.startDate < project.startDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.INVALID_SPRINT_START_DATE,
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        const today = new Date();
+
+        if (today < sprint.startDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.SPRINT_CANNOT_START_YET,
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+
+
         const activeSprint = await this._sprintRepo.findActiveSprint(projectId);
         if (activeSprint) {
             throw new AppError(
@@ -66,6 +84,12 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
                 HttpStatus.CONFLICT
 
             )
+        }
+        if (today > sprint.endDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.SPRINT_ALREADY_EXPIRED,
+                HttpStatus.BAD_REQUEST
+            );
         }
 
         const task = await this._taskRepo.findByProjectId(projectId);
@@ -90,7 +114,7 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
         const developers = users.filter(u => u.role === Role.DEVELOPER);
 
         for (const dev of developers) {
-            const notification=await this._notificationRepo.create({
+            const notification = await this._notificationRepo.create({
                 userId: dev.id,
                 type: "SPRINT_STARTED",
                 title: "Sprint Started",
@@ -101,7 +125,7 @@ export class ActivateSprintUseCase implements IActivateSprintUseCase {
                 }
             });
 
-                        const io = getSocketInstance();
+            const io = getSocketInstance();
 
             io.to(`user:${dev.id}`).emit("new_notification", {
                 id: notification.id,

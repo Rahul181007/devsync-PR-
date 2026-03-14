@@ -9,61 +9,84 @@ import { CreateSprintRequestDTO } from "../../dto/sprint/createSprintRequest.dto
 import { SprintResponseDTO } from "../../dto/sprint/sprintResponse.dto";
 import { ICreateSprintUseCase } from "../../interface/sprint/ICreateSprintUseCase";
 
-export class CreateSprintUseCase implements ICreateSprintUseCase{
+export class CreateSprintUseCase implements ICreateSprintUseCase {
     constructor(
-        private _sprintRepo:ISprintRepository,
-        private _projectRepo:IProjectRepository,
+        private _sprintRepo: ISprintRepository,
+        private _projectRepo: IProjectRepository,
         private _userRepo: IUserRepository
-    ){}
+    ) { }
 
-    async execute(userId: string, companyId: string, projectId: string,data:CreateSprintRequestDTO): Promise<SprintResponseDTO> {
-        const user=await this._userRepo.findById(userId);
-        if(!user){
+    async execute(userId: string, companyId: string, projectId: string, data: CreateSprintRequestDTO): Promise<SprintResponseDTO> {
+        const user = await this._userRepo.findById(userId);
+        if (!user) {
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,
                 HttpStatus.NOT_FOUND
             )
         }
-        if(user.role!==Role.COMPANY_ADMIN){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.FORBIDDEN)
+        if (user.role !== Role.COMPANY_ADMIN) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.FORBIDDEN)
         }
-        const project= await this._projectRepo.findById(projectId);
-        if(!project){
+        const project = await this._projectRepo.findById(projectId);
+        if (!project) {
             throw new AppError(
                 RESPONSE_MESSAGES.PROJECT.PROJECT_NOT_FOUND,
                 HttpStatus.NOT_FOUND
             )
         }
-        if(project.companyId!==companyId){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.FORBIDDEN)
+
+
+        if (project.companyId !== companyId) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.FORBIDDEN)
         }
 
-        if(project.status==="ARCHIVED"|| project.status==="COMPLETED"){
+        if (project.status === "ARCHIVED" || project.status === "COMPLETED") {
             throw new AppError(
                 RESPONSE_MESSAGES.PROJECT.ARCHIVED,
                 HttpStatus.FORBIDDEN
             )
         }
-   
-        const existingSprints=await this._sprintRepo.findByProjectId(projectId);
-        const duplicate=existingSprints.find((s)=>s.name.toLowerCase()===data.name.toLowerCase())
-        
-        if(duplicate){
+
+
+        if (data.startDate > data.endDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.INVALID_DATE_RANGE,
+                HttpStatus.BAD_REQUEST
+            )
+        }
+
+        if (project.startDate && data.startDate < project.startDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.INVALID_SPRINT_START_DATE,
+                HttpStatus.BAD_REQUEST
+            )
+        }
+
+        if (project.endDate && data.endDate > project.endDate) {
+            throw new AppError(
+                RESPONSE_MESSAGES.SPRINT.INVALID_SPRINT_END_DATE,
+                HttpStatus.BAD_REQUEST
+            )
+        }
+        const existingSprints = await this._sprintRepo.findByProjectId(projectId);
+        const duplicate = existingSprints.find((s) => s.name.toLowerCase() === data.name.toLowerCase())
+
+        if (duplicate) {
             throw new AppError(
                 RESPONSE_MESSAGES.SPRINT.SPRINT_NAME_EXISTS,
                 HttpStatus.CONFLICT
             )
         }
-        const overlapping=existingSprints.find(
-            (s)=>
+        const overlapping = existingSprints.find(
+            (s) =>
                 s.status !== "COMPLETED" &&
-                s.startDate<=data.endDate &&
-                s.endDate>=data.startDate
+                s.startDate <= data.endDate &&
+                s.endDate >= data.startDate
         )
 
-        if(overlapping){
+        if (overlapping) {
             throw new AppError(
-                RESPONSE_MESSAGES.SPRINT.SPRINT_DATE_OVERLAP,HttpStatus.CONFLICT
+                RESPONSE_MESSAGES.SPRINT.SPRINT_DATE_OVERLAP, HttpStatus.CONFLICT
             )
         }
 
@@ -71,28 +94,28 @@ export class CreateSprintUseCase implements ICreateSprintUseCase{
 
 
 
-        const sprint=await this._sprintRepo.create({
+        const sprint = await this._sprintRepo.create({
             projectId,
             companyId,
-            name:data.name,
-            goal:data.goal?? null,
-            startDate:data.startDate,
-            endDate:data.endDate,
-            status:"PLANNED",
-            createdBy:userId
+            name: data.name,
+            goal: data.goal ?? null,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            status: "PLANNED",
+            createdBy: userId
         })
 
         return {
-            id:sprint.id,
-            projectId:sprint.projectId,
-            name:sprint.name,
-            goal:sprint.goal,
-            startDate:sprint.startDate,
-            endDate:sprint.endDate,
-            status:sprint.status,
-            createdBy:sprint.createdBy,
-            createdAt:sprint.createdAt,
-            updatedAt:sprint.updatedAt
+            id: sprint.id,
+            projectId: sprint.projectId,
+            name: sprint.name,
+            goal: sprint.goal,
+            startDate: sprint.startDate,
+            endDate: sprint.endDate,
+            status: sprint.status,
+            createdBy: sprint.createdBy,
+            createdAt: sprint.createdAt,
+            updatedAt: sprint.updatedAt
         }
     }
 }
