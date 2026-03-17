@@ -72,6 +72,7 @@ export class GetDeveloperTasksUseCase implements IGetDeveloperTasksUseCase{
             const card={
                 id:task.id,
                 title:task.title,
+                type: task.type,
                 priority:task.priority,
                 dueDate:task.dueDate
             }

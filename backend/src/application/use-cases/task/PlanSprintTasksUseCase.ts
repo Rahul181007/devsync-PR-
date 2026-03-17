@@ -70,6 +70,13 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
                 throw new AppError(RESPONSE_MESSAGES.TASK.TASK_NOT_BELONG_PROJECT, HttpStatus.FORBIDDEN)
             }
 
+if (task.type !== "TASK" && task.type !== "BUG") {
+    throw new AppError(
+        "Only TASK or BUG can be added to sprint",
+        HttpStatus.BAD_REQUEST
+    )
+}
+
             if (task.sprintId !== null) {
                 throw new AppError(RESPONSE_MESSAGES.TASK.ALREADY_ASSIGNED_TO_SPRINT, HttpStatus.CONFLICT)
             }
@@ -96,7 +103,7 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
             await this._taskRepo.update(task)
 
             try {
-                const notification=await this._notificationRepo.create({
+                const notification = await this._notificationRepo.create({
                     userId: item.developerId,
                     type: "TASK_ASSIGNED",
                     title: "New Task Assigned",
@@ -109,17 +116,17 @@ export class PlanSprintTaskUseCase implements IPlanSprintTasksUseCase {
                 });
 
 
-                            const io = getSocketInstance();
-                
-                            io.to(`user:${item.developerId}`).emit("new_notification", {
-                                id: notification.id,
-                                type: notification.type,
-                                title: notification.title,
-                                message: notification.message,
-                                metadata: notification.metadata,
-                                isRead: false,
-                                createdAt: notification.createdAt,
-                            });
+                const io = getSocketInstance();
+
+                io.to(`user:${item.developerId}`).emit("new_notification", {
+                    id: notification.id,
+                    type: notification.type,
+                    title: notification.title,
+                    message: notification.message,
+                    metadata: notification.metadata,
+                    isRead: false,
+                    createdAt: notification.createdAt,
+                });
             } catch (error) {
                 console.error("Task assignment notification failed:", error);
             }

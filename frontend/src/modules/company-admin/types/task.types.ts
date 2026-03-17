@@ -1,20 +1,27 @@
-export type TaskStatus="BACKLOG"| "TODO"| "IN_PROGRESS"| "SUBMITTED"| "COMPLETED";
-export type TaskPriority="LOW"|"MEDIUM"|"HIGH"
+export type TaskStatus = "BACKLOG" | "TODO" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH"
+export type TaskType =
+  | "EPIC"
+  | "STORY"
+  | "TASK"
+  | "BUG";
 
-
-export interface TaskAssignee{
-    id:string;
-    name:string;
-    avatar:string|null
+export interface TaskAssignee {
+  id: string;
+  name: string;
+  avatar: string | null
 }
 
 export interface TaskListItem {
   id: string;
-  code :string;
+  code: string;
   title: string;
+
+  type: TaskType;
+  parentId: string | null
   status: TaskStatus;
   priority: TaskPriority;
-  dueDate: string | null; 
+  dueDate: string | null;
   assignee: TaskAssignee | null;
   sprintId: string | null;
 }
@@ -37,6 +44,9 @@ export interface TaskDetail {
 
   title: string;
   description: string;
+
+  type: TaskType;
+  parentId: string | null
 
   status: TaskStatus;
   priority: TaskPriority;

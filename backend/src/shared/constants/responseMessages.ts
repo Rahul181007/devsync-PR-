@@ -113,7 +113,8 @@ export const RESPONSE_MESSAGES = {
         TASK_NOT_BELONG_PROJECT: "Task not belong to project",
         ALREADY_ASSIGNED_TO_SPRINT: "Task is already assigned to a sprint",
         ASSIGNED_USER: "Assigned user must be a developer",
-        DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date"
+        DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date",
+        CANNOT_CHANGE_TYPE_WITH_CHILDREN:"cannot change the type it has children task"
     },
 
     SPRINT: {

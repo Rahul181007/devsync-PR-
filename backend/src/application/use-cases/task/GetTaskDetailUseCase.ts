@@ -74,6 +74,8 @@ export class GetTaskDetailUseCase implements IGetTaskDetailUseCase {
             description: task.description,
 
             status: task.status,
+            type:task.type,
+            parentId: task.parentId,
             priority: task.priority,
 
             sprint: task.sprintId

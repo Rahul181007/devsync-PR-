@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch } from "../../../../store/hook";
+import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { createTask, getProjectTasks } from "../../store/task.slice";
 import toast from "react-hot-toast";
 
@@ -18,47 +18,71 @@ export const CreateTaskModal = ({
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [type, setType] = useState<"EPIC" | "STORY" | "TASK" | "BUG">("TASK");
   const [priority, setPriority] =
     useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
   const [dueDate, setDueDate] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [parentId, setParentId] = useState<string | null>(null);
 
+  const { tasks } = useAppSelector((state) => state.companyAdminTask);
+
+  const parentTypeMap = {
+    STORY: "EPIC",
+    TASK: "STORY",
+    BUG: "TASK",
+  } as const;
+
+  const requiredParentType = parentTypeMap[type as keyof typeof parentTypeMap];
+
+  const parentTasks =
+    requiredParentType
+      ? tasks.filter((t) => t.type === requiredParentType)
+      : [];
   if (!isOpen) return null;
 
-const handleSubmit = async () => {
-  if (!title.trim() || !description.trim()) return;
+  const handleSubmit = async () => {
+    if (!title.trim() || !description.trim()) return;
+    console.log({
+      title,
+      description,
+      type,
+      priority,
+      dueDate
+    });
+    setIsSubmitting(true);
 
-  setIsSubmitting(true);
+    try {
+      const result = await dispatch(
+        createTask({
+          projectId,
+          data: {
+            title,
+            description,
+            type,
+            priority,
+            parentId,
+            dueDate: dueDate || null,
+          },
+        })
+      );
 
-  try {
-    const result = await dispatch(
-      createTask({
-        projectId,
-        data: {
-          title,
-          description,
-          priority,
-          dueDate: dueDate || null,
-        },
-      })
-    );
+      // ✅ Success
+      if (createTask.fulfilled.match(result)) {
+        toast.success("Task created successfully");
 
-    // ✅ Success
-    if (createTask.fulfilled.match(result)) {
-      toast.success("Task created successfully");
+        dispatch(getProjectTasks(projectId));
+        onClose();
+      }
 
-      dispatch(getProjectTasks(projectId));
-      onClose();
+      // ❌ Error
+      if (createTask.rejected.match(result)) {
+        toast.error(result.payload as string || "Failed to create task");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // ❌ Error
-    if (createTask.rejected.match(result)) {
-      toast.error(result.payload as string || "Failed to create task");
-    }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   // Check if form is valid
   const isFormValid = title.trim() && description.trim();
@@ -126,6 +150,53 @@ const handleSubmit = async () => {
             )}
           </div>
 
+          {/* Task Type Field */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-gray-700">Task Type</label>
+
+            <select
+              value={type}
+              onChange={(e) => {
+                const newType = e.target.value as "EPIC" | "STORY" | "TASK" | "BUG";
+                setType(newType);
+                setParentId(null);
+              }}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            >
+              <option value="TASK">Task</option>
+              <option value="STORY">Story</option>
+              <option value="EPIC">Epic</option>
+              <option value="BUG">Bug</option>
+            </select>
+          </div>
+
+          {requiredParentType && (
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-gray-700">
+                Parent {requiredParentType}
+              </label>
+
+              <select
+                value={parentId ?? ""}
+                onChange={(e) => setParentId(e.target.value || null)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                <option value="">Select parent {requiredParentType}</option>
+
+                {parentTasks.map((task) => (
+                  <option key={task.id} value={task.id}>
+                    {task.code} — {task.title}
+                  </option>
+                ))}
+              </select>
+
+              {parentTasks.length === 0 && (
+                <p className="text-xs text-gray-500">
+                  No {requiredParentType} available in this project
+                </p>
+              )}
+            </div>
+          )}
           {/* Priority and Due Date Grid */}
           <div className="grid grid-cols-2 gap-4">
             {/* Priority Field */}
@@ -153,11 +224,10 @@ const handleSubmit = async () => {
               </div>
               {/* Priority preview */}
               <div className="mt-2">
-                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                  priority === "HIGH" ? "bg-red-50 text-red-700" :
-                  priority === "MEDIUM" ? "bg-yellow-50 text-yellow-700" :
-                  "bg-green-50 text-green-700"
-                }`}>
+                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${priority === "HIGH" ? "bg-red-50 text-red-700" :
+                    priority === "MEDIUM" ? "bg-yellow-50 text-yellow-700" :
+                      "bg-green-50 text-green-700"
+                  }`}>
                   {priority.charAt(0) + priority.slice(1).toLowerCase()} priority
                 </span>
               </div>

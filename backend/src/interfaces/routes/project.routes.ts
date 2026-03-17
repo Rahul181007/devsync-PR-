@@ -35,7 +35,7 @@ router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessT
 
 
 router.patch("/company/projects/:projectId/sprints/plan",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.planSprintTasks);
-
+router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.updateTask);
 
 //sprint-module
 

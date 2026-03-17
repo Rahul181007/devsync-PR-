@@ -4,10 +4,14 @@ export interface ITaskDocument extends Document {
     companyId: mongoose.Types.ObjectId;
     projectId: mongoose.Types.ObjectId;
     sprintId?: mongoose.Types.ObjectId | null;
-
+    parentId: mongoose.Types.ObjectId;
     code: string;
     title: string;
     description: string;
+
+    type: "EPIC" | "STORY" | "TASK" | "BUG";
+
+    
 
     status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED";
     priority: "LOW" | "MEDIUM" | "HIGH";
@@ -16,7 +20,7 @@ export interface ITaskDocument extends Document {
     reporterId: mongoose.Types.ObjectId;
 
     dueDate?: Date | null;
-    
+
     submission?: {
         summary: string;
         workDone: string;
@@ -48,6 +52,12 @@ const TaskSchema = new Schema<ITaskDocument>(
             default: null,
         },
 
+        parentId: {
+            type: Schema.Types.ObjectId,
+            ref: "Task",
+            default: null,
+        },
+
         code: {
             type: String,
             required: true,
@@ -62,6 +72,12 @@ const TaskSchema = new Schema<ITaskDocument>(
             type: String,
             required: true,
             trim: true,
+        },
+
+        type: {
+            type: String,
+            enum: ["EPIC", "STORY", "TASK", "BUG"],
+            default: "TASK",
         },
 
         status: {
@@ -104,6 +120,7 @@ const TaskSchema = new Schema<ITaskDocument>(
 
 TaskSchema.index({ companyId: 1, projectId: 1 });
 TaskSchema.index({ projectId: 1, sprintId: 1 });
+TaskSchema.index({ parentId: 1 });
 
 export const TaskModel = mongoose.model<ITaskDocument>(
     "Task",

@@ -39,11 +39,12 @@ export const PlanSprintModal=({
 
     if(!isOpen)return null
 
-    const backlogTasks = tasks.filter(
-      (task) =>
-        task.status === "BACKLOG" &&
-        !task.sprintId
-    );
+const backlogTasks = tasks.filter(
+  (task) =>
+    task.status === "BACKLOG" &&
+    !task.sprintId &&
+    (task.type === "TASK" || task.type === "BUG")
+);
 
     const handleAssign=(taskId:string,developerId:string)=>{
         setSelectedTasks((prev)=>{

@@ -4,6 +4,7 @@ export type TaskPriority="LOW"|"MEDIUM"|"HIGH"
 export interface DeveloperTaskCard {
   id: string;
   title: string;
+  type: "EPIC" | "STORY" | "TASK" | "BUG";
   priority: TaskPriority;
   dueDate: string | null;
 }
@@ -21,5 +22,6 @@ export interface DeveloperTaskDetail {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+   type: "EPIC" | "STORY" | "TASK" | "BUG"
   dueDate: string | null;
 }

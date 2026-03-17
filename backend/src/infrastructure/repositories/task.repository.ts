@@ -9,9 +9,11 @@ export class TaskRepository implements ITaskRepository {
             doc.companyId.toString(),
             doc.projectId.toString(),
             doc.sprintId ? doc.sprintId.toString() : null,
+            doc.parentId ? doc.parentId.toString() : null,
             doc.code,
             doc.title,
             doc.description,
+            doc.type,
             doc.status,
             doc.priority,
             doc.assigneeId ? doc.assigneeId.toString() : null,
@@ -37,11 +39,12 @@ export class TaskRepository implements ITaskRepository {
             companyId: task.companyId,
             projectId: task.projectId,
             sprintId: task.sprintId,
+            parentId: task.parentId ?? undefined,
 
             code: task.code,
             title: task.title,
             description: task.description,
-
+            type: task.type ?? "Task",
             status: task.status,
             priority: task.priority,
 
@@ -70,9 +73,14 @@ export class TaskRepository implements ITaskRepository {
     async findByProjectId(projectId: string): Promise<Task[]> {
         const docs = await TaskModel.find({
             projectId,
-            
+
         }).sort({ createdAt: -1 })
         return docs.map((doc) => this._toDomain(doc))
+    }
+
+    async findByParentId(parentId: string): Promise<Task[]> {
+        const docs=await TaskModel.find({parentId}).sort({ createdAt: -1})
+        return docs.map((doc)=>this._toDomain(doc))
     }
 
     async update(task: Task): Promise<Task> {
@@ -82,12 +90,13 @@ export class TaskRepository implements ITaskRepository {
                 sprintId: task.sprintId,
                 title: task.title,
                 description: task.description,
+                type: task.type,
                 status: task.status,
                 priority: task.priority,
                 assigneeId: task.assigneeId,
                 dueDate: task.dueDate ?? null,
 
-                submission:task.submission??null,
+                submission: task.submission ?? null,
             },
             { new: true }
         );

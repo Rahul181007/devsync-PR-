@@ -6,7 +6,9 @@ export const taskApi = {
     createTask(projectId: string, data: {
         title: string;
         description: string;
+        type: "EPIC" | "STORY" | "TASK" | "BUG";
         priority: "LOW" | "MEDIUM" | "HIGH";
+        parentId?: string | null;
         assigneeId?: string | null;
         dueDate?: string | null
     }) {
@@ -25,16 +27,34 @@ export const taskApi = {
             `/company/projects/${projectId}/tasks/${taskId}`
         );
     },
-      updateTaskStatus(
-    projectId: string,
-    taskId: string,
-    status: TaskStatus
-  ) {
-    return http.patch<{ message: string; data: TaskDetail }>(
-      `/company/projects/${projectId}/tasks/${taskId}/status`,
-      { status }
-    );
-  }
+    updateTaskStatus(
+        projectId: string,
+        taskId: string,
+        status: TaskStatus
+    ) {
+        return http.patch<{ message: string; data: TaskDetail }>(
+            `/company/projects/${projectId}/tasks/${taskId}/status`,
+            { status }
+        );
+    },
+
+    updateTask(
+        projectId: string,
+        taskId: string,
+        data: {
+            title?: string
+            description?: string
+            type?: "EPIC" | "STORY" | "TASK" | "BUG"
+            priority?: "LOW" | "MEDIUM" | "HIGH"
+            assigneeId?: string | null
+            dueDate?: string | null
+        }
+    ) {
+        return http.patch<{ message: string; data: TaskDetail }>(
+            `/company/projects/${projectId}/tasks/${taskId}`,
+            data
+        );
+    }
 
 
 }

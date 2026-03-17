@@ -5,7 +5,12 @@ export type TaskStatus =
   | "SUBMITTED"
   | "COMPLETED";
 
-  
+  export type TaskType=
+  | "EPIC"
+  | "STORY"
+  | "TASK"
+  | "BUG";
+
   export type TaskSubmission = {
   summary: string;
   workDone: string;
@@ -23,9 +28,13 @@ export class Task {
 
         public sprintId: string | null,
 
+        public parentId: string | null,
+
         public code: string,
         public title: string,
         public description: string,
+
+        public type:TaskType,
 
         public status: TaskStatus,
         public priority: TaskPriority,
