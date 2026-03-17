@@ -25,3 +25,13 @@ export interface DeveloperTaskDetail {
    type: "EPIC" | "STORY" | "TASK" | "BUG"
   dueDate: string | null;
 }
+
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  userName: string;
+  message: string;
+  createdAt: string;
+}

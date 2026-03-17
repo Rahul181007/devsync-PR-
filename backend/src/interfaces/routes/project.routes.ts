@@ -8,6 +8,7 @@ import { sprintController } from "../../di/sprint.di";
 import { standupController } from "../../di/standup.di";
 import { chatController } from "../../di/chat.di";
 import { aiController } from "../../di/ai.di";
+import { taskCommentController } from "../../di/taskComment.di";
 
 
 const router=Router();
@@ -36,6 +37,9 @@ router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessT
 
 router.patch("/company/projects/:projectId/sprints/plan",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.planSprintTasks);
 router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.updateTask);
+
+router.post("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.addComment)
+router.get("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.getComments)
 
 //sprint-module
 

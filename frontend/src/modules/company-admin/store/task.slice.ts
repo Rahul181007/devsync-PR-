@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { TaskDetail, TaskListItem, TaskPriority, TaskType } from "../types/task.types";
+import type { TaskComment, TaskDetail, TaskListItem, TaskPriority, TaskType } from "../types/task.types";
 import { taskApi } from "../services/task.api";
 import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
 
@@ -7,14 +7,19 @@ interface TaskState {
     loading: boolean;
     error: string | null;
     tasks: TaskListItem[];
-    selectedTask: TaskDetail | null
+    selectedTask: TaskDetail | null;
+    comments: TaskComment[],
+    commentsLoading: boolean
 }
 
 const initialState: TaskState = {
     loading: false,
     error: null,
     tasks: [],
-    selectedTask: null
+    selectedTask: null,
+
+    comments: [],
+    commentsLoading: false
 }
 
 export const getProjectTasks = createAsyncThunk<
@@ -78,7 +83,7 @@ export const createTask = createAsyncThunk<
             description: string;
             type: TaskType;
             priority: TaskPriority;
-            parentId?: string | null; 
+            parentId?: string | null;
             assigneeId?: string | null;
             dueDate?: string | null
         }
@@ -122,6 +127,42 @@ export const updateTask = createAsyncThunk<
     }
 )
 
+export const getTaskComments = createAsyncThunk<
+    TaskComment[],
+    { projectId: string; taskId: string },
+    { rejectValue: string }
+>(
+    "task/getTaskComments",
+    async ({ projectId, taskId }, { rejectWithValue }) => {
+        try {
+            const res = await taskApi.getTaskComment(projectId, taskId);
+            return res.data.data;
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+
+export const addTaskComment = createAsyncThunk<
+    void,
+    { projectId: string; taskId: string; message: string },
+    { rejectValue: string }
+>(
+    "task/addTaskComment",
+    async ({ projectId, taskId, message }, { dispatch, rejectWithValue }) => {
+        try {
+            await taskApi.addComment(projectId, taskId, message);
+
+            // refresh comments
+            dispatch(getTaskComments({ projectId, taskId }));
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+
 const taskSlice = createSlice({
     name: "task",
     initialState,
@@ -159,6 +200,18 @@ const taskSlice = createSlice({
             .addCase(getTaskDetail.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string
+            })
+
+            // GET COMMENTS
+            .addCase(getTaskComments.pending, (state) => {
+                state.commentsLoading = true;
+            })
+            .addCase(getTaskComments.fulfilled, (state, action) => {
+                state.commentsLoading = false;
+                state.comments = action.payload;
+            })
+            .addCase(getTaskComments.rejected, (state) => {
+                state.commentsLoading = false;
             })
     }
 })

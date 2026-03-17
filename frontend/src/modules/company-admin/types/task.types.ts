@@ -62,3 +62,13 @@ export interface TaskDetail {
   createdAt: string;
   updatedAt: string;
 }
+
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  userName: string;
+  message: string;
+  createdAt: string;
+}
