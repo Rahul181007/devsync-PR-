@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { TaskComment, TaskDetail, TaskListItem, TaskPriority, TaskType } from "../types/task.types";
+import type { TaskAttachment, TaskComment, TaskDetail, TaskListItem, TaskPriority, TaskType } from "../types/task.types";
 import { taskApi } from "../services/task.api";
 import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
 
@@ -8,8 +8,10 @@ interface TaskState {
     error: string | null;
     tasks: TaskListItem[];
     selectedTask: TaskDetail | null;
-    comments: TaskComment[],
-    commentsLoading: boolean
+    comments: TaskComment[];
+    commentsLoading: boolean;
+    attachments: TaskAttachment[];
+    attachmentsLoading: boolean;
 }
 
 const initialState: TaskState = {
@@ -19,7 +21,9 @@ const initialState: TaskState = {
     selectedTask: null,
 
     comments: [],
-    commentsLoading: false
+    commentsLoading: false,
+    attachments: [],
+    attachmentsLoading: false,
 }
 
 export const getProjectTasks = createAsyncThunk<
@@ -163,6 +167,40 @@ export const addTaskComment = createAsyncThunk<
 );
 
 
+export const uploadTaskAttachment = createAsyncThunk<
+    void,
+    { projectId: string; taskId: string; file: File },
+    { rejectValue: string }
+>(
+    "task/uploadAttachment",
+    async ({ projectId, taskId, file }, { dispatch, rejectWithValue }) => {
+        try {
+            await taskApi.uploadTaskAttachment(projectId, taskId, file);
+
+            dispatch(getTaskAttachments({ projectId, taskId }));
+        } catch (error) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+export const getTaskAttachments = createAsyncThunk<
+    TaskAttachment[],
+    { projectId: string; taskId: string },
+    { rejectValue: string }
+>(
+    "task/getAttachments",
+    async ({ projectId, taskId }, { rejectWithValue }) => {
+        try {
+            const res = await taskApi.getTaskAttachments(projectId, taskId);
+            return res.data.data;
+        } catch (error) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+
 const taskSlice = createSlice({
     name: "task",
     initialState,
@@ -212,6 +250,17 @@ const taskSlice = createSlice({
             })
             .addCase(getTaskComments.rejected, (state) => {
                 state.commentsLoading = false;
+            })
+
+            .addCase(getTaskAttachments.pending, (state) => {
+                state.attachmentsLoading = true;
+            })
+            .addCase(getTaskAttachments.fulfilled, (state, action) => {
+                state.attachmentsLoading = false;
+                state.attachments = action.payload;
+            })
+            .addCase(getTaskAttachments.rejected, (state) => {
+                state.attachmentsLoading = false;
             })
     }
 })

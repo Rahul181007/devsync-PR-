@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
-import { addTaskComment, clearSelectedTask, getTaskComments, getTaskDetail, updateTaskStatus } from "../../store/task.slice";
+import { addTaskComment, clearSelectedTask, getTaskAttachments, getTaskComments, getTaskDetail, updateTaskStatus, uploadTaskAttachment } from "../../store/task.slice";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import {
     XMarkIcon,
@@ -15,6 +15,7 @@ import {
     ExclamationTriangleIcon,
     PaperAirplaneIcon,
     ChatBubbleLeftIcon,
+    PaperClipIcon,
 } from "@heroicons/react/24/outline";
 import {
     CheckCircleIcon,
@@ -182,9 +183,9 @@ export const TaskDetailModal = ({
     taskId
 }: TaskDetailModalProps) => {
     const dispatch = useAppDispatch();
-    const { selectedTask, loading, comments, commentsLoading } = useAppSelector((state) => state.companyAdminTask);
+    const { selectedTask, loading, comments, commentsLoading,attachments,attachmentsLoading } = useAppSelector((state) => state.companyAdminTask);
     const [commentText, setCommentText] = useState("");
-    
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     useEffect(() => {
         if (isOpen && taskId) {
             dispatch(getTaskDetail({ projectId, taskId }))
@@ -202,6 +203,13 @@ export const TaskDetailModal = ({
             dispatch(getTaskComments({ projectId, taskId }));
         }
     }, [dispatch, isOpen, projectId, taskId]);
+
+
+    useEffect(() => {
+  if (isOpen && taskId) {
+    dispatch(getTaskAttachments({ projectId, taskId }));
+  }
+}, [dispatch, isOpen, projectId, taskId]);
 
     const handleAddComment = () => {
         if (!commentText.trim() || !taskId) return;
@@ -228,6 +236,20 @@ export const TaskDetailModal = ({
         dispatch(updateTaskStatus({ projectId, taskId, status: 'IN_PROGRESS' }))
         onClose()
     }
+
+    const handleUpload = () => {
+  if (!selectedFile || !taskId) return;
+
+  dispatch(
+    uploadTaskAttachment({
+      projectId,
+      taskId,
+      file: selectedFile,
+    })
+  );
+
+  setSelectedFile(null);
+};
 
     if (!isOpen) return null
 
@@ -364,73 +386,150 @@ export const TaskDetailModal = ({
                             )}
                         </div>
 
-                        {/* Comments Section */}
+                        {/* Two Column Layout for Comments and Attachments */}
                         <div className="border-t border-gray-100 bg-gray-50/50 p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                                    <ChatBubbleLeftIcon className="w-4 h-4 text-gray-500" />
-                                    Comments ({comments.length})
-                                </h3>
-                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Comments Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                            <ChatBubbleLeftIcon className="w-4 h-4 text-gray-500" />
+                                            Comments ({comments.length})
+                                        </h3>
+                                    </div>
 
-                            {/* Comment List */}
-                            <div className="space-y-3 max-h-48 overflow-y-auto pr-2 mb-4 scrollbar-thin scrollbar-thumb-gray-300">
-                                {commentsLoading ? (
-                                    <div className="flex items-center justify-center py-6">
-                                        <Spinner size="sm" />
-                                        <p className="ml-2 text-xs text-gray-400">Loading comments...</p>
-                                    </div>
-                                ) : comments.length === 0 ? (
-                                    <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                                        <ChatBubbleLeftIcon className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                                        <p className="text-xs text-gray-400">No comments yet</p>
-                                        <p className="text-xs text-gray-300 mt-1">Be the first to comment</p>
-                                    </div>
-                                ) : (
-                                    comments.map((c) => (
-                                        <div
-                                            key={c.id}
-                                            className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                                        >
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <div className="w-6 h-6 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                                                    <span className="text-xs font-medium text-white">
-                                                        {c.userName?.charAt(0).toUpperCase() || "U"}
-                                                    </span>
-                                                </div>
-                                                <p className="font-medium text-gray-900 text-xs">
-                                                    {c.userName}
-                                                </p>
-                                                <span className="text-[10px] text-gray-400 ml-auto">
-                                                    {new Date(c.createdAt).toLocaleString()}
-                                                </span>
+                                    {/* Comment List */}
+                                    <div className="space-y-3 max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
+                                        {commentsLoading ? (
+                                            <div className="flex items-center justify-center py-6">
+                                                <Spinner size="sm" />
+                                                <p className="ml-2 text-xs text-gray-400">Loading comments...</p>
                                             </div>
-                                            <p className="text-sm text-gray-700 ml-8">{c.message}</p>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                                        ) : comments.length === 0 ? (
+                                            <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                                                <ChatBubbleLeftIcon className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                                <p className="text-xs text-gray-400">No comments yet</p>
+                                                <p className="text-xs text-gray-300 mt-1">Be the first to comment</p>
+                                            </div>
+                                        ) : (
+                                            comments.map((c) => (
+                                                <div
+                                                    key={c.id}
+                                                    className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                                                >
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="w-6 h-6 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                                                            <span className="text-xs font-medium text-white">
+                                                                {c.userName?.charAt(0).toUpperCase() || "U"}
+                                                            </span>
+                                                        </div>
+                                                        <p className="font-medium text-gray-900 text-xs">
+                                                            {c.userName}
+                                                        </p>
+                                                        <span className="text-[10px] text-gray-400 ml-auto">
+                                                            {new Date(c.createdAt).toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-700 ml-8">{c.message}</p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
 
-                            {/* Input */}
-                            <div className="flex gap-2 items-center">
-                                <input
-                                    value={commentText}
-                                    onChange={(e) => setCommentText(e.target.value)}
-                                    placeholder="Write a comment..."
-                                    className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                                    onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
-                                />
-                                <button
-                                    onClick={handleAddComment}
-                                    disabled={!commentText.trim()}
-                                    className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                        !commentText.trim()
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow active:scale-95"
-                                    }`}
-                                >
-                                    Send
-                                </button>
+                                    {/* Comment Input */}
+                                    <div className="flex gap-2 items-center">
+                                        <input
+                                            value={commentText}
+                                            onChange={(e) => setCommentText(e.target.value)}
+                                            placeholder="Write a comment..."
+                                            className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            onKeyPress={(e) => e.key === "Enter" && handleAddComment()}
+                                        />
+                                        <button
+                                            onClick={handleAddComment}
+                                            disabled={!commentText.trim()}
+                                            className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                                                !commentText.trim()
+                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow active:scale-95"
+                                            }`}
+                                        >
+                                            Send
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Attachments Section */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                            <PaperClipIcon className="w-4 h-4 text-gray-500" />
+                                            Attachments ({attachments.length})
+                                        </h3>
+                                    </div>
+
+                                    {/* Upload Area */}
+                                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                                        <div className="flex gap-2 items-center">
+                                            <input
+                                                type="file"
+                                                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                                                className="block w-full text-sm text-gray-500
+                                                    file:mr-4 file:py-2 file:px-4
+                                                    file:rounded-lg file:border-0
+                                                    file:text-sm file:font-medium
+                                                    file:bg-blue-50 file:text-blue-700
+                                                    hover:file:bg-blue-100
+                                                    cursor-pointer"
+                                            />
+                                            <button
+                                                onClick={handleUpload}
+                                                disabled={!selectedFile}
+                                                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                                                    !selectedFile
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow active:scale-95"
+                                                }`}
+                                            >
+                                                Upload
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Attachments List */}
+                                    <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 pr-2">
+                                        {attachmentsLoading ? (
+                                            <div className="flex items-center justify-center py-6 bg-white rounded-lg border border-gray-200">
+                                                <Spinner size="sm" />
+                                                <p className="ml-2 text-xs text-gray-400">Loading attachments...</p>
+                                            </div>
+                                        ) : attachments.length === 0 ? (
+                                            <div className="text-center py-8 bg-white rounded-lg border-2 border-dashed border-gray-200">
+                                                <PaperClipIcon className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                                <p className="text-xs text-gray-400">No attachments</p>
+                                                <p className="text-xs text-gray-300 mt-1">Upload files to share</p>
+                                            </div>
+                                        ) : (
+                                            attachments.map((a) => (
+                                                <a
+                                                    key={a.id}
+                                                    href={a.fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all group"
+                                                >
+                                                    <span className="text-lg">📎</span>
+                                                    <span className="flex-1 text-sm text-gray-700 group-hover:text-blue-600 truncate">
+                                                        {a.fileName}
+                                                    </span>
+                                                    <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        Download
+                                                    </span>
+                                                </a>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -439,7 +538,7 @@ export const TaskDetailModal = ({
                             <div className="border-t border-gray-100 px-6 py-4 bg-linear-to-r from-gray-50 to-white flex justify-end gap-3">
                                 <button
                                     onClick={handleMoveToInProgress}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-white hover:border-gray-400 transition-all"
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-xs font-medium text-gray-700 hover:bg-white hover:border-gray-400 transition-all active:scale-95"
                                 >
                                     Move to In Progress
                                 </button>

@@ -1,5 +1,5 @@
 import { http } from "../../../core/api/http";
-import type { TaskListItem, TaskDetail, TaskStatus, TaskComment } from "../types/task.types";
+import type { TaskListItem, TaskDetail, TaskStatus, TaskComment, TaskAttachment } from "../types/task.types";
 
 
 export const taskApi = {
@@ -67,6 +67,31 @@ addComment(projectId: string, taskId: string, message: string) {
   return http.post<{ message: string; data: TaskComment }>(
     `/projects/${projectId}/tasks/${taskId}/comments`,
     { message }
+  );
+},
+
+getTaskAttachments(projectId: string, taskId: string) {
+  return http.get<{ data: TaskAttachment[] }>(
+    `/projects/${projectId}/tasks/${taskId}/attachments`
+  );
+},
+
+uploadTaskAttachment(
+  projectId: string,
+  taskId: string,
+  file: File
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return http.post(
+    `/projects/${projectId}/tasks/${taskId}/attachments`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
 }
 }

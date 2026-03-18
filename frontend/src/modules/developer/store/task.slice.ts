@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { DeveloperTaskBoard, DeveloperTaskDetail, TaskComment } from "../types/task.type";
+import type { DeveloperTaskBoard, DeveloperTaskDetail, TaskAttachment, TaskComment } from "../types/task.type";
 import { devTaskApi } from "../services/task.api";
 import { getErrorMessage } from "../../../shared/utiils/getErrorMessage";
 
@@ -10,6 +10,8 @@ interface DeveloperTaskState {
     board: DeveloperTaskBoard | null;
     comments: TaskComment[];
     commentsLoading: boolean;
+    attachments: TaskAttachment[];
+    attachmentsLoading: boolean;
 }
 const initialState: DeveloperTaskState = {
     loading: false,
@@ -18,6 +20,9 @@ const initialState: DeveloperTaskState = {
     board: null,
     comments: [],
     commentsLoading: false,
+
+    attachments: [],
+    attachmentsLoading: false,
 };
 
 export const getDeveloperTasks = createAsyncThunk<
@@ -130,6 +135,41 @@ export const addDeveloperTaskComment = createAsyncThunk<
 );
 
 
+export const uploadTaskAttachment = createAsyncThunk<
+    void,
+    { projectId: string; taskId: string; file: File },
+    { rejectValue: string }
+>(
+    "task/uploadAttachment",
+    async ({ projectId, taskId, file }, { dispatch, rejectWithValue }) => {
+        try {
+            await devTaskApi.uploadTaskAttachment(projectId, taskId, file);
+
+            dispatch(getDevelopersTaskAttachments({ projectId, taskId }));
+        } catch (error) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+export const getDevelopersTaskAttachments = createAsyncThunk<
+    TaskAttachment[],
+    { projectId: string; taskId: string },
+    { rejectValue: string }
+>(
+    "task/getAttachments",
+    async ({ projectId, taskId }, { rejectWithValue }) => {
+        try {
+            const res = await devTaskApi.getTaskAttachments(projectId, taskId);
+            return res.data.data;
+        } catch (error) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+
+
 const developerTaskSlice = createSlice({
     name: 'developerTask',
     initialState,
@@ -181,6 +221,17 @@ const developerTaskSlice = createSlice({
             })
             .addCase(getDeveloperTaskComments.rejected, (state) => {
                 state.commentsLoading = false;
+            })
+
+            .addCase(getDevelopersTaskAttachments.pending, (state) => {
+                state.attachmentsLoading = true;
+            })
+            .addCase(getDevelopersTaskAttachments.fulfilled, (state, action) => {
+                state.attachmentsLoading = false;
+                state.attachments = action.payload;
+            })
+            .addCase(getDevelopersTaskAttachments.rejected, (state) => {
+                state.attachmentsLoading = false;
             })
     }
 })

@@ -9,6 +9,8 @@ import { standupController } from "../../di/standup.di";
 import { chatController } from "../../di/chat.di";
 import { aiController } from "../../di/ai.di";
 import { taskCommentController } from "../../di/taskComment.di";
+import { upload } from "../middleware/upload.middleware";
+import { taskAttachmentController } from "../../di/taskAttachment.di";
 
 
 const router=Router();
@@ -40,6 +42,10 @@ router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,requ
 
 router.post("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.addComment)
 router.get("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.getComments)
+
+router.post("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,upload.single("file"), taskAttachmentController.uploadAttachment);
+router.get("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,taskAttachmentController.getAttachments);
+
 
 //sprint-module
 

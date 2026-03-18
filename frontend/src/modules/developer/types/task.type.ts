@@ -35,3 +35,12 @@ export interface TaskComment {
   message: string;
   createdAt: string;
 }
+
+export interface TaskAttachment {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  uploadedBy: string;
+  uploadedByName?: string;
+  createdAt: string;
+}
