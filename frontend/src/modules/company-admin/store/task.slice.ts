@@ -90,6 +90,7 @@ export const createTask = createAsyncThunk<
             parentId?: string | null;
             assigneeId?: string | null;
             dueDate?: string | null
+            estimatedTime?: number|null;
         }
     },
     { rejectValue: string }
@@ -115,6 +116,7 @@ export const updateTask = createAsyncThunk<
             type?: TaskType
             priority?: TaskPriority
             dueDate?: string | null
+            estimatedTime?:number|null
         }
     },
     { rejectValue: string }

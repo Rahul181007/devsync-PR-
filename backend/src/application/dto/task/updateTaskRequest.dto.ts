@@ -7,5 +7,5 @@ export interface UpdateTaskRequestDTO{
     priority?:TaskPriority;
     assigneeId?:string|null;
     dueDate?:Date|null
-
+    estimatedTime?: number;
 }

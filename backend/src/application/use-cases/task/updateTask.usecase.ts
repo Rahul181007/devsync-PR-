@@ -124,6 +124,9 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
         if (data.description) task.description = data.description.trim();
         if (data.type) task.type = data.type;
         if (data.priority) task.priority = data.priority;
+        if (data.estimatedTime !== undefined) {
+            task.estimatedTime = data.estimatedTime ?? null;
+        }
         if (data.dueDate !== undefined) task.dueDate = data.dueDate ?? null;
 
         task.assigneeId = assigneeId;
@@ -146,6 +149,7 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
             type: updatedTask.type,
             status: updatedTask.status,
             priority: updatedTask.priority,
+            estimatedTime:updatedTask.estimatedTime,
 
             assigneeId: updatedTask.assigneeId,
             reporterId: updatedTask.reporterId,

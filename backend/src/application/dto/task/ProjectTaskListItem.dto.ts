@@ -8,6 +8,7 @@ export interface ProjectTaskListItemDTO {
     parentId: string | null
     status: TaskStatus;
     priority: TaskPriority;
+    estimatedTime: number | null;
     dueDate: Date | null;
     sprintId: string | null
     assignee: {

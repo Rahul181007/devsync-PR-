@@ -38,7 +38,6 @@ export class Task {
 
         public status: TaskStatus,
         public priority: TaskPriority,
-
         public assigneeId: string | null,
         public reporterId: string,
 
@@ -50,5 +49,6 @@ export class Task {
         public updatedAt: Date,
 
         public submission?: TaskSubmission | null,
+        public estimatedTime?: number | null,
     ) { }
 }

@@ -29,8 +29,8 @@ export class TaskRepository implements ITaskRepository {
                     blockers: doc.submission.blockers ?? null,
                     submittedAt: doc.submission.submittedAt,
                 }
-                : null
-
+                : null,
+            doc.estimatedTime ?? null
         )
     }
 
@@ -44,14 +44,15 @@ export class TaskRepository implements ITaskRepository {
             code: task.code,
             title: task.title,
             description: task.description,
-            type: task.type ?? "Task",
+            type: task.type ?? "TASK",
             status: task.status,
             priority: task.priority,
 
             assigneeId: task.assigneeId,
             reporterId: task.reporterId,
 
-            dueDate: task.dueDate ?? null
+            dueDate: task.dueDate ?? null,
+            estimatedTime: task.estimatedTime ?? null,
 
         })
         return this._toDomain(doc)
@@ -97,6 +98,7 @@ export class TaskRepository implements ITaskRepository {
                 dueDate: task.dueDate ?? null,
 
                 submission: task.submission ?? null,
+                estimatedTime: task.estimatedTime ?? null,
             },
             { new: true }
         );

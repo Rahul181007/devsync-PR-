@@ -11,10 +11,11 @@ export interface ITaskDocument extends Document {
 
     type: "EPIC" | "STORY" | "TASK" | "BUG";
 
-    
+
 
     status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED";
     priority: "LOW" | "MEDIUM" | "HIGH";
+    estimatedTime?: number | null;
 
     assigneeId?: mongoose.Types.ObjectId | null;
     reporterId: mongoose.Types.ObjectId;
@@ -91,6 +92,12 @@ const TaskSchema = new Schema<ITaskDocument>(
             enum: ["LOW", "MEDIUM", "HIGH"],
             required: true,
         },
+
+        estimatedTime: {
+            type: Number,
+            default: null
+        },
+
 
         assigneeId: {
             type: Schema.Types.ObjectId,

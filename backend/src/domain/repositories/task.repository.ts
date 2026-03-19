@@ -12,6 +12,7 @@ export interface CreateTaskInput {
 
     status: TaskStatus;
     priority: TaskPriority;
+    estimatedTime?: number | null;
 
     reporterId: string;
     assigneeId?: string | null;

@@ -11,4 +11,5 @@ export const createTaskSchema = z.object({
 
   assigneeId: z.string().trim().optional().nullable(),
   dueDate: z.coerce.date().optional().nullable(),
+  estimatedTime: z.number().min(0).optional(),
 });

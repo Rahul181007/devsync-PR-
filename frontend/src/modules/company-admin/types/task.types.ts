@@ -21,6 +21,7 @@ export interface TaskListItem {
   parentId: string | null
   status: TaskStatus;
   priority: TaskPriority;
+  estimatedTime: number | null;
   dueDate: string | null;
   assignee: TaskAssignee | null;
   sprintId: string | null;
@@ -50,6 +51,7 @@ export interface TaskDetail {
 
   status: TaskStatus;
   priority: TaskPriority;
+  estimatedTime: number | null;
 
   sprint: TaskSprint | null;
 

@@ -168,6 +168,7 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
 
             status: "BACKLOG",
             priority: data.priority,
+            estimatedTime:data.estimatedTime??null,
 
             assigneeId,
             reporterId: user.id,
@@ -189,6 +190,7 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             type: createdTask.type,
             status: createdTask.status,
             priority: createdTask.priority,
+            estimatedTime:createdTask.estimatedTime,
 
             assigneeId: createdTask.assigneeId,
             reporterId: createdTask.reporterId,
