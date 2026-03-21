@@ -8,5 +8,6 @@ export interface DeveloperTaskDetailDTO {
   parentId: string | null
   status: TaskStatus;
   priority: TaskPriority;
+  estimatedTime: number | null;
   dueDate: Date | null;
 }

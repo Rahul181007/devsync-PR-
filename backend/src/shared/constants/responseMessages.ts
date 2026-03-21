@@ -186,6 +186,12 @@ export const RESPONSE_MESSAGES = {
     INVOICE:{
       NOT_FOUND:"Invoice not found"
     },
+    WORKLOG:{
+        INVALID_TIME_SPENT:"Worlog invalid time spend",
+        INVALID_DATE:"worklog invalid date",
+        NOT_FOUND:"Worklog not found",
+        
+    },
 
 
     COMMON: {

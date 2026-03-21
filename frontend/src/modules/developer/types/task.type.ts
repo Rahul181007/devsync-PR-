@@ -22,6 +22,7 @@ export interface DeveloperTaskDetail {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+  estimatedTime: number | null;
    type: "EPIC" | "STORY" | "TASK" | "BUG"
   dueDate: string | null;
 }

@@ -17,6 +17,8 @@ import aiReducer from "../modules/ai/store/ai.slice";
 import notificationReducer from "../modules/notification/store/notification.slice"
 import planReducer from "../modules/super-admin/store/plan.slice";
 import billingReducer from "../modules/company-admin/store/companyBilling.slice"
+import devWorklogReducer from "../modules/developer/store/worklog.slice"
+import adminWorklogReducer from "../modules/company-admin/store/worklog.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -35,7 +37,9 @@ const appReducer = combineReducers({
   ai:aiReducer,
   notification:notificationReducer,
   plans:planReducer,
-  companyBiiling:billingReducer
+  companyBiiling:billingReducer,
+  devWorklog:devWorklogReducer,
+  adminWorklog:adminWorklogReducer
 });
 
 /* ================= RootState ================= */

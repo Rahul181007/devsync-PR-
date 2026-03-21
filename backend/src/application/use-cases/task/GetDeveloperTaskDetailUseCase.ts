@@ -56,6 +56,7 @@ export class GetDeveloperTaskDetailUseCase implements IGetDeveloperTaskDetailUse
             parentId: task.parentId,
             status: task.status,
             priority: task.priority,
+            estimatedTime:task.estimatedTime??null,
             dueDate: task.dueDate
         }
     }
