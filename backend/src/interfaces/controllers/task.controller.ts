@@ -13,6 +13,8 @@ import { ISubmitTaskUseCase } from "../../application/interface/task/ISubmitTask
 import { IGetDeveloperTaskDetailUseCase } from "../../application/interface/task/IGetDeveloperTaskDetailUseCase";
 import { IPlanSprintTasksUseCase } from "../../application/interface/task/IPlanSprintTasksUseCase";
 import { planSprintSchema } from "../../application/validators/task/planSprint.validator";
+import { IupdateTaskUseCase } from "../../application/interface/task/IUpdateTask.usecase";
+import { updateTaskSchema } from "../../application/validators/task/updateTask.validator";
 
 
 
@@ -30,6 +32,7 @@ export class TaskController {
         private _submitTaskUseCase: ISubmitTaskUseCase,
         private _getDeveloperTaskDetailUseCase: IGetDeveloperTaskDetailUseCase,
         private _planSprintTasksUseCase: IPlanSprintTasksUseCase,
+        private _updateTaskUseCase: IupdateTaskUseCase
     ) { }
 
     createTask = async (req: Request, res: Response) => {
@@ -42,7 +45,11 @@ export class TaskController {
                     message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
                 })
             }
+
             const parsed = createTaskSchema.parse(req.body);
+            console.log("raw body:", req.body);
+
+            console.log("parsed body:", parsed);
 
             const task = await this._createTaskUseCase.execute(userId, companyId, projectId, parsed);
 
@@ -121,6 +128,38 @@ export class TaskController {
             return handleError(error, res)
         }
     }
+
+    updateTask = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            const { projectId, taskId } = req.params;
+
+            if (!userId || !companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
+                });
+            }
+
+            const parsed = updateTaskSchema.parse(req.body);
+
+            const task = await this._updateTaskUseCase.execute(
+                userId,
+                companyId,
+                projectId,
+                taskId,
+                parsed
+            );
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                data: task,
+            });
+
+        } catch (error: unknown) {
+            return handleError(error, res);
+        }
+    };
 
     getDeveloperTask = async (req: Request, res: Response) => {
         try {

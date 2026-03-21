@@ -1,4 +1,4 @@
-import { TaskPriority, TaskStatus } from "../../../domain/entities/task.entity";
+import { TaskPriority, TaskStatus, TaskType } from "../../../domain/entities/task.entity";
 
 export interface TaskDetailResponsDTO {
     id: string;
@@ -7,7 +7,11 @@ export interface TaskDetailResponsDTO {
     title: string;
     description: string;
     status: TaskStatus;
+
+    type:TaskType
+     parentId: string | null 
     priority: TaskPriority;
+    estimatedTime:number|null
 
     sprint: {
         id: string;

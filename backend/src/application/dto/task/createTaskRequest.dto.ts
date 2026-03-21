@@ -1,12 +1,16 @@
-import { TaskPriority } from "../../../domain/entities/task.entity";
+import { TaskPriority, TaskType } from "../../../domain/entities/task.entity";
 
 
-export interface CreateTaskRequestDTO{
-    title:string;
-    description:string;
+export interface CreateTaskRequestDTO {
+    title: string;
+    description: string;
 
-    priority:TaskPriority;
+    type?: TaskType;
 
-    assigneeId?:string|null;
-    dueDate?:Date|null
+    priority: TaskPriority;
+    parentId?: string | null;
+
+    assigneeId?: string | null;
+    dueDate?: Date | null
+    estimatedTime?: number;
 }

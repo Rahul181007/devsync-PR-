@@ -231,6 +231,7 @@ const DeveloperTaskBoard = ({ projectId }: DeveloperTaskBoardProps) => {
       {selectedTask && (
         <DeveloperTaskDetailModal
           task={selectedTask}
+          projectId={projectId}
           onClose={() => {
             setSelectedTaskId(null);
             dispatch(clearSelectedTask());

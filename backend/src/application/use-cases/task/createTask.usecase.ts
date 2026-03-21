@@ -120,6 +120,37 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             assigneeId = assignee.id
         }
 
+        let parentId: string | null = null;
+
+        if (data.parentId) {
+            const parentTask = await this._taskRepo.findById(data.parentId);
+
+            if (!parentTask || parentTask.projectId !== projectId) {
+                throw new AppError(
+                    RESPONSE_MESSAGES.TASK.NOT_FOUND,
+                    HttpStatus.NOT_FOUND
+                );
+            }
+
+            // Hierarchy validation
+            if (data.type === "EPIC") {
+                throw new AppError("Epic cannot have parent", HttpStatus.BAD_REQUEST);
+            }
+
+            if (data.type === "STORY" && parentTask.type !== "EPIC") {
+                throw new AppError("Story must belong to Epic", HttpStatus.BAD_REQUEST);
+            }
+
+            if (data.type === "TASK" && parentTask.type !== "STORY") {
+                throw new AppError("Task must belong to Story", HttpStatus.BAD_REQUEST);
+            }
+
+            if (data.type === "BUG" && parentTask.type !== "TASK") {
+                throw new AppError("Bug must belong to Task", HttpStatus.BAD_REQUEST);
+            }
+
+            parentId = parentTask.id;
+        }
 
 
 
@@ -127,13 +158,17 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             companyId,
             projectId,
             sprintId: null,
+            parentId: parentId,
 
             code: this._generateTaskCode(),
             title: data.title.trim(),
             description: data.description.trim(),
 
+            type: data.type ?? "TASK",
+
             status: "BACKLOG",
             priority: data.priority,
+            estimatedTime:data.estimatedTime??null,
 
             assigneeId,
             reporterId: user.id,
@@ -146,13 +181,16 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             companyId: createdTask.companyId,
             projectId: createdTask.projectId,
             sprintId: createdTask.sprintId,
+            parentId: createdTask.parentId,
 
             code: createdTask.code,
             title: createdTask.title,
             description: createdTask.description,
 
+            type: createdTask.type,
             status: createdTask.status,
             priority: createdTask.priority,
+            estimatedTime:createdTask.estimatedTime,
 
             assigneeId: createdTask.assigneeId,
             reporterId: createdTask.reporterId,

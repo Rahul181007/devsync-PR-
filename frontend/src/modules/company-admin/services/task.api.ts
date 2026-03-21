@@ -1,12 +1,14 @@
 import { http } from "../../../core/api/http";
-import type { TaskListItem, TaskDetail, TaskStatus } from "../types/task.types";
+import type { TaskListItem, TaskDetail, TaskStatus, TaskComment, TaskAttachment } from "../types/task.types";
 
 
 export const taskApi = {
     createTask(projectId: string, data: {
         title: string;
         description: string;
+        type: "EPIC" | "STORY" | "TASK" | "BUG";
         priority: "LOW" | "MEDIUM" | "HIGH";
+        parentId?: string | null;
         assigneeId?: string | null;
         dueDate?: string | null
     }) {
@@ -25,16 +27,71 @@ export const taskApi = {
             `/company/projects/${projectId}/tasks/${taskId}`
         );
     },
-      updateTaskStatus(
-    projectId: string,
-    taskId: string,
-    status: TaskStatus
-  ) {
-    return http.patch<{ message: string; data: TaskDetail }>(
-      `/company/projects/${projectId}/tasks/${taskId}/status`,
-      { status }
-    );
-  }
+    updateTaskStatus(
+        projectId: string,
+        taskId: string,
+        status: TaskStatus
+    ) {
+        return http.patch<{ message: string; data: TaskDetail }>(
+            `/company/projects/${projectId}/tasks/${taskId}/status`,
+            { status }
+        );
+    },
+
+    updateTask(
+        projectId: string,
+        taskId: string,
+        data: {
+            title?: string
+            description?: string
+            type?: "EPIC" | "STORY" | "TASK" | "BUG"
+            priority?: "LOW" | "MEDIUM" | "HIGH"
+            assigneeId?: string | null
+            dueDate?: string | null
+        }
+    ) {
+        return http.patch<{ message: string; data: TaskDetail }>(
+            `/company/projects/${projectId}/tasks/${taskId}`,
+            data
+        );
+    },
 
 
+getTaskComment(projectId: string, taskId: string) {
+  return http.get<{ message: string; data: TaskComment[] }>(
+    `/projects/${projectId}/tasks/${taskId}/comments`
+  );
+},
+
+addComment(projectId: string, taskId: string, message: string) {
+  return http.post<{ message: string; data: TaskComment }>(
+    `/projects/${projectId}/tasks/${taskId}/comments`,
+    { message }
+  );
+},
+
+getTaskAttachments(projectId: string, taskId: string) {
+  return http.get<{ data: TaskAttachment[] }>(
+    `/projects/${projectId}/tasks/${taskId}/attachments`
+  );
+},
+
+uploadTaskAttachment(
+  projectId: string,
+  taskId: string,
+  file: File
+) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return http.post(
+    `/projects/${projectId}/tasks/${taskId}/attachments`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+}
 }

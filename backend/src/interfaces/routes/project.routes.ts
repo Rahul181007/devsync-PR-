@@ -8,6 +8,10 @@ import { sprintController } from "../../di/sprint.di";
 import { standupController } from "../../di/standup.di";
 import { chatController } from "../../di/chat.di";
 import { aiController } from "../../di/ai.di";
+import { taskCommentController } from "../../di/taskComment.di";
+import { upload } from "../middleware/upload.middleware";
+import { taskAttachmentController } from "../../di/taskAttachment.di";
+import { worklogController } from "../../di/worklog.di";
 
 
 const router=Router();
@@ -35,6 +39,13 @@ router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessT
 
 
 router.patch("/company/projects/:projectId/sprints/plan",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.planSprintTasks);
+router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),taskController.updateTask);
+
+router.post("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.addComment)
+router.get("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,taskCommentController.getComments)
+
+router.post("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,upload.single("file"), taskAttachmentController.uploadAttachment);
+router.get("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,taskAttachmentController.getAttachments);
 
 
 //sprint-module
@@ -63,5 +74,17 @@ router.get('/projects/:projectId/chat',verifyAccessToken,chatController.getProje
 
 // ai module
 router.get("/projects/:projectId/ai-summary",verifyAccessToken,aiController.getProjectAISummary);
+
+
+// worklog module
+
+router.post("/developer/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,requireRole(Role.DEVELOPER),worklogController.createWorklog);
+router.patch("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,requireRole(Role.DEVELOPER),worklogController.updateWorklog);
+
+router.delete("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,requireRole(Role.DEVELOPER),worklogController.deleteWorklog);
+router.get("/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,worklogController.getByTask);
+
+// Admin → project timesheet
+router.get("/company/projects/:projectId/worklogs",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),worklogController.getByProject);
 
 export default router;

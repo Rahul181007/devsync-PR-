@@ -4,6 +4,7 @@ interface Props {
   task: {
     id: string;
     title: string;
+    type: "EPIC" | "STORY" | "TASK" | "BUG";
     priority: string;
     dueDate?: string | null;
   };
@@ -28,6 +29,27 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
   );
 };
 
+const TypeBadge = ({ type }: { type: string }) => {
+  const typeConfig: Record<string, { color: string; bgColor: string }> = {
+    EPIC: { color: "text-purple-700", bgColor: "bg-purple-50" },
+    STORY: { color: "text-blue-700", bgColor: "bg-blue-50" },
+    TASK: { color: "text-gray-700", bgColor: "bg-gray-100" },
+    BUG: { color: "text-red-700", bgColor: "bg-red-50" },
+  };
+
+  const config = typeConfig[type] || typeConfig.TASK;
+
+  return (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${config.bgColor} ${config.color}`}>
+      {type}
+    </span>
+  );
+};
+
+
+
+
+
 const DraggableTaskCard = ({ task, column, onClick }: Props) => {
   const isLocked = column === "SUBMITTED" || column === "COMPLETED";
 
@@ -39,9 +61,9 @@ const DraggableTaskCard = ({ task, column, onClick }: Props) => {
 
   const style = transform
     ? {
-        transform: `translate(${transform.x}px, ${transform.y}px)`,
-        zIndex: 100,
-      }
+      transform: `translate(${transform.x}px, ${transform.y}px)`,
+      zIndex: 100,
+    }
     : undefined;
 
   // Column color mapping for left border
@@ -53,14 +75,16 @@ const DraggableTaskCard = ({ task, column, onClick }: Props) => {
     COMPLETED: "border-l-green-400",
   };
 
+
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`
         relative bg-white rounded-lg shadow-sm border-2 transition-all
-        ${isLocked 
-          ? "opacity-70 border-gray-200" 
+        ${isLocked
+          ? "opacity-70 border-gray-200"
           : "hover:shadow-md cursor-default border-gray-200"
         }
         ${isDragging ? "opacity-50 ring-2 ring-blue-500 ring-offset-2 shadow-xl" : ""}
@@ -88,15 +112,17 @@ const DraggableTaskCard = ({ task, column, onClick }: Props) => {
         onClick={onClick}
         className="cursor-pointer p-3 hover:bg-gray-50 transition-colors rounded-b-lg"
       >
-        {/* Title */}
-        <p className="text-sm font-medium text-gray-800 mb-2 line-clamp-2">
-          {task.title}
-        </p>
+        <div className="flex items-center gap-2 mb-2">
+          <TypeBadge type={task.type} />
+          <p className="text-sm font-medium text-gray-800 line-clamp-2">
+            {task.title}
+          </p>
+        </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between">
           <PriorityBadge priority={task.priority} />
-          
+
           {/* Due Date */}
           {task.dueDate ? (
             <div className="flex items-center gap-1 text-xs text-gray-400">

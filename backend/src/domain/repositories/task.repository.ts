@@ -1,15 +1,18 @@
-import { Task, TaskPriority, TaskStatus } from "../entities/task.entity";
+import { Task, TaskPriority, TaskStatus, TaskType } from "../entities/task.entity";
 export interface CreateTaskInput {
     companyId: string;
     projectId: string;
     sprintId: string | null;
+    parentId?: string | null 
     code: string;
 
     title: string;
     description: string;
+    type?:TaskType
 
     status: TaskStatus;
     priority: TaskPriority;
+    estimatedTime?: number | null;
 
     reporterId: string;
     assigneeId?: string | null;
@@ -24,6 +27,8 @@ export interface ITaskRepository {
     findByProjectId(projectId: string): Promise<Task[]>;
 
     findBacklogTasks(projectId: string): Promise<Task[]>;
+
+    findByParentId(parentId: string): Promise<Task[]>
 
     update(task: Task): Promise<Task>;
 

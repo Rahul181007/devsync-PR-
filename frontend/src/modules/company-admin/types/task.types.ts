@@ -1,20 +1,28 @@
-export type TaskStatus="BACKLOG"| "TODO"| "IN_PROGRESS"| "SUBMITTED"| "COMPLETED";
-export type TaskPriority="LOW"|"MEDIUM"|"HIGH"
+export type TaskStatus = "BACKLOG" | "TODO" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH"
+export type TaskType =
+  | "EPIC"
+  | "STORY"
+  | "TASK"
+  | "BUG";
 
-
-export interface TaskAssignee{
-    id:string;
-    name:string;
-    avatar:string|null
+export interface TaskAssignee {
+  id: string;
+  name: string;
+  avatar: string | null
 }
 
 export interface TaskListItem {
   id: string;
-  code :string;
+  code: string;
   title: string;
+
+  type: TaskType;
+  parentId: string | null
   status: TaskStatus;
   priority: TaskPriority;
-  dueDate: string | null; 
+  estimatedTime: number | null;
+  dueDate: string | null;
   assignee: TaskAssignee | null;
   sprintId: string | null;
 }
@@ -38,8 +46,12 @@ export interface TaskDetail {
   title: string;
   description: string;
 
+  type: TaskType;
+  parentId: string | null
+
   status: TaskStatus;
   priority: TaskPriority;
+  estimatedTime: number | null;
 
   sprint: TaskSprint | null;
 
@@ -51,4 +63,23 @@ export interface TaskDetail {
 
   createdAt: string;
   updatedAt: string;
+}
+
+
+export interface TaskComment {
+  id: string;
+  taskId: string;
+  userId: string;
+  userName: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface TaskAttachment {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  uploadedBy: string;
+  uploadedByName?: string;
+  createdAt: string;
 }
