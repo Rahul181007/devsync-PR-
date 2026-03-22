@@ -5,12 +5,7 @@ interface Props {
   senderName?: string;
 }
 
-const ChatMessage = ({
-  message,
-  isOwn,
-  createdAt,
-  senderName,
-}: Props) => {
+const ChatMessage = ({ message, isOwn, createdAt, senderName }: Props) => {
   const formattedTime = createdAt
     ? new Date(createdAt).toLocaleTimeString([], {
         hour: "2-digit",
@@ -66,20 +61,23 @@ const ChatMessage = ({
               isOwn ? "text-blue-200" : "text-gray-400"
             }`}
           >
-            <svg 
-              className={`w-3 h-3 ${isOwn ? "text-blue-200" : "text-gray-400"}`} 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className={`w-3 h-3 ${isOwn ? "text-blue-200" : "text-gray-400"}`}
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
+
             {formattedTime}
+
+            {isOwn && <span className="ml-1">✓</span>}
           </div>
         )}
       </div>
