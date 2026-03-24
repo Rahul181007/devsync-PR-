@@ -80,7 +80,8 @@ export const RESPONSE_MESSAGES = {
         NOT_FOUND: 'User not found',
         DEVELOPER_BLOCKED: 'Developer is blocked',
         DEVELOPER_UNBLOCKED: 'Developer is unblocked',
-        NOT_BELONG_TO_COMPANY: "User does not belong to this company"
+        NOT_BELONG_TO_COMPANY: "User does not belong to this company",
+        PROFILE_UPDATED:"User profile is updated"
     },
     PROJECT: {
         ALREADY_EXISTS: 'Project already exist',

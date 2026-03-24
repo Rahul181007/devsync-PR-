@@ -142,5 +142,27 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         return doc ? this._toDomain(doc) : null;
     }
 
+async updateProfile(
+  userId: string,
+  data: { name?: string; avatarUrl?: string | null }
+): Promise<{ name: string; avatarUrl: string | null }> {
+  
+  const updated = await this.model.findByIdAndUpdate(
+    userId,
+    {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+    },
+    { new: true }
+  );
 
+  if (!updated) {
+    throw new Error("SuperAdmin not found");
+  }
+
+  return {
+    name: updated.name,
+    avatarUrl: updated.avatarUrl ?? null,
+  };
+}
 }

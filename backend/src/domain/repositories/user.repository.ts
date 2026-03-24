@@ -59,5 +59,8 @@ findByIds(userIds: string[]): Promise<User[]>;
 
 findCompanyAdminByCompany(companyId: string): Promise<User | null>;
 
-
+updateProfile(
+  userId: string,
+  data: { name?: string; avatarUrl?: string | null }
+): Promise<{ name: string; avatarUrl: string | null }>;
 }

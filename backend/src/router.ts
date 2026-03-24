@@ -10,7 +10,8 @@ import notificationRoutes from './interfaces/routes/notification.routes';
 import planRoutes from './interfaces/routes/plan.routes'
 import subscriptionRoutes from "./interfaces/routes/subscription.routes";
 import paymentRoutes from "./interfaces/routes/payment.routes";
-import invoicesRoutes from "./interfaces/routes/invoice.routes"
+import invoicesRoutes from "./interfaces/routes/invoice.routes";
+import settingRoutes from "./interfaces/routes/settings.routes";
 const router =Router();
 
 router.use("/auth", authRoutes);
@@ -25,5 +26,6 @@ router.use("/",notificationRoutes);
 router.use("/",planRoutes)
 router.use("/",subscriptionRoutes);
 router.use("/",paymentRoutes)
-router.use("/",invoicesRoutes)
+router.use("/",invoicesRoutes);
+router.use("/setting",settingRoutes)
 export default router
