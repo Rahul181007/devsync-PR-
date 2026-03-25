@@ -45,6 +45,8 @@ import InvoicePage from "../modules/company-admin/pages/billing/InvoicePage";
 import PaymentMethodPage from "../modules/company-admin/pages/billing/PaymentMethodPage";
 import PaymentFailedPage from "../modules/company-admin/pages/billing/PaymentFailedPage";
 import PaymentSuccessPage from "../modules/company-admin/pages/billing/PaymentSuccessPage";
+import SettingsPage from "../modules/settings/pages/SettingsPage";
+
 
 
 const AppRouter = () => {
@@ -84,8 +86,11 @@ const AppRouter = () => {
             <Route path="companies" element={<CompaniesPage />} />
             <Route path="companies/:companyId" element={<CompanyDetailPage />} />
             <Route path="plans" element={<PlanListPage/>} />
+            <Route path='settings'element={<SettingsPage/>} />
           </Route>
         </Route>
+
+
 
         {/* ================= COMPANY ADMIN ================= */}
         <Route path={ROUTES.COMPANY_ADMIN.COMPANY_ONBOARDING} element={<OnboardingRoute />}>
@@ -126,8 +131,12 @@ const AppRouter = () => {
             <Route path="billing/payment-method" element={<PaymentMethodPage />} />
             <Route path="billing/failed" element={<PaymentFailedPage />} />
             <Route path="billing/success" element={<PaymentSuccessPage />} />
+            <Route path='settings'element={<SettingsPage/>} />
           </Route>
         </Route>
+
+
+
 
         {/* ================= DEVELOPER ================= */}
         <Route
@@ -143,6 +152,7 @@ const AppRouter = () => {
             <Route path="dashboard" element={<DevDashboard />} />
             <Route path="projects" element={<DevProjectListingPage />}/>
             <Route path="projects/:projectId" element={<DevProjectDetailPage/>}/>
+            <Route path='settings'element={<SettingsPage/>} />
           </Route>
         </Route>
         {/* ================= Error================= */}

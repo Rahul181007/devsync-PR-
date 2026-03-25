@@ -27,5 +27,5 @@ router.use("/",planRoutes)
 router.use("/",subscriptionRoutes);
 router.use("/",paymentRoutes)
 router.use("/",invoicesRoutes);
-router.use("/setting",settingRoutes)
+router.use("/settings",settingRoutes)
 export default router

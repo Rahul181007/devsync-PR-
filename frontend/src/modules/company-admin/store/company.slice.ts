@@ -13,7 +13,7 @@ export interface Company{
     id:string;
     name:string;
     status:CompanyStatus;
-    loginUrl?:string|null;
+    logoUrl?:string|null;
     themeColor?:string|null
 }
 

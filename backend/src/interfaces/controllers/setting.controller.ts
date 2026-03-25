@@ -124,7 +124,7 @@ export class SettingsController {
             }
 
             const file = req.file;
-
+            console.log(file)
             if (!file) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     message: "File is required",

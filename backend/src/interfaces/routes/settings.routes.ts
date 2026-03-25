@@ -14,7 +14,7 @@ router.get("/profile",verifyAccessToken,settingsController.getProfile);
 router.patch("/profile",verifyAccessToken,settingsController.updateProfile);
 router.patch("/profile/avatar",verifyAccessToken,upload.single("file"),settingsController.updateAvatar)
 router.patch(
-  "/settings/company/logo",
+  "/company/logo",
   verifyAccessToken,
   upload.single("file"),
   requireRole(Role.COMPANY_ADMIN),

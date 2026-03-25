@@ -40,6 +40,7 @@ const SuperAdminLoginPage=()=>{
           onSubmit={(data) => dispatch(superAdminLogin(data))}
         />
       }
+      
     />
   );
 
