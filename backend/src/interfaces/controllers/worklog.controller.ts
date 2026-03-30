@@ -9,6 +9,7 @@ import { handleError } from "../../shared/utils/handleError";
 import { updateWorklogSchema } from "../../application/validators/worklog/updateWorklog.validator";
 import { IUpdateWorklogUseCase } from "../../application/interface/worklog/IUpdateWorklogUseCase";
 import { IDeleteWorklogUseCase } from "../../application/interface/worklog/IDeleteWorklogUseCase";
+import { IGetTimesheetByProjectUseCase } from "../../application/interface/worklog/IGetTimesheetByProjectUseCase";
 
 export class WorklogController {
   constructor(
@@ -17,7 +18,8 @@ export class WorklogController {
     private _getWorklogsByProjectUseCase: IGetWorklogsByProjectUseCase,
     private _updateWorklogUseCase: IUpdateWorklogUseCase,
     private _deleteWorklogUseCase: IDeleteWorklogUseCase,
-  ) {}
+    private _getTimesheetByProjectUseCase: IGetTimesheetByProjectUseCase,
+  ) { }
 
   createWorklog = async (req: Request, res: Response) => {
     try {
@@ -160,4 +162,40 @@ export class WorklogController {
       success: true,
     });
   };
+
+
+  getTimesheetByProject = async (req: Request, res: Response) => {
+    try {
+      const userId = req.user?.id;
+      const companyId = req.user?.companyId;
+      if (!userId || !companyId) {
+        return res.status(HttpStatus.FORBIDDEN).json({
+          message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
+        });
+      }
+
+      const {projectId}=req.params;
+      const {startDate,endDate,userId:filterUserId}=req.query
+
+      const data=await this._getTimesheetByProjectUseCase.execute(
+        userId,
+        companyId,
+        projectId,
+        {
+            startDate: startDate ? new Date(startDate as string) : undefined,
+        endDate: endDate ? new Date(endDate as string) : undefined,
+        userId: filterUserId as string | undefined,
+
+        }
+      )
+
+      return res.status(HttpStatus.OK).json({
+        success:true,
+        data
+      })
+
+    } catch (error:unknown) {
+       return handleError(error,res)
+    }
+  }
 }

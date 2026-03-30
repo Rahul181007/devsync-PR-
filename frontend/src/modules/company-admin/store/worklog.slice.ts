@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type {
   AdminWorklogItem,
+  ProjectTimesheetItem,
   ProjectWorklogItem,
 } from "../types/wroklog.types";
 import { adminWorklogApi } from "../services/worklog.api";
@@ -11,6 +12,7 @@ interface AdminWorklogState {
   projectWorklogs: ProjectWorklogItem[];
   loading: boolean;
   error: string | null;
+  projectTimesheet: ProjectTimesheetItem[]
 }
 
 const initialState: AdminWorklogState = {
@@ -18,6 +20,7 @@ const initialState: AdminWorklogState = {
   projectWorklogs: [],
   loading: false,
   error: null,
+  projectTimesheet: []
 };
 
 export const getAdminTaskWorklogs = createAsyncThunk<
@@ -49,6 +52,23 @@ export const getProjectWorklogs = createAsyncThunk<
   }
 });
 
+
+export const getProjectTimesheet = createAsyncThunk<
+  ProjectTimesheetItem[],
+  string,
+  { rejectValue: string }
+>(
+  "adminWorklog/getProjectTimesheet",
+  async (projectId, { rejectWithValue }) => {
+    try {
+      const res = await adminWorklogApi.getProjectTimesheet(projectId);
+      return res.data.data
+    } catch (error: unknown) {
+      return rejectWithValue(getErrorMessage(error))
+    }
+  }
+)
+
 const adminWorklogSlice = createSlice({
   name: "adminWorklog",
   initialState,
@@ -77,7 +97,19 @@ const adminWorklogSlice = createSlice({
       .addCase(getProjectWorklogs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-      });
+      })
+
+      .addCase(getProjectTimesheet.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProjectTimesheet.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projectTimesheet = action.payload;
+      })
+      .addCase(getProjectTimesheet.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
   },
 });
 

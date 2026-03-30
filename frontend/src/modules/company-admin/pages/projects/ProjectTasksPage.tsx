@@ -389,17 +389,17 @@ const ProjectTasksPage = ({ projectId }: ProjectTasksPageProps) => {
     };
 
     // Calculate task statistics
-    const taskStats = {
-        total: tasks.length,
-        todo: tasks.filter(t => t.status.toLowerCase() === 'todo').length,
-        inProgress: tasks.filter(t => t.status.toLowerCase() === 'in-progress').length,
-        review: tasks.filter(t => t.status.toLowerCase() === 'review').length,
-        done: tasks.filter(t => t.status.toLowerCase() === 'done').length,
-        overdue: tasks.filter(t => {
-            if (!t.dueDate) return false;
-            return new Date(t.dueDate) < new Date();
-        }).length
-    };
+const taskStats = {
+    total: tasks.length,
+    todo: tasks.filter(t => t.status.toLowerCase() === "todo").length,
+    inProgress: tasks.filter(t => t.status.toLowerCase() === "in_progress").length,
+    review: tasks.filter(t => t.status.toLowerCase() === "submitted").length,
+    done: tasks.filter(t => t.status.toLowerCase() === "completed").length,
+    overdue: tasks.filter(t => {
+        if (!t.dueDate) return false;
+        return new Date(t.dueDate) < new Date();
+    }).length
+};
 
     return (
         <>

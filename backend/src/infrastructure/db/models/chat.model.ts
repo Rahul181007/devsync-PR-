@@ -6,7 +6,12 @@ export interface IChatMessageDocument extends Document {
 
     senderName: string;
 
+
     message: string;
+    attachmentUrl: string | null;
+    attachmentType: "image" | "file" | null;
+    fileName: string | null;
+
     replyToMessageId?: mongoose.Types.ObjectId | null;
 
     createdAt: Date;
@@ -35,8 +40,24 @@ const ChatMessageSchema = new Schema<IChatMessageDocument>(
         },
         message: {
             type: String,
-            required: true,
             trim: true,
+            default: "",
+        },
+
+        attachmentUrl: {
+            type: String,
+            default: null,
+        },
+
+        attachmentType: {
+            type: String,
+            enum: ["image", "file"],
+            default: null,
+        },
+
+        fileName: {
+            type: String,
+            default: null,
         },
         replyToMessageId: {
             type: Schema.Types.ObjectId,

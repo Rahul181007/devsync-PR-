@@ -3,9 +3,13 @@ interface Props {
   isOwn: boolean;
   createdAt?: string;
   senderName?: string;
+
+  attachmentUrl?: string | null;
+  attachmentType?: "image" | "file" | null;
+  fileName?: string | null;
 }
 
-const ChatMessage = ({ message, isOwn, createdAt, senderName }: Props) => {
+const ChatMessage = ({ message, isOwn, createdAt, senderName ,attachmentUrl,attachmentType,fileName}: Props) => {
   const formattedTime = createdAt
     ? new Date(createdAt).toLocaleTimeString([], {
         hour: "2-digit",
@@ -50,9 +54,37 @@ const ChatMessage = ({ message, isOwn, createdAt, senderName }: Props) => {
         )}
 
         {/* Message with better typography */}
-        <p className="text-sm wrap-break-word whitespace-pre-wrap leading-relaxed">
-          {message}
-        </p>
+{message && (
+  <p className="text-sm wrap-break-word whitespace-pre-wrap leading-relaxed">
+    {message}
+  </p>
+)}
+
+
+{attachmentUrl && (
+  <div className="mt-2">
+    {attachmentType === "image" ? (
+      <img
+        src={attachmentUrl}
+        alt="attachment"
+        className="rounded-lg max-w-[220px] object-cover border border-gray-200"
+      />
+    ) : (
+      <a
+        href={attachmentUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${
+          isOwn
+            ? "bg-blue-600 border-blue-500 text-white"
+            : "bg-gray-50 border-gray-200 text-gray-700"
+        }`}
+      >
+        📄 {fileName || "File"}
+      </a>
+    )}
+  </div>
+)}
 
         {/* Time with improved positioning and styling */}
         {createdAt && (

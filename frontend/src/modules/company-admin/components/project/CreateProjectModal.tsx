@@ -2,83 +2,97 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { fetchDevelopers } from "../../store/developer.slice";
 import { createProject } from "../../store/project.slice";
- import { toast } from "react-hot-toast";
-interface CreateProjectModalProps{
-    open:boolean;
-    onClose:()=>void;
-    onCreated?:()=> void;
+import { toast } from "react-hot-toast";
+import { projectWithMembersSchema } from "../../validator/cretaeProject.validator";
+import { validateZod } from "../../../../shared/utiils/validateZod";
+import InputField from "../../../../shared/components/InputField";
+interface CreateProjectModalProps {
+  open: boolean;
+  onClose: () => void;
+  onCreated?: () => void;
 }
 
-const CreateProjectModal=({
-    open,
-    onClose,
-    onCreated
-}:CreateProjectModalProps)=>{
-    const dispatch=useAppDispatch();
-    const {loading}=useAppSelector(state=>state.project)
-    const {items:developers}=useAppSelector(state=>state.companyAdminDevelopers)
+const CreateProjectModal = ({
+  open,
+  onClose,
+  onCreated
+}: CreateProjectModalProps) => {
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector(state => state.project)
+  const { items: developers } = useAppSelector(state => state.companyAdminDevelopers)
 
-    const [name,setName]=useState("");
-    const [description,setDescription]=useState('')
-    const [selectMembers,setSelectMembers]=useState<string[]>([])
-    const [startDate,setStartDate]=useState('');
-    const [endDate,setEndDate]=useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState('')
+  const [selectMembers, setSelectMembers] = useState<string[]>([])
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-    useEffect(()=>{
-        if(open){
-            dispatch(fetchDevelopers({page:1,limit:100}))
-        }
-    },[dispatch,open])
+  useEffect(() => {
+    if (open) {
+      dispatch(fetchDevelopers({ page: 1, limit: 100 }))
+    }
+  }, [dispatch, open])
 
-    if(!open) return null;
-    const toggleMember=(id:string)=>{
-        setSelectMembers((prev)=>
-            prev.includes(id)
-            ?prev.filter((m)=>m!==id)
-            :[...prev,id]
-        )
+  if (!open) return null;
+  const toggleMember = (id: string) => {
+    setSelectMembers((prev) =>
+      prev.includes(id)
+        ? prev.filter((m) => m !== id)
+        : [...prev, id]
+    )
+  }
+
+
+  const handleSubmit = async () => {
+    const validation = validateZod(projectWithMembersSchema, {
+      name,
+      description,
+      startDate,
+      endDate,
+      members: selectMembers.map((id) => ({ userId: id })),
+    });
+
+    if (!validation.success) {
+      setErrors(validation.errors);
+      return;
+    }
+
+    setErrors({});
+
+    const result = await dispatch(
+      createProject({
+        name,
+        description: description || undefined,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        members: selectMembers.map((id) => ({
+          userId: id
+        }))
+      })
+    );
+
+
+    if (createProject.fulfilled.match(result)) {
+      toast.success("Project created successfully");
+
+      onCreated?.();
+      onClose();
+
+      // Reset form
+      setName("");
+      setDescription("");
+      setStartDate("");
+      setEndDate("");
+      setSelectMembers([]);
     }
 
 
-const handleSubmit = async () => {
-  if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
-    toast.error("End date cannot be before start date");
-    return;
-  }
-
-  const result = await dispatch(
-    createProject({
-      name,
-      description: description || undefined,
-      startDate: startDate || undefined,
-      endDate: endDate || undefined,
-      members: selectMembers.map((id) => ({
-        userId: id
-      }))
-    })
-  );
-
-
-  if (createProject.fulfilled.match(result)) {
-    toast.success("Project created successfully");
-
-    onCreated?.();
-    onClose();
-
-    // Reset form
-    setName("");
-    setDescription("");
-    setStartDate("");
-    setEndDate("");
-    setSelectMembers([]);
-  }
-
-
-  if (createProject.rejected.match(result)) {
-    toast.error(result.payload as string || "Failed to create project");
-  }
-};
-     return (
+    if (createProject.rejected.match(result)) {
+      toast.error(result.payload as string || "Failed to create project");
+    }
+  };
+  return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
         {/* Header */}
@@ -108,12 +122,19 @@ const handleSubmit = async () => {
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Project Name <span className="text-red-500">*</span>
             </label>
-            <input
+
+
+            <InputField
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400"
+              onChange={(val) => {
+                setName(val);
+                setErrors((prev) => ({ ...prev, name: "" }));
+              }}
+              error={errors.name}
               placeholder="e.g., Website Redesign"
             />
+
+
           </div>
 
           {/* Description */}
@@ -143,6 +164,9 @@ const handleSubmit = async () => {
                   onChange={(e) => setStartDate(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all scheme-light"
                 />
+                {errors.startDate && (
+                  <p className="text-xs text-red-500 mt-1">{errors.startDate}</p>
+                )}
                 <svg className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -160,6 +184,9 @@ const handleSubmit = async () => {
                   onChange={(e) => setEndDate(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all scheme-light"
                 />
+                {errors.endDate && (
+                  <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>
+                )}
                 <svg className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>

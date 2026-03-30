@@ -1,4 +1,4 @@
-import { ChatMessage } from "../../../domain/entities/chat .entity";
+import { ChatMessage } from "../../../domain/entities/chat.entity";
 import { SendMessageRequestDTO } from "../../dto/chat/sendMessageRequest.dto";
 
 export interface ISendMessageUseCase{

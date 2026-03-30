@@ -71,7 +71,7 @@ router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken
 
 //chat module
 router.get('/projects/:projectId/chat',verifyAccessToken,chatController.getProjectMessage);
-
+router.post("/projects/:projectId/chat",verifyAccessToken,upload.single("file"),chatController.sendMessage)
 // ai module
 router.get("/projects/:projectId/ai-summary",verifyAccessToken,aiController.getProjectAISummary);
 
@@ -86,5 +86,5 @@ router.get("/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,workl
 
 // Admin → project timesheet
 router.get("/company/projects/:projectId/worklogs",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),worklogController.getByProject);
-
+router.get("/company/projects/:projectId/timesheet",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),worklogController.getTimesheetByProject)
 export default router;

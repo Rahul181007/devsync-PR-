@@ -43,20 +43,20 @@ export const DevProjectDetailPage = () => {
     }
   }, [dispatch, projectId]);
 
- if (loading)
-  return (
-    <div className="p-6 flex justify-center">
-      <Spinner size="lg" />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="p-6 flex justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
   if (error) return <p className="p-6 text-red-500">{error}</p>;
   if (!selectedProject) return null;
 
   const project = selectedProject;
-const isOverdue =
-  project.endDate &&
-  new Date(project.endDate) < new Date() &&
-  project.status !== "COMPLETED";
+  const isOverdue =
+    project.endDate &&
+    new Date(project.endDate) < new Date() &&
+    project.status !== "COMPLETED";
 
   return (
     <div className="p-6 space-y-6">
@@ -70,13 +70,13 @@ const isOverdue =
             {project.description || "—"}
           </p>
 
-                {isOverdue && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600 font-medium">
-            ⚠ This project has exceeded its planned end date.
-          </p>
-        </div>
-      )}
+          {isOverdue && (
+            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm text-red-600 font-medium">
+                ⚠ This project has exceeded its planned end date.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-4 gap-6 mt-6 text-sm">
@@ -90,14 +90,18 @@ const isOverdue =
           <div>
             <p className="text-gray-500">Start Date</p>
             <p className="font-medium text-gray-900">
-              {project.startDate ?? "—"}
+              {project.startDate
+                ? new Date(project.startDate).toISOString().split("T")[0]
+                : "—"}
             </p>
           </div>
 
           <div>
             <p className="text-gray-500">End Date</p>
             <p className="font-medium text-gray-900">
-              {project.endDate ?? "—"}
+              {project.endDate
+                ? new Date(project.endDate).toISOString().split("T")[0]
+                : "—"}
             </p>
           </div>
 
@@ -114,11 +118,10 @@ const isOverdue =
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`pb-2 ${
-              activeTab === tab.key
+            className={`pb-2 ${activeTab === tab.key
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "text-gray-500"
-            }`}
+              }`}
           >
             {tab.label}
           </button>
@@ -126,25 +129,25 @@ const isOverdue =
       </div>
 
       {/* ================= Tab Content ================= */}
- {/* ================= Tab Content ================= */}
+      {/* ================= Tab Content ================= */}
 
-{activeTab === "TASKS" && projectId && (
-  <DeveloperTaskBoard projectId={projectId} />
-)}
+      {activeTab === "TASKS" && projectId && (
+        <DeveloperTaskBoard projectId={projectId} />
+      )}
 
-{activeTab === "CHAT" && projectId && (
-  <ProjectChat projectId={projectId} />
-)}
+      {activeTab === "CHAT" && projectId && (
+        <ProjectChat projectId={projectId} />
+      )}
 
-{activeTab === "STANDUP" && projectId && (
-  <DevStandupPanel projectId={projectId} />
-)}
+      {activeTab === "STANDUP" && projectId && (
+        <DevStandupPanel projectId={projectId} />
+      )}
 
 
 
-{activeTab === "AI" && projectId && (
-  <ProjectAISummary projectId={projectId} />
-)}
+      {activeTab === "AI" && projectId && (
+        <ProjectAISummary projectId={projectId} />
+      )}
 
     </div>
   );

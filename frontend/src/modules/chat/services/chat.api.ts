@@ -10,5 +10,8 @@ export const chatApi={
         }
     ){
         return http.get<ChatMessagesResponse>(`/projects/${projectId}/chat`,{params})
+    },
+    sendMessage(projectId:string,formData:FormData){
+        return http.post(`/projects/${projectId}/chat`,formData)
     }
 }

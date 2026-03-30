@@ -34,6 +34,22 @@ ChatMessage[],
    } 
 )
 
+export const sendMessage=createAsyncThunk<
+ChatMessage,
+{projectId:string;formData:FormData},
+{rejectValue:string}
+>(
+    "chat/sendMessage",
+    async({projectId,formData},{rejectWithValue})=>{
+        try {
+            const res=await chatApi.sendMessage(projectId,formData);
+            return res.data.data;
+        } catch (error:unknown) {
+            return rejectWithValue(getErrorMessage(error))
+        }
+    }
+)
+
 const chatSlice=createSlice({
     name:"chat",
     initialState,

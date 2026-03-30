@@ -24,12 +24,12 @@ app.use(compression());
 
 app.use('/api',router);
 
-// 🔥 Create HTTP server
+
 const httpServer = createServer(app);
 
-// 🔥 Initialize socket
-initSocketServer(httpServer);
 
+const io=initSocketServer(httpServer);
+app.set("io",io)
 connectDB().then(() => {
   httpServer.listen(env.PORT, () => {
     console.log(`Server running on port ${env.PORT}`);

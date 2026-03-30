@@ -5,13 +5,13 @@ import { IUpdateProfileAvatarUseCase } from "../application/interface/auth/IUpda
 import { IUpdateProfileUseCase } from "../application/interface/auth/IUpdateProfileUseCase";
 import { IVerifyOtpForAuthenticatedUserUseCase } from "../application/interface/auth/IVerifyOtpForAuthenticatedUserUseCase";
 import { IUpdateCompanyLogoFromSettingsUseCase } from "../application/interface/company/IUpdateCompanyLogoFromSettingsUseCase";
-import { GetProfileUseCase } from "../application/use-cases/auth/GetProfile.usecase";
+import { GetProfileUseCase } from "../application/use-cases/auth/getProfile.usecase";
 import { ResetPasswordForAuthenticatedUserUseCase } from "../application/use-cases/auth/ResetPasswordForAuthenticatedUser.usecase";
 import { SendOtpForAuthenticatedUserUseCase } from "../application/use-cases/auth/SendOtpForAuthenticatedUserUseCase";
 import { UpdateProfileUseCase } from "../application/use-cases/auth/updateProfile.usecase";
 import { UpdateProfileAvatarUseCase } from "../application/use-cases/auth/updateProfileAvatar.usecase";
 import { VerifyOtpForAuthenticatedUserUseCase } from "../application/use-cases/auth/VerifyOtpForAuthenticated.usecase";
-import { UpdateCompanyLogoFromSettingsUseCase } from "../application/use-cases/company/UpdateCompanyLogoFromSettings.usecase";
+import { UpdateCompanyLogoFromSettingsUseCase } from "../application/use-cases/company/updateCompanyLogoFromSettings.usecase";
 import { CompanyRepository } from "../infrastructure/repositories/company.repository";
 import { PasswordResetRepository } from "../infrastructure/repositories/passwordReset.repository";
 import { SuperAdminRepository } from "../infrastructure/repositories/superAdmin.repository";
