@@ -17,3 +17,8 @@ export interface ProjectWorklogItem {
   description: string;
   date: string;
 }
+
+export interface ProjectTimesheetItem {
+  date: string;
+  totalHours: number;
+}

@@ -3,6 +3,9 @@ import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { updateProject } from "../../store/project.slice";
+import InputField from "../../../../shared/components/InputField";
+import { validateZod } from "../../../../shared/utiils/validateZod";
+import { projectSchema } from "../../validator/cretaeProject.validator";
 
 interface EditProjectModalProps {
   isOpen: boolean;
@@ -22,7 +25,7 @@ export const EditProjectModal = ({
 
   const toDateInputValue = (date?: string | null) => {
     if (!date) return "";
-    return date.split("T")[0]; // YYYY-MM-DD
+    return date.split("T")[0]; 
   };
 
   const [form, setForm] = useState(() => ({
@@ -48,25 +51,22 @@ export const EditProjectModal = ({
     }
   };
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!form.name.trim()) {
-      newErrors.name = "Project name is required";
-    }
-    
-    if (form.startDate && form.endDate) {
-      if (new Date(form.startDate) > new Date(form.endDate)) {
-        newErrors.endDate = "End date must be after start date";
-      }
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+
 
   const handleSubmit = () => {
-    if (!validateForm()) return;
+const validation = validateZod(projectSchema, {
+    name: form.name,
+    description: form.description,
+    startDate: form.startDate,
+    endDate: form.endDate,
+  });
+
+  if (!validation.success) {
+    setErrors(validation.errors);
+    return;
+  }
+
+  setErrors({});
     
     dispatch(
       updateProject({
@@ -147,20 +147,16 @@ export const EditProjectModal = ({
                     Project Name
                     <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors ${
-                      errors.name 
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-500/20" 
-                        : "border-gray-300 focus:border-blue-500"
-                    }`}
-                    placeholder="Enter project name"
-                  />
-                  {errors.name && (
-                    <p className="text-xs text-red-500 mt-1">{errors.name}</p>
-                  )}
+<InputField
+
+  value={form.name}
+  onChange={(val) => {
+    setForm((prev) => ({ ...prev, name: val }));
+    setErrors((prev) => ({ ...prev, name: "" }));
+  }}
+  error={errors.name}
+  placeholder="Enter project name"
+/>
                 </div>
 
                 {/* Description */}

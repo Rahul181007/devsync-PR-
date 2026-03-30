@@ -5,6 +5,9 @@ import { createFirstProject } from "../../store/project.slice";
 import { ROUTES } from "../../../../shared/constants/routes";
 import OnboardingLayout from "../../components/OnboardingLayout";
 import { CalendarDaysIcon, DocumentTextIcon, HashtagIcon } from "@heroicons/react/24/outline";
+import { validateZod } from "../../../../shared/utiils/validateZod";
+import { projectSchema } from "../../validator/cretaeProject.validator";
+import InputField from "../../../../shared/components/InputField";
 
 const CreateProjectPage = () => {
   const dispatch = useAppDispatch();
@@ -15,9 +18,22 @@ const CreateProjectPage = () => {
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async () => {
-    if (!name.trim()) return;
+    const validation = validateZod(projectSchema, {
+      name,
+      description,
+      startDate,
+      endDate,
+    });
+
+    if (!validation.success) {
+      setErrors(validation.errors);
+      return;
+    }
+
+    setErrors({});
 
     const res = await dispatch(
       createFirstProject({
@@ -36,8 +52,8 @@ const CreateProjectPage = () => {
   };
 
   return (
-    <OnboardingLayout 
-      step={3} 
+    <OnboardingLayout
+      step={3}
       title="Create your first project"
       subtitle="Kickstart your journey with your first project"
     >
@@ -58,11 +74,14 @@ const CreateProjectPage = () => {
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <HashtagIcon className="h-5 w-5 text-gray-400" />
             </div>
-            <input
-              className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="e.g., Website Redesign"
+            <InputField
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(val) => {
+                setName(val);
+                setErrors((prev) => ({ ...prev, name: "" }));
+              }}
+              error={errors.name}
+              placeholder="e.g., Website Redesign"
             />
           </div>
         </div>

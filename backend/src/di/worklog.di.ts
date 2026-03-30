@@ -1,10 +1,12 @@
 import { ICreateWorklogUseCase } from "../application/interface/worklog/ICreateWorklogUseCase";
 import { IDeleteWorklogUseCase } from "../application/interface/worklog/IDeleteWorklogUseCase";
+import { IGetTimesheetByProjectUseCase } from "../application/interface/worklog/IGetTimesheetByProjectUseCase";
 import { IGetWorklogsByProjectUseCase } from "../application/interface/worklog/IGetWorklogsByProjectUseCase";
 import { IGetWorklogsByTaskUseCase1 } from "../application/interface/worklog/IGetWorklogsByTaskUseCase";
 import { IUpdateWorklogUseCase } from "../application/interface/worklog/IUpdateWorklogUseCase";
 import { CreateWorklogUseCase } from "../application/use-cases/worklog/createWorklog.usecase";
 import { DeleteWorklogUseCase } from "../application/use-cases/worklog/deleteWorklogUseCase";
+import { GetTimesheetByProjectUseCase } from "../application/use-cases/worklog/getTimesheetByProject.usecase";
 import { GetWorklogsByProjectUseCase } from "../application/use-cases/worklog/getWorklogByProject.usecase";
 import { GetWorklogsByTaskUseCase } from "../application/use-cases/worklog/getWorklogbyTask.usecasde";
 import { UpdateWorklogUseCase } from "../application/use-cases/worklog/updateWorklogUseCase";
@@ -54,10 +56,18 @@ const deleteWorklogUsecase:IDeleteWorklogUseCase=new DeleteWorklogUseCase(
     taskRepository
 )
 
+const getTimesheetByProjectUsecase:IGetTimesheetByProjectUseCase=new GetTimesheetByProjectUseCase(
+  worklogRepository,
+  projectMemberRepository,
+  projectRepository,
+  userRepository
+)
+
 export const worklogController = new WorklogController(
   createWorklogUseCase,
   getWorklogsByTaskUseCase,
   getWorklogsByProjectUseCase,
   updateWorklogUseCase,
-  deleteWorklogUsecase
+  deleteWorklogUsecase,
+  getTimesheetByProjectUsecase
 );

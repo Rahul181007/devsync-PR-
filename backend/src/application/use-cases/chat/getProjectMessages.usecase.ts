@@ -49,7 +49,7 @@ export class GetProjectMessageUseCase implements IGetProjectMessageUseCase {
         )
         const enriched = await Promise.all(
             messages.map(async (msg) => {
-                
+
 
                 return {
                     id: msg.id,
@@ -57,6 +57,10 @@ export class GetProjectMessageUseCase implements IGetProjectMessageUseCase {
                     senderId: msg.senderId,
                     senderName: msg.senderName,
                     message: msg.message,
+
+                    attachmentUrl: msg.attachmentUrl,
+                    attachmentType: msg.attachmentType,
+                    fileName: msg.fileName,
                     replyToMessageId: msg.replyToMessageId,
                     createdAt: msg.createdAt,
                 };

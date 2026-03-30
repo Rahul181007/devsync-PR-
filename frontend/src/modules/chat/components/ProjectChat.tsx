@@ -4,6 +4,7 @@ import {
   addMessage,
   clearChat,
   getProjectMessage,
+  sendMessage,
 } from "../store/chat.slice";
 import { connectSocket } from "../../../shared/socket";
 import ChatMessages from "./ChatMessage";
@@ -77,14 +78,22 @@ const ProjectChat = ({ projectId }: Props) => {
     }
   }, [messages, isUserScrolling]);
 
-  const handleSend = (message: string) => {
-    if (!socketRef.current) return;
-
-    socketRef.current.emit("send_message", {
+const handleSend = (message: string, file?: File | null) => {
+  if (!file) {
+    // ✅ TEXT → socket
+    socketRef.current?.emit("send_message", {
       projectId,
       message,
     });
-  };
+  } else {
+    // ✅ FILE → REST (thunk)
+    const formData = new FormData();
+    formData.append("message", message);
+    formData.append("file", file);
+
+    dispatch(sendMessage({ projectId, formData }));
+  }
+};
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/80 flex flex-col h-[560px] shadow-lg shadow-gray-100/50 overflow-hidden transition-all duration-300 hover:shadow-xl">
@@ -188,6 +197,8 @@ const ProjectChat = ({ projectId }: Props) => {
             <ChatMessages
               key={msg.id}
               message={msg.message}
+                attachmentUrl={msg.attachmentUrl}
+  attachmentType={msg.attachmentType}
               isOwn={msg.senderId === user?.id}
               createdAt={msg.createdAt}
               senderName={msg.senderName}

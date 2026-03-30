@@ -3,6 +3,7 @@ import { IChatRepository } from "../../../domain/repositories/chat.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { IFileStorage } from "../../../domain/service/fileStorage.service";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
@@ -14,7 +15,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
         private _chatRepo: IChatRepository,
         private _userRepo: IUserRepository,
         private _projectRepo: IProjectRepository,
-        private _projectMemberRepe: IProjectMemberRepository
+        private _projectMemberRepe: IProjectMemberRepository,
+        private _fileStorage: IFileStorage
     ) { }
 
     async execute(userId: string, companyId: string, projectId: string, data: SendMessageRequestDTO): Promise<ChatMessage> {
@@ -62,11 +64,35 @@ export class SendMessageUseCase implements ISendMessageUseCase {
                 )
             }
         }
+
+        let attachmentUrl: string | null = null;
+        let attachmentType: "image" | "file" | null = null;
+        let fileName: string | null = null;
+
+        if (data.file) {
+            const uploadedUrl = await this._fileStorage.upload({
+                file: data.file,
+                folder: `chat/${projectId}`,
+                contentType: data.mimeType ?? "application/octet-stream",
+            });
+
+            attachmentUrl = uploadedUrl;
+            fileName = data.fileName ?? null;
+
+            if (data.mimeType?.startsWith("image")) {
+                attachmentType = "image";
+            } else {
+                attachmentType = "file";
+            }
+        }
         const created = await this._chatRepo.create({
             projectId,
             senderId: userId,
-            senderName:user.name,
+            senderName: user.name,
             message: data.message,
+            attachmentUrl,
+            attachmentType,
+            fileName,
             replyToMessageId: data.replyToMessageId ?? null
         })
 

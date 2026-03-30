@@ -3,58 +3,76 @@ import { findMessageOptions, IChatRepository } from "../../domain/repositories/c
 import { ChatMessageModel, IChatMessageDocument } from "../db/models/chat.model";
 import { ChatMessage } from "../../domain/entities/chat .entity";
 
-type ChatQuery={
-    projectId:mongoose.Types.ObjectId;
-    createdAt?:{
-        $lt?:Date
+type ChatQuery = {
+    projectId: mongoose.Types.ObjectId;
+    createdAt?: {
+        $lt?: Date
     }
 }
 
-export class ChatRepository implements IChatRepository{
+type CreateChatMessageData = {
+    projectId: string;
+    senderId: string;
+    senderName: string;
+    message: string;
 
-    private _toDomain(doc:IChatMessageDocument):ChatMessage{
+    attachmentUrl?: string | null;
+    attachmentType?: "image" | "file" | null;
+    fileName?: string | null;
+
+    replyToMessageId?: string | null;
+};
+
+export class ChatRepository implements IChatRepository {
+
+    private _toDomain(doc: IChatMessageDocument): ChatMessage {
         return new ChatMessage(
             doc._id.toString(),
             doc.projectId.toString(),
             doc.senderId.toString(),
             doc.senderName,
             doc.message,
-            doc.replyToMessageId?doc.replyToMessageId.toString():null,
+            doc.attachmentUrl ?? null,
+            doc.attachmentType as "image" | "file" | null,
+            doc.fileName ?? null,
+            doc.replyToMessageId ? doc.replyToMessageId.toString() : null,
             doc.createdAt,
             doc.updatedAt
         )
     }
 
-async create(data: Partial<ChatMessage>): Promise<ChatMessage> {
+    async create(data: CreateChatMessageData): Promise<ChatMessage> {
+        const doc = await ChatMessageModel.create({
+            projectId: data.projectId,
+            senderId: data.senderId,
+            senderName: data.senderName,
+            message: data.message,
+            attachmentUrl: data.attachmentUrl ?? null,
+            attachmentType: data.attachmentType ?? null,
+            fileName: data.fileName ?? null,
+            replyToMessageId: data.replyToMessageId ?? undefined,
+        });
 
-    const doc = await ChatMessageModel.create({
-        projectId: data.projectId,
-        senderId: data.senderId,
-        senderName:data.senderName,
-        message: data.message,
-        replyToMessageId: data.replyToMessageId ?? undefined
-    });
-
- return this._toDomain(doc);
-}
+        return this._toDomain(doc);
+    }
 
     async findByProjectId(projectId: string, options: findMessageOptions): Promise<ChatMessage[]> {
-        const query:ChatQuery={
-            projectId:new mongoose.Types.ObjectId(projectId)
+        const query: ChatQuery = {
+            projectId: new mongoose.Types.ObjectId(projectId)
         }
-        if(options.cursor){
-            const cursorDoc=await ChatMessageModel.findById(options.cursor);
-            if(cursorDoc){
-                query.createdAt={$lt:cursorDoc.createdAt}
+        if (options.cursor) {
+            const cursorDoc = await ChatMessageModel.findById(options.cursor);
+            if (cursorDoc) {
+                query.createdAt = { $lt: cursorDoc.createdAt }
             }
         }
-        const docs=await ChatMessageModel.find(query).sort({createdAt:-1}).limit(options.limit).lean()
+        const docs = await ChatMessageModel.find(query).sort({ createdAt: -1 }).limit(options.limit).lean()
 
-        return docs.reverse().map((doc)=>this._toDomain(doc as IChatMessageDocument))
+        return docs.reverse().map((doc) => this._toDomain(doc as IChatMessageDocument))
     }
 
     async findById(id: string): Promise<ChatMessage | null> {
-        const doc=await ChatMessageModel.findById(id);
-        return doc?this._toDomain(doc):null
+        const doc = await ChatMessageModel.findById(id);
+        return doc ? this._toDomain(doc) : null
     }
 }

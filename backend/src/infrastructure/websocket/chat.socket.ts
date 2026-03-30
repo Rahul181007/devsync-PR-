@@ -15,7 +15,7 @@ interface JoinProjectPayload {
 export const registerChatSocket = (
   io: Server,
   sendMessageUseCase: ISendMessageUseCase,
-  joinProjectChatUseCase:IJoinProjectChatUseCase
+  joinProjectChatUseCase: IJoinProjectChatUseCase
 ): void => {
   io.on("connection", (socket: Socket) => {
     console.log("✅ Socket connected:", socket.id);
@@ -24,55 +24,55 @@ export const registerChatSocket = (
       console.log("📡 EVENT RECEIVED:", event, args);
     });
 
-socket.on(
-  "join_project",
-  async ({ projectId }: JoinProjectPayload) => {
-    try {
-      const user = socket.data.user;
+    socket.on(
+      "join_project",
+      async ({ projectId }: JoinProjectPayload) => {
+        try {
+          const user = socket.data.user;
 
-      if (!user) {
-        return socket.emit("chat_error", {
-          message: "Unauthorized",
-        });
+          if (!user) {
+            return socket.emit("chat_error", {
+              message: "Unauthorized",
+            });
+          }
+
+          if (!projectId) {
+            return socket.emit("chat_error", {
+              message: "ProjectId required",
+            });
+          }
+
+          await joinProjectChatUseCase.execute(
+            user.id,
+            user.companyId,
+            projectId
+          );
+
+
+          socket.join(projectId);
+
+          socket.emit("joined_project", { projectId });
+
+          console.log(
+            "JOINED ROOM:",
+            projectId,
+            "Rooms:",
+            Array.from(socket.rooms)
+          );
+
+        } catch (err: unknown) {
+          console.log("Join project error:", err);
+
+          let message = "Failed to join project";
+
+          if (err instanceof Error) {
+            message = err.message;
+          }
+
+          socket.emit("chat_error", { message });
+        }
       }
-
-      if (!projectId) {
-        return socket.emit("chat_error", {
-          message: "ProjectId required",
-        });
-      }
-
-      await joinProjectChatUseCase.execute(
-        user.id,
-        user.companyId,
-        projectId
-      );
-
-
-      socket.join(projectId);
-
-      socket.emit("joined_project", { projectId });
-
-      console.log(
-        "JOINED ROOM:",
-        projectId,
-        "Rooms:",
-        Array.from(socket.rooms)
-      );
-
-} catch (err: unknown) {
-  console.log("Join project error:", err);
-
-  let message = "Failed to join project";
-
-  if (err instanceof Error) {
-    message = err.message;
-  }
-
-  socket.emit("chat_error", { message });
-}
-  }
-);
+    );
 
     /* ================= SEND MESSAGE ================= */
     socket.on(
@@ -110,6 +110,10 @@ socket.on(
             senderId: createdMessage.senderId,
             senderName: createdMessage.senderName,
             message: createdMessage.message,
+            attachmentUrl: createdMessage.attachmentUrl,
+            attachmentType: createdMessage.attachmentType,
+            fileName: createdMessage.fileName,
+
             replyToMessageId: createdMessage.replyToMessageId,
             createdAt: createdMessage.createdAt,
           };
