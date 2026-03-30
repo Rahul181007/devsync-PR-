@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 import { findMessageOptions, IChatRepository } from "../../domain/repositories/chat.repository";
 import { ChatMessageModel, IChatMessageDocument } from "../db/models/chat.model";
-import { ChatMessage } from "../../domain/entities/chat .entity";
+import { ChatMessage } from "../../domain/entities/chat.entity";
 
 type ChatQuery = {
     projectId: mongoose.Types.ObjectId;

@@ -1,4 +1,4 @@
-import { ChatMessage } from "../entities/chat .entity";
+import { ChatMessage } from "../entities/chat.entity";
 
 export interface findMessageOptions{
     limit:number;

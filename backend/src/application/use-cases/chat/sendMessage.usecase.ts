@@ -1,4 +1,4 @@
-import { ChatMessage } from "../../../domain/entities/chat .entity";
+import { ChatMessage } from "../../../domain/entities/chat.entity";
 import { IChatRepository } from "../../../domain/repositories/chat.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
