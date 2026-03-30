@@ -35,6 +35,12 @@ export const http = axios.create({
     "Content-Type": "application/json"
   }
 });
+http.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"]; 
+  }
+  return config;
+});
 
 let isRefreshing = false;
 let failedQueue: {

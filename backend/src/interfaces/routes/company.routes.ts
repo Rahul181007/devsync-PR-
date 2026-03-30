@@ -18,7 +18,7 @@ router.patch('/superadmin/companies/:id/unsuspend',verifyAccessToken,requireRole
 //company- create workspace -onboarding 1
 // we have to use Onboarding middle ware with verify access token for routes other than onboarding in company
 router.post('/company/workspace',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),companyController.createWorkspace)
-router.get('/company/me',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),companyController.getMyCompany)
+router.get('/company/me',verifyAccessToken,companyController.getMyCompany)
 router.patch('/company/branding',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),upload.single('logo'),companyController.updateBranding)
 router.post('/company/reapply',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),companyController.reapplyCompany)
 export default router

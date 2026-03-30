@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../../store/hook";
 import { logout } from "../../auth/auth.slice";
+import { Building2, CreditCard, LayoutDashboard, LogOut, Settings } from "lucide-react";
 
 const Sidebar = () => {
     const dispatch=useAppDispatch();
@@ -15,44 +16,73 @@ const Sidebar = () => {
       <h2 className="text-xl font-bold mb-8">DevSync</h2>
 
       <nav className="space-y-2">
-        <NavLink
-          to="/super-admin/dashboard"
-          className={({ isActive }) =>
-            `block px-3 py-2 rounded ${
-              isActive ? "bg-slate-700" : "hover:bg-slate-800"
-            }`
-          }
-        >
-          Dashboard
-        </NavLink>
+         <NavLink
+      to="/super-admin/dashboard"
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-md transition ${
+          isActive
+            ? "bg-slate-700"
+            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        }`
+      }
+    >
+      <LayoutDashboard size={18} />
+      Dashboard
+    </NavLink>
 
-        <NavLink
-          to="/super-admin/companies"
-          className={({ isActive }) =>
-            `block px-3 py-2 rounded ${
-              isActive ? "bg-slate-700" : "hover:bg-slate-800"
-            }`
-          }
-        >
-          Companies
-        </NavLink>
+    {/* Companies */}
+    <NavLink
+      to="/super-admin/companies"
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-md transition ${
+          isActive
+            ? "bg-slate-700"
+            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        }`
+      }
+    >
+      <Building2 size={18} />
+      Companies
+    </NavLink>
 
-                <NavLink
-          to="/super-admin/plans"
-          className={({ isActive }) =>
-            `block px-3 py-2 rounded ${
-              isActive ? "bg-slate-700" : "hover:bg-slate-800"
-            }`
-          }
-        >
-          Plans
-        </NavLink>
-        <button
-          onClick={handleLogout}
-          className="w-full text-left px-3 py-2 rounded hover:bg-slate-800 text-red-400"
-        >
-          Logout
-        </button>
+    {/* Plans */}
+    <NavLink
+      to="/super-admin/plans"
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-md transition ${
+          isActive
+            ? "bg-slate-700"
+            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        }`
+      }
+    >
+      <CreditCard size={18} />
+      Plans
+    </NavLink>
+
+    {/* Settings */}
+    <NavLink
+      to="/super-admin/settings"
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2 rounded-md transition ${
+          isActive
+            ? "bg-slate-700"
+            : "text-slate-300 hover:bg-slate-800 hover:text-white"
+        }`
+      }
+    >
+      <Settings size={18} />
+      Settings
+    </NavLink>
+
+        
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-3 px-3 py-2 rounded-md text-red-400 hover:bg-slate-800"
+      >
+        <LogOut size={18} />
+        Logout
+      </button>
 
       </nav>
     </aside>

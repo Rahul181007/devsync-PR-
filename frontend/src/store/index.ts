@@ -18,7 +18,8 @@ import notificationReducer from "../modules/notification/store/notification.slic
 import planReducer from "../modules/super-admin/store/plan.slice";
 import billingReducer from "../modules/company-admin/store/companyBilling.slice"
 import devWorklogReducer from "../modules/developer/store/worklog.slice"
-import adminWorklogReducer from "../modules/company-admin/store/worklog.slice"
+import adminWorklogReducer from "../modules/company-admin/store/worklog.slice";
+import settingReducer from "../modules/settings/store/setting.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -39,7 +40,8 @@ const appReducer = combineReducers({
   plans:planReducer,
   companyBiiling:billingReducer,
   devWorklog:devWorklogReducer,
-  adminWorklog:adminWorklogReducer
+  adminWorklog:adminWorklogReducer,
+  setting:settingReducer
 });
 
 /* ================= RootState ================= */
