@@ -20,6 +20,7 @@ import billingReducer from "../modules/company-admin/store/companyBilling.slice"
 import devWorklogReducer from "../modules/developer/store/worklog.slice"
 import adminWorklogReducer from "../modules/company-admin/store/worklog.slice";
 import settingReducer from "../modules/settings/store/setting.slice"
+import transactionReducer from "../modules/super-admin/store/transaction.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -41,7 +42,8 @@ const appReducer = combineReducers({
   companyBiiling:billingReducer,
   devWorklog:devWorklogReducer,
   adminWorklog:adminWorklogReducer,
-  setting:settingReducer
+  setting:settingReducer,
+  transaction:transactionReducer
 });
 
 /* ================= RootState ================= */
