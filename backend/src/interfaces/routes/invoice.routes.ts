@@ -13,4 +13,6 @@ router.get(
   invoiceController.downloadInvoice
 );
 
+router.get("/superadmin/invoices/:invoiceId/download", verifyAccessToken,requireRole(Role.SUPER_ADMIN),invoiceController.downloadInvoiceForSuperAdmin)
+
 export default router;

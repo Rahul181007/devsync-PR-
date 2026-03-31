@@ -46,6 +46,7 @@ import PaymentMethodPage from "../modules/company-admin/pages/billing/PaymentMet
 import PaymentFailedPage from "../modules/company-admin/pages/billing/PaymentFailedPage";
 import PaymentSuccessPage from "../modules/company-admin/pages/billing/PaymentSuccessPage";
 import SettingsPage from "../modules/settings/pages/SettingsPage";
+import TransactionListPage from "../modules/super-admin/pages/transactions/TransactionListPage";
 
 
 
@@ -87,6 +88,7 @@ const AppRouter = () => {
             <Route path="companies/:companyId" element={<CompanyDetailPage />} />
             <Route path="plans" element={<PlanListPage/>} />
             <Route path='settings'element={<SettingsPage/>} />
+            <Route path='transactions'element={<TransactionListPage/>} />
           </Route>
         </Route>
 
