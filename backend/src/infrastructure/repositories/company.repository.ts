@@ -21,8 +21,8 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
             companyDoc.ownerAdminId?.toString() ?? undefined,
             companyDoc.domain ?? undefined,
             companyDoc.approvedBy?.toString() ?? undefined,
-            companyDoc.rejectionReason??undefined,
-            companyDoc.reviewedAt??undefined,
+            companyDoc.rejectionReason ?? undefined,
+            companyDoc.reviewedAt ?? undefined,
             companyDoc.logoUrl ?? undefined,
             companyDoc.themeColor ?? undefined,
             companyDoc.currentPlanId?.toString() ?? undefined,
@@ -117,18 +117,58 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
     }
 
     async save(company: Company): Promise<void> {
-        await this.updateById(company.id,{
-            status:company.status,
-            approvedBy:company.approvedBy??null,
-            rejectionReason:company.rejectionReason??null,
-            reviewedAt:company.reviewedAt??null
+        await this.updateById(company.id, {
+            status: company.status,
+            approvedBy: company.approvedBy ?? null,
+            rejectionReason: company.rejectionReason ?? null,
+            reviewedAt: company.reviewedAt ?? null
         })
     }
 
     async updateSubscription(companyId: string, data: { currentPlanId: string; subscriptionId: string; }): Promise<void> {
-        await this.updateById(companyId,{
-            currentPlanId:data.currentPlanId,
-            subscriptionId:data.subscriptionId
+        await this.updateById(companyId, {
+            currentPlanId: data.currentPlanId,
+            subscriptionId: data.subscriptionId
         })
+    }
+
+    async countAll(): Promise<number> {
+        return this.count({});
+    }
+    async countByStatus(status: CompanyStatus): Promise<number> {
+        return this.count({ status });
+    }
+
+    async getPlanDistribution(): Promise<{ plan: string; count: number }[]> {
+        const result = await this.model.aggregate([
+            {
+                $match: {
+                    status: "APPROVED",
+                    currentPlanId: { $ne: null }
+                }
+            },
+            {
+                $lookup: {
+                    from: "plans",
+                    localField: "currentPlanId",
+                    foreignField: "_id",
+                    as: "plan"
+                }
+            },
+            {
+                $unwind: "$plan"
+            },
+            {
+                $group: {
+                    _id: "$plan.name",
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        return result.map((item) => ({
+            plan: item._id,
+            count: item.count
+        }));
     }
 }

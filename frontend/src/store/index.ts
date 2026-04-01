@@ -21,6 +21,7 @@ import devWorklogReducer from "../modules/developer/store/worklog.slice"
 import adminWorklogReducer from "../modules/company-admin/store/worklog.slice";
 import settingReducer from "../modules/settings/store/setting.slice"
 import transactionReducer from "../modules/super-admin/store/transaction.slice"
+import superAdminDashboardReducer from "../modules/super-admin/store/dashboard.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -43,7 +44,8 @@ const appReducer = combineReducers({
   devWorklog:devWorklogReducer,
   adminWorklog:adminWorklogReducer,
   setting:settingReducer,
-  transaction:transactionReducer
+  transaction:transactionReducer,
+  superAdminDashboard:superAdminDashboardReducer
 });
 
 /* ================= RootState ================= */

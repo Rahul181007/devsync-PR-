@@ -16,6 +16,8 @@ interface TransactionState {
     status: "ALL" | "PENDING" | "SUCCESS" | "FAILED";
     fromDate: string;
     toDate: string;
+
+    recentTransactions: Transaction[];
 }
 
 type TransactionQuery = {
@@ -38,7 +40,8 @@ const initialState: TransactionState = {
     search: "",
     status: "ALL",
     fromDate: "",
-    toDate: ""
+    toDate: "",
+    recentTransactions: [],
 }
 
 export const fetchTransactions = createAsyncThunk(
@@ -83,6 +86,28 @@ export const fetchTransactions = createAsyncThunk(
         }
     }
 )
+
+export const fetchRecentTransactions = createAsyncThunk<
+    Transaction[],
+    void,
+    { rejectValue: string }
+>(
+    "transactions/fetchRecent",
+    async (_, { rejectWithValue }) => {
+        try {
+            const res = await transactionApi.getTransactions({
+                page: 1,
+                limit: 5
+            });
+
+            return res.data.data.data;
+        } catch (error: unknown) {
+            return rejectWithValue(getErrorMessage(error));
+        }
+    }
+);
+
+
 
 export const downloadInvoice = createAsyncThunk<
     Blob,
@@ -141,9 +166,13 @@ const transactionSlice = createSlice({
             .addCase(fetchTransactions.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+
+            .addCase(fetchRecentTransactions.fulfilled, (state, action) => {
+                state.recentTransactions = action.payload;
+            })
     }
 });
 
-export const { setPage, setSearch, setStatus,setFromDate,setToDate } = transactionSlice.actions;
+export const { setPage, setSearch, setStatus, setFromDate, setToDate } = transactionSlice.actions;
 export default transactionSlice.reducer;

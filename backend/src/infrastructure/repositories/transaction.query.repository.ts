@@ -151,4 +151,80 @@ export class TransactionQueryRepository implements ITransactionQueryRepository {
             limit
          }
     }
+
+    async getTotalRevenue(): Promise<number> {
+    const result = await PaymentModel.aggregate([
+        {
+            $match: {
+                status: "SUCCESS"
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                total: { $sum: "$amount" }
+            }
+        }
+    ]);
+
+    return result[0]?.total || 0;
+}
+
+async getRevenueByMonth(): Promise<{ month: string; revenue: number }[]> {
+  const result = await PaymentModel.aggregate([
+    {
+      $match: {
+        status: "SUCCESS"
+      }
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" }
+        },
+        revenue: { $sum: "$amount" }
+      }
+    },
+    {
+      $sort: {
+        "_id.year": 1,
+        "_id.month": 1
+      }
+    }
+  ]);
+
+const monthNames = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+];
+
+// Convert aggregation result to map
+const revenueMap = new Map<string, number>();
+
+result.forEach((item) => {
+  const key = `${item._id.year}-${item._id.month}`;
+  revenueMap.set(key, item.revenue);
+});
+
+// Get last 6 months
+const now = new Date();
+const months = [];
+
+for (let i = 5; i >= 0; i--) {
+  const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+
+  const key = `${year}-${month}`;
+
+  months.push({
+    month: monthNames[month - 1],
+    revenue: revenueMap.get(key) || 0
+  });
+}
+
+return months;
+}
 }
