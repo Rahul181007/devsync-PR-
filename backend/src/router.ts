@@ -12,7 +12,8 @@ import subscriptionRoutes from "./interfaces/routes/subscription.routes";
 import paymentRoutes from "./interfaces/routes/payment.routes";
 import invoicesRoutes from "./interfaces/routes/invoice.routes";
 import settingRoutes from "./interfaces/routes/settings.routes";
-import transactionRoutes from "./interfaces/routes/transaction.routes"
+import transactionRoutes from "./interfaces/routes/transaction.routes";
+import dashboardRoutes from "./interfaces/routes/dashboard.routes"
 const router =Router();
 
 router.use("/auth", authRoutes);
@@ -29,5 +30,6 @@ router.use("/",subscriptionRoutes);
 router.use("/",paymentRoutes)
 router.use("/",invoicesRoutes);
 router.use("/settings",settingRoutes);
-router.use("/",transactionRoutes)
+router.use("/",transactionRoutes);
+router.use("/",dashboardRoutes)
 export default router

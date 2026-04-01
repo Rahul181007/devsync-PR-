@@ -46,4 +46,9 @@ export interface ICompanyRepository{
     subscriptionId: string;
   }
 ): Promise<void>;
+
+countAll(): Promise<number>
+countByStatus(status: CompanyStatus): Promise<number>
+
+getPlanDistribution(): Promise<{ plan: string; count: number }[]>
 }

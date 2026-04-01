@@ -46,4 +46,7 @@ export interface ITransactionQueryRepository {
     getAllTransactions(
         options: GetTransactionOptions
     ): Promise<TransactionListResult>;
+
+    getTotalRevenue(): Promise<number>;
+    getRevenueByMonth(): Promise<{ month: string; revenue: number }[]>
 }

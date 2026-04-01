@@ -10,7 +10,6 @@ import AcceptInvitePage from "../modules/auth/pages/AcceptInvitePage";
 
 // super admin
 import SuperAdminLayout from "../modules/super-admin/components/SuperAdminLayout";
-import DashboardPage from "../modules/super-admin/pages/DashboardPage";
 import CompaniesPage from "../modules/super-admin/pages/CompaniesPage";
 import CompanyDetailPage from "../modules/super-admin/pages/CompanyDetailPage";
 
@@ -47,6 +46,7 @@ import PaymentFailedPage from "../modules/company-admin/pages/billing/PaymentFai
 import PaymentSuccessPage from "../modules/company-admin/pages/billing/PaymentSuccessPage";
 import SettingsPage from "../modules/settings/pages/SettingsPage";
 import TransactionListPage from "../modules/super-admin/pages/transactions/TransactionListPage";
+import DashboardPage from "../modules/super-admin/pages/dashboard/DashboardPage";
 
 
 
