@@ -145,8 +145,8 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
                 throw new AppError("Task must belong to Story", HttpStatus.BAD_REQUEST);
             }
 
-            if (data.type === "BUG" && parentTask.type !== "TASK") {
-                throw new AppError("Bug must belong to Task", HttpStatus.BAD_REQUEST);
+            if (data.type === "BUG" && parentTask.type !== "STORY") {
+                throw new AppError("Bug must belong to Story", HttpStatus.BAD_REQUEST);
             }
 
             parentId = parentTask.id;

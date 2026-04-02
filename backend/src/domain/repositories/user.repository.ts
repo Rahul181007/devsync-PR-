@@ -3,11 +3,11 @@ import { UserStatus } from "../entities/user.entity";
 
 
 export interface DeveloperListItem {
-  id: string;
-  name: string;
-  email: string;
-  status: string;
-  role: UserRole;
+    id: string;
+    name: string;
+    email: string;
+    status: string;
+    role: UserRole;
 }
 export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>;
@@ -50,17 +50,26 @@ export interface IUserRepository {
     }): Promise<{ items: DeveloperListItem[]; total: number }>
 
     updateOtp(
-  userId: string,
-  otp: string | null,
-  otpExpiresAt: Date | null
-): Promise<void>;
+        userId: string,
+        otp: string | null,
+        otpExpiresAt: Date | null
+    ): Promise<void>;
 
-findByIds(userIds: string[]): Promise<User[]>;
+    findByIds(userIds: string[]): Promise<User[]>;
 
-findCompanyAdminByCompany(companyId: string): Promise<User | null>;
+    findCompanyAdminByCompany(companyId: string): Promise<User | null>;
 
-updateProfile(
-  userId: string,
-  data: { name?: string; avatarUrl?: string | null }
-): Promise<{ name: string; avatarUrl: string | null }>;
+    updateProfile(
+        userId: string,
+        data: { name?: string; avatarUrl?: string | null }
+    ): Promise<{ name: string; avatarUrl: string | null }>;
+
+    countDevelopers(companyId: string): Promise<number>;
+
+    countByStatus(
+        companyId: string,
+        status: UserStatus
+    ): Promise<number>;
+
+    countActiveDevelopers(companyId: string): Promise<number>;
 }

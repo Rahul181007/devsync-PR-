@@ -142,27 +142,56 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         return doc ? this._toDomain(doc) : null;
     }
 
-async updateProfile(
-  userId: string,
-  data: { name?: string; avatarUrl?: string | null }
-): Promise<{ name: string; avatarUrl: string | null }> {
-  
-  const updated = await this.model.findByIdAndUpdate(
-    userId,
-    {
-      ...(data.name !== undefined && { name: data.name }),
-      ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
-    },
-    { new: true }
-  );
+    async updateProfile(
+        userId: string,
+        data: { name?: string; avatarUrl?: string | null }
+    ): Promise<{ name: string; avatarUrl: string | null }> {
 
-  if (!updated) {
-    throw new Error("SuperAdmin not found");
-  }
+        const updated = await this.model.findByIdAndUpdate(
+            userId,
+            {
+                ...(data.name !== undefined && { name: data.name }),
+                ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+            },
+            { new: true }
+        );
 
-  return {
-    name: updated.name,
-    avatarUrl: updated.avatarUrl ?? null,
-  };
+        if (!updated) {
+            throw new Error("SuperAdmin not found");
+        }
+
+        return {
+            name: updated.name,
+            avatarUrl: updated.avatarUrl ?? null,
+        };
+    }
+
+    async countDevelopers(companyId: string): Promise<number> {
+        return await this.model.countDocuments({
+            companyId,
+            role: "DEVELOPER"
+        });
+    }
+
+    async countByStatus(
+        companyId: string,
+        status: UserStatus
+    ): Promise<number> {
+        return await this.model.countDocuments({
+            companyId,
+            role: "DEVELOPER",
+            status
+        });
+    }
+
+    async countActiveDevelopers(companyId: string): Promise<number> {
+    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    return await this.model.countDocuments({
+        companyId,
+        role: "DEVELOPER",
+        status: "ACTIVE",
+        lastLoginAt: { $gte: last24Hours }
+    });
 }
 }

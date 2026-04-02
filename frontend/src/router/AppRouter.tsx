@@ -15,7 +15,7 @@ import CompanyDetailPage from "../modules/super-admin/pages/CompanyDetailPage";
 
 // company admin
 import CompanyAdminLayout from "../modules/company-admin/components/CompanyAdminLayout";
-import CompanyDashboardPage from "../modules/company-admin/pages/DashboardPage";
+
 
 // developer
 import DeveloperLayout from "../modules/developer/components/DeveloperLAyout";
@@ -47,6 +47,7 @@ import PaymentSuccessPage from "../modules/company-admin/pages/billing/PaymentSu
 import SettingsPage from "../modules/settings/pages/SettingsPage";
 import TransactionListPage from "../modules/super-admin/pages/transactions/TransactionListPage";
 import DashboardPage from "../modules/super-admin/pages/dashboard/DashboardPage";
+import CompanyDashboardPage from "../modules/company-admin/pages/dashboard/DashboardPage";
 
 
 
@@ -124,7 +125,7 @@ const AppRouter = () => {
         >
           <Route path={'/company/:companySlug'} element={<CompanyAdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<CompanyDashboardPage />} />
+            <Route path="dashboard" element={<CompanyDashboardPage/>} />
             <Route path="users" element={<DevelopersPage />} />
             <Route path='projects'element={<ProjectListingPage/>} />
             <Route path="projects/:projectId" element={<ProjectDetailPage />} />

@@ -1,4 +1,4 @@
-import { Task } from "../../domain/entities/task.entity";
+import { Task, TaskStatus } from "../../domain/entities/task.entity";
 import { CreateTaskInput, ITaskRepository } from "../../domain/repositories/task.repository";
 import { ITaskDocument, TaskModel } from "../db/models/task.model";
 
@@ -80,8 +80,8 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async findByParentId(parentId: string): Promise<Task[]> {
-        const docs=await TaskModel.find({parentId}).sort({ createdAt: -1})
-        return docs.map((doc)=>this._toDomain(doc))
+        const docs = await TaskModel.find({ parentId }).sort({ createdAt: -1 })
+        return docs.map((doc) => this._toDomain(doc))
     }
 
     async update(task: Task): Promise<Task> {
@@ -115,5 +115,31 @@ export class TaskRepository implements ITaskRepository {
         return doc.map((doc) => this._toDomain(doc))
     }
 
+countByCompany(companyId:string) {
+  return TaskModel.countDocuments({
+    companyId,
+    type: { $in: ["TASK", "BUG"] }
+  });
+}
+
+    async countByStatus(
+        companyId: string,
+        status: TaskStatus
+    ): Promise<number> {
+        return await TaskModel.countDocuments({
+            companyId,
+            status
+        });
+    }
+
+    async countOverdue(companyId: string): Promise<number> {
+        const now = new Date();
+
+        return await TaskModel.countDocuments({
+            companyId,
+            dueDate: { $lt: now },
+            status: { $ne: "COMPLETED" }
+        });
+    }
 
 }

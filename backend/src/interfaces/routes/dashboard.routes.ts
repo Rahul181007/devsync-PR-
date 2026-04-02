@@ -7,5 +7,5 @@ import { dashBoardController } from "../../di/dashboard.di";
 const router = Router();
 
 router.get("/superadmin/dashboard",verifyAccessToken,requireRole(Role.SUPER_ADMIN),dashBoardController.getDashBoardForSuperAdmin);
-
+router.get("/company/dashboard",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),dashBoardController.getDashboardForCompanyAdmin)
 export default router
