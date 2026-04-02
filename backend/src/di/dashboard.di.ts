@@ -2,6 +2,7 @@ import { IGetCompanyDashboardSummaryUseCase } from "../application/interface/das
 import { IGetSuperAdminDashboardUseCase } from "../application/interface/dashboard/superAdmin/IGetDashboardUseCase";
 import { GetCompanyDashboardSummaryUseCase } from "../application/use-cases/dashboard/companyAdmin/getCompanyDashboardSummary.usecase";
 import { GetSuperAdminDashboardUseCase } from "../application/use-cases/dashboard/superAdmin/getDashboard.usecase";
+import { ActivityRepository } from "../infrastructure/repositories/activity.repository";
 import { CompanyRepository } from "../infrastructure/repositories/company.repository";
 import { ProjectRepository } from "../infrastructure/repositories/project.repository";
 import { TaskRepository } from "../infrastructure/repositories/task.repository";
@@ -17,8 +18,9 @@ const taskRepo=new TaskRepository();
 const projectRepo=new ProjectRepository();
 const userRepo=new UserRepository();
 const worklogRepo=new WorklogRepository();
+const activityRepo=new ActivityRepository()
 const getSuperAdminDashboardUseCase:IGetSuperAdminDashboardUseCase=new GetSuperAdminDashboardUseCase(companyRepository,transactionQueryRepository);
- const getCompanyDashboardSummaryUseCase:IGetCompanyDashboardSummaryUseCase=new GetCompanyDashboardSummaryUseCase(projectRepo,userRepo,taskRepo,companyRepository,worklogRepo)
+ const getCompanyDashboardSummaryUseCase:IGetCompanyDashboardSummaryUseCase=new GetCompanyDashboardSummaryUseCase(projectRepo,userRepo,taskRepo,companyRepository,worklogRepo,activityRepo)
 export const dashBoardController=new DashBoardController (
     getSuperAdminDashboardUseCase,
      getCompanyDashboardSummaryUseCase

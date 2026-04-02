@@ -8,7 +8,7 @@ interface Props {
 const WorklogChart = ({ data }: Props) => {
   if (!data || data.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl shadow-md border border-gray-100 h-80 flex items-center justify-center">
+      <div className="bg-linear-to-br from-white to-gray-50 p-6 rounded-xl shadow-md border border-gray-100 h-80 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@ const WorklogChart = ({ data }: Props) => {
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+    <div className="bg-linear-to-br from-white to-gray-50 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300">
       <div className="p-6 pb-2">
         <div className="flex items-center justify-between mb-4">
           <div>

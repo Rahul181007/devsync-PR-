@@ -14,5 +14,19 @@ export interface DashboardSummaryDTO {
     date: string;
     hours: number;
   }[];
+
+  projectHealth: {
+  projectId: string;
+  projectName: string;
+  totalTasks: number;
+  completedTasks: number;
+  health: number;
+}[];
+
+activityFeed: {
+  type: string;
+  message: string;
+  createdAt: Date;
+}[];
 }
 

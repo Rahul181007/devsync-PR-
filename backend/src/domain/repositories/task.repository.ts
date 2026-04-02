@@ -45,4 +45,12 @@ export interface ITaskRepository {
     ): Promise<number>;
 
     countOverdue(companyId: string): Promise<number>;
+
+    getProjectHealth(companyId: string): Promise<{
+  projectId: string;
+  projectName: string;
+  totalTasks: number;
+  completedTasks: number;
+  health: number;
+}[]>;
 }

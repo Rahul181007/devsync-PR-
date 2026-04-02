@@ -1,3 +1,4 @@
+import { IActivityRepository } from "../../../../domain/repositories/activity.repository";
 import { ICompanyRepository } from "../../../../domain/repositories/company.repository";
 import { IProjectRepository } from "../../../../domain/repositories/project.repository";
 import { ITaskRepository } from "../../../../domain/repositories/task.repository";
@@ -15,7 +16,8 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
         private _userRepo: IUserRepository,
         private _taskRepo: ITaskRepository,
         private _companyRepo: ICompanyRepository,
-        private _worlogRepo:IWorklogRepository,
+        private _worklogRepo:IWorklogRepository,
+        private _activityRepo:IActivityRepository
     ) { }
 
     async execute(companyId: string): Promise<DashboardSummaryDTO> {
@@ -37,7 +39,9 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             completedTasks,
             overdueTasks,
 
-            worklogTrend
+            worklogTrend,
+            projectHealth,
+            activityFeed
         ] = await Promise.all([
             this._projectRepo.countByCompany(companyId),
             this._projectRepo.countByCompanyAndStatus(companyId, "ACTIVE"),
@@ -50,7 +54,9 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             this._taskRepo.countByStatus(companyId, "COMPLETED"),
             this._taskRepo.countOverdue(companyId),
 
-            this._worlogRepo.getWorklogTrend(companyId)
+            this._worklogRepo.getWorklogTrend(companyId),
+            this._taskRepo.getProjectHealth(companyId),
+            this._activityRepo.getRecentActivities(companyId)
         ]);
 
         return {
@@ -65,7 +71,9 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             completedTasks,
             overdueTasks,
 
-            worklogTrend
+            worklogTrend,
+            projectHealth,
+            activityFeed
         };
     }
 }

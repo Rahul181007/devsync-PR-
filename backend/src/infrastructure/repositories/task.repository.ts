@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Task, TaskStatus } from "../../domain/entities/task.entity";
 import { CreateTaskInput, ITaskRepository } from "../../domain/repositories/task.repository";
 import { ITaskDocument, TaskModel } from "../db/models/task.model";
@@ -115,12 +116,12 @@ export class TaskRepository implements ITaskRepository {
         return doc.map((doc) => this._toDomain(doc))
     }
 
-countByCompany(companyId:string) {
-  return TaskModel.countDocuments({
-    companyId,
-    type: { $in: ["TASK", "BUG"] }
-  });
-}
+    countByCompany(companyId: string) {
+        return TaskModel.countDocuments({
+            companyId,
+            type: { $in: ["TASK", "BUG"] }
+        });
+    }
 
     async countByStatus(
         companyId: string,
@@ -142,4 +143,66 @@ countByCompany(companyId:string) {
         });
     }
 
+    async getProjectHealth(companyId: string) {
+        const result = await TaskModel.aggregate([
+            {
+                $match: {
+                    companyId: new mongoose.Types.ObjectId(companyId),
+                    type: { $in: ["TASK", "BUG"] }
+                }
+            },
+            {
+                $group: {
+                    _id: "$projectId",
+                    totalTasks: { $sum: 1 },
+                    completedTasks: {
+                        $sum: {
+                            $cond: [{ $eq: ["$status", "COMPLETED"] }, 1, 0]
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "projects",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "project"
+                }
+            },
+            {
+                $unwind: "$project"
+            },
+            {
+                $project: {
+                    projectId: "$_id",
+                    projectName: "$project.name",
+                    totalTasks: 1,
+                    completedTasks: 1,
+                    health: {
+                        $round: [
+                            {
+                                $cond: [
+                                    { $eq: ["$totalTasks", 0] },
+                                    0,
+                                    {
+                                        $multiply: [
+                                            { $divide: ["$completedTasks", "$totalTasks"] },
+                                            100
+                                        ]
+                                    }
+                                ]
+                            },
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                $sort: { health: -1 }
+            }
+        ]);
+
+        return result;
+    }
 }
