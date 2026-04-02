@@ -9,4 +9,12 @@ export interface CompanyDashboardData {
   totalTasks: number;
   completedTasks: number;
   overdueTasks: number;
+
+  worklogTrend: WorklogTrendItem[];
+
+}
+
+export interface WorklogTrendItem {
+  date: string;
+  hours: number;
 }

@@ -177,12 +177,18 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow"
-                onClick={() => setIsWorklogOpen(true)}
-              >
-                + Log Work
-              </button>
+              {task.status === "COMPLETED" ? (
+                <span className="text-sm text-gray-400 px-2">
+                  Worklog disabled
+                </span>
+              ) : (
+                <button
+                  className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  onClick={() => setIsWorklogOpen(true)}
+                >
+                  + Log Work
+                </button>
+              )}
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
@@ -242,10 +248,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                       <p className="text-sm text-gray-700">
                         {task.dueDate
                           ? new Date(task.dueDate).toLocaleDateString("en-US", {
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                           : "—"}
                       </p>
                     </div>
@@ -304,10 +310,9 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`
                       flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative
-                      ${
-                        activeTab === tab.id
-                          ? "text-blue-600 bg-white border-t border-x border-gray-200 rounded-t-lg"
-                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-t-lg"
+                      ${activeTab === tab.id
+                        ? "text-blue-600 bg-white border-t border-x border-gray-200 rounded-t-lg"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-t-lg"
                       }
                     `}
                   >
@@ -316,11 +321,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                     <span
                       className={`
                       px-1.5 py-0.5 text-xs rounded-full
-                      ${
-                        activeTab === tab.id
+                      ${activeTab === tab.id
                           ? "bg-blue-100 text-blue-700"
                           : "bg-gray-200 text-gray-600"
-                      }
+                        }
                     `}
                     >
                       {tab.count}
@@ -356,11 +360,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                         <button
                           onClick={handleAddComment}
                           disabled={!commentText.trim()}
-                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                            !commentText.trim()
+                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${!commentText.trim()
                               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                               : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow"
-                          }`}
+                            }`}
                         >
                           Post Comment
                         </button>
@@ -437,11 +440,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                       <button
                         onClick={handleUpload}
                         disabled={!selectedFile}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                          !selectedFile
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!selectedFile
                             ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                             : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow"
-                        }`}
+                          }`}
                       >
                         Upload
                       </button>
@@ -540,11 +542,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                               <button
                                 disabled={!isEditable}
                                 onClick={() => handleEdit(log)}
-                                className={`text-xs ${
-                                  isEditable
+                                className={`text-xs ${isEditable
                                     ? "text-blue-600 hover:underline"
                                     : "text-gray-400 cursor-not-allowed"
-                                }`}
+                                  }`}
                               >
                                 Edit
                               </button>
@@ -553,11 +554,10 @@ const DeveloperTaskDetailModal = ({ task, projectId, onClose }: Props) => {
                               <button
                                 disabled={!isEditable}
                                 onClick={() => handleDelete(log.id)}
-                                className={`text-xs ${
-                                  isEditable
+                                className={`text-xs ${isEditable
                                     ? "text-red-600 hover:underline"
                                     : "text-gray-400 cursor-not-allowed"
-                                }`}
+                                  }`}
                               >
                                 Delete
                               </button>

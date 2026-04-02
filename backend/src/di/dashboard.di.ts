@@ -7,6 +7,7 @@ import { ProjectRepository } from "../infrastructure/repositories/project.reposi
 import { TaskRepository } from "../infrastructure/repositories/task.repository";
 import { TransactionQueryRepository } from "../infrastructure/repositories/transaction.query.repository";
 import { UserRepository } from "../infrastructure/repositories/user.repository";
+import { WorklogRepository } from "../infrastructure/repositories/worklog.repository";
 import { DashBoardController } from "../interfaces/controllers/dashboard.controller";
 
 const companyRepository = new CompanyRepository();
@@ -15,9 +16,9 @@ const transactionQueryRepository = new TransactionQueryRepository();
 const taskRepo=new TaskRepository();
 const projectRepo=new ProjectRepository();
 const userRepo=new UserRepository();
-
+const worklogRepo=new WorklogRepository();
 const getSuperAdminDashboardUseCase:IGetSuperAdminDashboardUseCase=new GetSuperAdminDashboardUseCase(companyRepository,transactionQueryRepository);
- const getCompanyDashboardSummaryUseCase:IGetCompanyDashboardSummaryUseCase=new GetCompanyDashboardSummaryUseCase(projectRepo,userRepo,taskRepo,companyRepository)
+ const getCompanyDashboardSummaryUseCase:IGetCompanyDashboardSummaryUseCase=new GetCompanyDashboardSummaryUseCase(projectRepo,userRepo,taskRepo,companyRepository,worklogRepo)
 export const dashBoardController=new DashBoardController (
     getSuperAdminDashboardUseCase,
      getCompanyDashboardSummaryUseCase

@@ -4,6 +4,7 @@ import { getCompanyDashboard } from "../../store/dashboard.slice";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import DashboardGrid from "../../components/dashboard/DashboardGrid";
 import TaskStatusChart from "../../components/dashboard/TaskStatusChart";
+import WorklogChart from "../../components/dashboard/WorklogChart";
 
 
 const CompanyDashboardPage = () => {
@@ -38,6 +39,7 @@ const CompanyDashboardPage = () => {
 
       <div className="mt-6 grid grid-cols-2 gap-4">
   <TaskStatusChart data={data} />
+  <WorklogChart data={data.worklogTrend} />
 </div>
     </div>
   )

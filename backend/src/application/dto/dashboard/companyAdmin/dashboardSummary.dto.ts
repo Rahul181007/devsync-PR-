@@ -9,4 +9,10 @@ export interface DashboardSummaryDTO {
   totalTasks: number;
   completedTasks: number;
   overdueTasks: number;
+
+  worklogTrend: {
+    date: string;
+    hours: number;
+  }[];
 }
+

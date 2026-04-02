@@ -2,6 +2,7 @@ import { ICompanyRepository } from "../../../../domain/repositories/company.repo
 import { IProjectRepository } from "../../../../domain/repositories/project.repository";
 import { ITaskRepository } from "../../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../../domain/repositories/user.repository";
+import { IWorklogRepository } from "../../../../domain/repositories/worklog.repository";
 import { HttpStatus } from "../../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../../shared/constants/responseMessages";
 import { AppError } from "../../../../shared/errors/AppError";
@@ -13,7 +14,8 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
         private _projectRepo: IProjectRepository,
         private _userRepo: IUserRepository,
         private _taskRepo: ITaskRepository,
-        private _companyRepo: ICompanyRepository
+        private _companyRepo: ICompanyRepository,
+        private _worlogRepo:IWorklogRepository,
     ) { }
 
     async execute(companyId: string): Promise<DashboardSummaryDTO> {
@@ -34,6 +36,8 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             totalTasks,
             completedTasks,
             overdueTasks,
+
+            worklogTrend
         ] = await Promise.all([
             this._projectRepo.countByCompany(companyId),
             this._projectRepo.countByCompanyAndStatus(companyId, "ACTIVE"),
@@ -45,6 +49,8 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             this._taskRepo.countByCompany(companyId),
             this._taskRepo.countByStatus(companyId, "COMPLETED"),
             this._taskRepo.countOverdue(companyId),
+
+            this._worlogRepo.getWorklogTrend(companyId)
         ]);
 
         return {
@@ -58,6 +64,8 @@ export class GetCompanyDashboardSummaryUseCase implements IGetCompanyDashboardSu
             totalTasks,
             completedTasks,
             overdueTasks,
+
+            worklogTrend
         };
     }
 }
