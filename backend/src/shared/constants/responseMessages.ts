@@ -115,7 +115,8 @@ export const RESPONSE_MESSAGES = {
         ALREADY_ASSIGNED_TO_SPRINT: "Task is already assigned to a sprint",
         ASSIGNED_USER: "Assigned user must be a developer",
         DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date",
-        CANNOT_CHANGE_TYPE_WITH_CHILDREN:"cannot change the type it has children task"
+        CANNOT_CHANGE_TYPE_WITH_CHILDREN:"cannot change the type it has children task",
+
     },
 
     SPRINT: {
@@ -191,6 +192,7 @@ export const RESPONSE_MESSAGES = {
         INVALID_TIME_SPENT:"Worlog invalid time spend",
         INVALID_DATE:"worklog invalid date",
         NOT_FOUND:"Worklog not found",
+                TASK_ALREADY_COMPLETED:"Task already completed"
         
     },
 

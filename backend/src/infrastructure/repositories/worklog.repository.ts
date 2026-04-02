@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Worklog } from "../../domain/entities/workLog.entity";
 import { IWorklogRepository, WorklogWithUser } from "../../domain/repositories/worklog.repository";
 import { IWorklogDocument, WorklogModel } from "../db/models/worklog.model";
@@ -107,5 +108,38 @@ async delete(id: string): Promise<void> {
   if (!doc) {
     throw new Error("Worklog not found");
   }
+}
+
+async getWorklogTrend(companyId: string): Promise<{ date: string; hours: number; }[]> {
+  const last7Days=new Date();
+  last7Days.setDate(last7Days.getDate()-7);
+
+
+  const result=await WorklogModel.aggregate([
+    {
+      $match:{
+        companyId:new mongoose.Types.ObjectId(companyId),
+        date:{$gte:last7Days,
+          $lte: new Date()
+        }
+      }
+    },
+    {
+      $group:{
+        _id:{
+          $dateToString: { format: "%Y-%m-%d", date: "$date" }
+        },
+        hours: { $sum: { $divide: ["$timeSpent", 60] } }
+      }
+    },
+    {
+      $sort:{_id:1}
+    }
+  ])
+
+  return result.map((item)=>({
+    date:item._id,
+    hours:item.hours
+  }))
 }
 }

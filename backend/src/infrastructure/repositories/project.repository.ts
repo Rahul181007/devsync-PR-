@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Project } from "../../domain/entities/project.entity";
+import { Project, ProjectStatus } from "../../domain/entities/project.entity";
 import { FindProjectOptions, IProjectRepository } from "../../domain/repositories/project.repository";
 import { IProjectDocument, ProjectModel } from "../db/models/Project.model";
 
@@ -97,5 +97,21 @@ export class ProjectRepository implements IProjectRepository {
 
     async delete(projectId: string): Promise<void> {
         await ProjectModel.findByIdAndDelete(projectId)
+    }
+
+    async countByCompany(companyId: string): Promise<number> {
+        return await ProjectModel.countDocuments({
+            companyId: new mongoose.Types.ObjectId(companyId)
+        });
+    }
+
+    async countByCompanyAndStatus(
+        companyId: string,
+        status: ProjectStatus
+    ): Promise<number> {
+        return await ProjectModel.countDocuments({
+            companyId: new mongoose.Types.ObjectId(companyId),
+            status
+        });
     }
 }

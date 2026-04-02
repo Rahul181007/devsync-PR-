@@ -31,7 +31,7 @@ export const CreateTaskModal = ({
   const parentTypeMap = {
     STORY: "EPIC",
     TASK: "STORY",
-    BUG: "TASK",
+    BUG: "STORY",
   } as const;
 
   const requiredParentType = parentTypeMap[type as keyof typeof parentTypeMap];
@@ -52,6 +52,11 @@ export const CreateTaskModal = ({
       priority,
       dueDate
     });
+
+    if ((type === "TASK" || type === "BUG") && !parentId) {
+  toast.error(`${type} must have a parent Story`);
+  return;
+}
     setIsSubmitting(true);
 
     try {

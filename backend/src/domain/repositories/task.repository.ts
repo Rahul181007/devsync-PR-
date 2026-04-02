@@ -3,12 +3,12 @@ export interface CreateTaskInput {
     companyId: string;
     projectId: string;
     sprintId: string | null;
-    parentId?: string | null 
+    parentId?: string | null
     code: string;
 
     title: string;
     description: string;
-    type?:TaskType
+    type?: TaskType
 
     status: TaskStatus;
     priority: TaskPriority;
@@ -36,4 +36,21 @@ export interface ITaskRepository {
         assigneeId: string,
         sprintId: string
     ): Promise<Task[]>;
+
+    countByCompany(companyId: string): Promise<number>;
+
+    countByStatus(
+        companyId: string,
+        status: TaskStatus
+    ): Promise<number>;
+
+    countOverdue(companyId: string): Promise<number>;
+
+    getProjectHealth(companyId: string): Promise<{
+  projectId: string;
+  projectName: string;
+  totalTasks: number;
+  completedTasks: number;
+  health: number;
+}[]>;
 }

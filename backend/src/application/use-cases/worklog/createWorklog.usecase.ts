@@ -71,6 +71,13 @@ export class CreateWorklogUseCase implements ICreateWorklogUseCase {
       );
     }
 
+    if (task.status === "COMPLETED") {
+  throw new AppError(
+    RESPONSE_MESSAGES.WORKLOG.TASK_ALREADY_COMPLETED,
+    HttpStatus.BAD_REQUEST
+  );
+}
+
     if (task.projectId !== projectId) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
