@@ -53,4 +53,17 @@ export interface ITaskRepository {
   completedTasks: number;
   health: number;
 }[]>;
+countTasksByStatusForUser(userId: string): Promise<
+  { _id: TaskStatus; count: number }[]
+>;
+
+ getPriorityTasks(userId: string): Promise<{
+  id: string;
+  title: string;
+  projectName: string;
+  status: string;
+  priority: string;
+  dueDate: Date | null;
+}[]>
+
 }

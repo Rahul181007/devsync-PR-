@@ -30,6 +30,10 @@ export interface IWorklogRepository {
   update(worklog: Worklog): Promise<Worklog>;
   delete(id: string): Promise<void>;
   getWorklogTrend(companyId: string): Promise<
-  { date: string; hours: number }[]
->;
+    { date: string; hours: number }[]
+  >;
+
+  getWorklogTrendByUser(userId: string): Promise<
+    { date: string; hours: number }[]
+  >;
 }

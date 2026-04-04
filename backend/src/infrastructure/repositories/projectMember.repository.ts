@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { IProjectMemberRepository } from "../../domain/repositories/projectMember.repository";
 import { ProjectMemberModel } from "../db/models/ProjectMember.model";
 
@@ -45,4 +46,9 @@ export class ProjectMemberRepository implements IProjectMemberRepository{
   }));
 }
 
+async countByUser(userId: string): Promise<number> {
+  return ProjectMemberModel.countDocuments({
+    userId: new mongoose.Types.ObjectId(userId)
+  });
+}
 }

@@ -19,7 +19,7 @@ import CompanyAdminLayout from "../modules/company-admin/components/CompanyAdmin
 
 // developer
 import DeveloperLayout from "../modules/developer/components/DeveloperLAyout";
-import DevDashboard from "../modules/developer/pages/DevDashboard";
+import DevDashboard from "../modules/developer/pages/dashboard/DevDashboard";
 
 // guards
 import AppRoute from "./ProtectedRoutes";

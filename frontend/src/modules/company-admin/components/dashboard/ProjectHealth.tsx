@@ -28,7 +28,7 @@ const ProjectHealth = ({ data }: Props) => {
     const { slug } = useParams();
     if (!data || data.length === 0) {
         return (
-            <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg border border-gray-100 h-80 flex items-center justify-center">
+            <div className="bg-linear-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg border border-gray-100 h-80 flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                         <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,12 +46,12 @@ const ProjectHealth = ({ data }: Props) => {
     const sortedProjects = [...data].sort((a, b) => a.health - b.health);
 
     return (
-        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 h-80 overflow-y-auto">
+        <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 h-80 overflow-y-auto">
             {/* Header with gradient accent */}
             <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-lg font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                        <h3 className="text-lg font-bold bg-linear-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                             Project Health
                         </h3>
                         <p className="text-xs text-gray-400 mt-0.5">Real-time project metrics</p>
@@ -95,7 +95,7 @@ const ProjectHealth = ({ data }: Props) => {
                         <div className="relative">
                             <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden shadow-inner">
                                 <div
-                                    className={`h-2.5 rounded-full bg-gradient-to-r ${getColor(project.health)} transition-all duration-500 ease-out`}
+                                    className={`h-2.5 rounded-full bg-linear-to-r ${getColor(project.health)} transition-all duration-500 ease-out`}
                                     style={{ width: `${project.health}%` }}
                                 >
                                     <div className="w-full h-full bg-white/20 animate-pulse"></div>
