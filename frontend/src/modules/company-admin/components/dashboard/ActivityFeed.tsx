@@ -21,7 +21,7 @@ const formatTimeAgo = (dateString: string) => {
 const getIcon = (type: ActivityItem["type"]) => {
   if (type === "TASK_COMPLETED") {
     return (
-      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
         <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
@@ -30,7 +30,7 @@ const getIcon = (type: ActivityItem["type"]) => {
   }
   if (type === "WORKLOG_ADDED") {
     return (
-      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
         <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -38,7 +38,7 @@ const getIcon = (type: ActivityItem["type"]) => {
     );
   }
   return (
-    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
       <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -66,7 +66,7 @@ const ActivityFeed = ({ data }: Props) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+      <div className="px-6 py-4 border-b border-gray-200 bg-linear-to-r from-gray-50 to-white">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-semibold text-gray-900">Activity Feed</h3>

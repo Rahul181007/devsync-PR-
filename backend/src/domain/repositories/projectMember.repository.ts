@@ -13,4 +13,6 @@ export interface IProjectMemberRepository {
         userId: string;
         role: "OWNER" | "DEVELOPER";
     }[]>;
+
+    countByUser(userId: string): Promise<number>;
 }

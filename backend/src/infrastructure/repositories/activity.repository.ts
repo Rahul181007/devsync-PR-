@@ -66,4 +66,49 @@ export class ActivityRepository implements IActivityRepository {
 
 
     }
+
+async getRecentActivitiesByUser(userId: string): Promise<ActivityItem[]> {
+    const limit = 5;
+    const objectId = new mongoose.Types.ObjectId(userId);
+
+    const tasks = await TaskModel.find({
+        assigneeId: objectId,
+        status: "COMPLETED"
+    })
+        .sort({ updatedAt: -1 })
+        .limit(limit)
+        .select("title updatedAt")
+        .lean();
+
+    const taskActivities: ActivityItem[] = tasks.map((task) => ({
+        type: "TASK_COMPLETED",
+        message: `You completed task "${task.title}"`,
+        createdAt: task.updatedAt
+    }));
+
+    const worklogs = await WorklogModel.find({
+        userId: objectId
+    })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .populate("taskId", "title")
+        .select("timeSpent taskId createdAt")
+        .lean<{
+            timeSpent: number;
+            createdAt: Date;
+            taskId?: { title: string };
+        }[]>();
+
+    const worklogActivities: ActivityItem[] = worklogs.map((log) => ({
+        type: "WORKLOG_ADDED",
+        message: `You logged ${Math.round(log.timeSpent / 60)}h on "${log.taskId?.title}"`,
+        createdAt: log.createdAt
+    }));
+
+    const combined = [...taskActivities, ...worklogActivities]
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        .slice(0, limit);
+
+    return combined;
+}
 }

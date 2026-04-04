@@ -6,4 +6,6 @@ export interface ActivityItem {
 
 export interface IActivityRepository {
   getRecentActivities(companyId: string): Promise<ActivityItem[]>;
+  getRecentActivitiesByUser(userId: string): Promise<ActivityItem[]>;
 }
+
