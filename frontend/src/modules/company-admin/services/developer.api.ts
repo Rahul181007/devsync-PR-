@@ -1,4 +1,5 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { Developer } from "../types/developer.types";
 
 export interface FetchDevelopersParams{
@@ -19,15 +20,15 @@ export interface FetchDevelopersResponse {
 }
 export const developerApiForCompany={
     getDevelopers(params:FetchDevelopersParams):Promise<FetchDevelopersResponse>{
-       return http.get('/company/developers',{params}).then(res=>res.data.data);
+       return http.get(API_ROUTES.COMPANY.DEVELOPERS,{params}).then(res=>res.data.data);
     },
     inviteDeveloper(data:{email:string}){
-     return http.post('/company/invite-developer',data)
+     return http.post(API_ROUTES.COMPANY.INVITE_DEVELOPER,data)
     },
     blockDeveloper(userId:string){
-        return http.post (`/company/developers/${userId}/block`)
+        return http.post (API_ROUTES.COMPANY.BLOCK_DEVELOPER(userId))
     },
     unblockDeveloper(userId:string){
-        return http.post(`/company/developers/${userId}/unblock`)
+        return http.post(API_ROUTES.COMPANY.UNBLOCK_DEVELOPER(userId))
     }
 }

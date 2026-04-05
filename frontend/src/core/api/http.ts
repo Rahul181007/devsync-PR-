@@ -61,6 +61,33 @@ http.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
+    if (
+  error.response?.status === 403 &&
+  (
+    error.response?.data?.code === "USER_BLOCKED" ||
+    error.response?.data?.message?.includes("blocked")
+  )
+) {
+  try {
+    // ✅ clear cookie from backend
+    await http.post("/auth/logout");
+  } catch (error) {
+    console.warn("Logout failed (ignored)", error)
+  }
+
+  const path = window.location.pathname;
+
+  if (path.startsWith("/developer")) {
+    window.location.href = "/developer/login";
+  } else if (path.startsWith("/company")) {
+    window.location.href = "/company/login";
+  } else {
+    window.location.href = "/super-admin/login";
+  }
+
+  return Promise.reject(error);
+}
+
     const isAuthRoute = AUTH_EXCLUDED_ROUTES.some(route =>
       originalRequest.url?.includes(route)
     );
@@ -68,6 +95,7 @@ http.interceptors.response.use(
     if (isAuthRoute) {
       return Promise.reject(error);
     }
+
 
     if (error.response?.status === 401 && error.response?.data?.code === "ACCESS_TOKEN_EXPIRED" && !originalRequest._retry) {
       if (isRefreshing) {

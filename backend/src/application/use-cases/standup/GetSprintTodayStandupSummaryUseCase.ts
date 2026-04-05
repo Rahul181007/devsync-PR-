@@ -8,6 +8,7 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
+import { toUTCDateOnly } from "../../../shared/utils/date.util";
 
 import { GetSprintTodayStandupSummaryResponseDTO, SprintTodayStandupMemberDTO } from "../../dto/standup/getSprintTodayStandupSummaryResponse.dto";
 import { IGetSprintTodayStandupSummaryUseCase } from "../../interface/standup/IGetSprintTodayStandupSummaryUseCase";
@@ -76,8 +77,7 @@ export class GetSprintTodayStandupSummaryUseCase implements IGetSprintTodayStand
             users.map((u) => [u.id, u])
         )
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0)
+const today = toUTCDateOnly(new Date());
 
         const todayStandups = await this._standupRepo.findBySprintAndDate(sprint.id, today)
 

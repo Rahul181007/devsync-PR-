@@ -1,5 +1,6 @@
 import { Standup } from "../../domain/entities/standup.entity";
 import { CreateStandupInput, IStandupRepository } from "../../domain/repositories/standup.repository";
+import { toUTCDateOnly } from "../../shared/utils/date.util";
 import { IStandupDocument, StandupModel } from "../db/models/standup.model";
 
 
@@ -14,91 +15,106 @@ type StandupQuery = {
 
 
 export class StandupRepository implements IStandupRepository {
-    private _toDomain(doc: IStandupDocument): Standup {
-        return new Standup(
-            doc._id.toString(),
-            doc.projectId.toString(),
-            doc.companyId.toString(),
-            doc.sprintId.toString(),
-            doc.userId.toString(),
-            doc.standupDate,
-            doc.yesterday,
-            doc.today,
-            doc.blockers ?? null,
-            doc.mood,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
-
-    async create(data: CreateStandupInput): Promise<Standup> {
-        const doc =await StandupModel.create({
-            projectId:data.projectId,
-            companyId:data.companyId,
-            sprintId:data.sprintId,
-            userId:data.userId,
-            standupDate:data.standupDate,
-            yesterday:data.yesterday,
-            today:data.today,
-            blockers:data.blockers?? undefined,
-            mood:data.mood
-        })
-        return this._toDomain(doc)
-    }
-
-    async findByUserSprintAndDate(userId: string, sprintId: string, standupDate: Date): Promise<Standup | null> {
-        const doc=await StandupModel.findOne({
-            userId,
-            sprintId,
-            standupDate
-        })
-        return doc?this._toDomain(doc):null
-    }
-
-    async findBySprint(sprintId: string): Promise<Standup[]> {
-        const docs=await StandupModel.find({sprintId}).sort({standupDate:-1})
-
-        return docs.map(doc=>this._toDomain(doc))
-    }
-
-async findByUserWithFilters(
-  userId: string,
-  filters?: {
-    sprintId?: string;
-    startDate?: Date;
-    endDate?: Date;
-  }
-): Promise<Standup[]> {
-
-  const query: StandupQuery = { userId };
-
-  if (filters?.sprintId) {
-    query.sprintId = filters.sprintId;
+  private _toDomain(doc: IStandupDocument): Standup {
+    return new Standup(
+      doc._id.toString(),
+      doc.projectId.toString(),
+      doc.companyId.toString(),
+      doc.sprintId.toString(),
+      doc.userId.toString(),
+      doc.standupDate,
+      doc.yesterday,
+      doc.today,
+      doc.blockers ?? null,
+      doc.mood,
+      doc.createdAt,
+      doc.updatedAt
+    )
   }
 
-  if (filters?.startDate || filters?.endDate) {
-    query.standupDate = {};
-
-    if (filters.startDate) {
-      query.standupDate.$gte = filters.startDate;
-    }
-
-    if (filters.endDate) {
-      query.standupDate.$lte = filters.endDate;
-    }
+  async create(data: CreateStandupInput): Promise<Standup> {
+    const doc = await StandupModel.create({
+      projectId: data.projectId,
+      companyId: data.companyId,
+      sprintId: data.sprintId,
+      userId: data.userId,
+      standupDate: data.standupDate,
+      yesterday: data.yesterday,
+      today: data.today,
+      blockers: data.blockers ?? undefined,
+      mood: data.mood
+    })
+    return this._toDomain(doc)
   }
 
-  const docs = await StandupModel
-    .find(query)
-    .sort({ standupDate: -1 })
-    .lean();
-
-  return docs.map(doc => this._toDomain(doc));
-}
 
 
+  async findByUserSprintAndDate(
+    userId: string,
+    sprintId: string,
+    date: Date
+  ): Promise<Standup | null> {
 
-     async update(standup: Standup): Promise<Standup> {
+    const start = toUTCDateOnly(date);
+    const end = new Date(start);
+    end.setUTCDate(end.getUTCDate() + 1);
+
+    const doc = await StandupModel.findOne({
+      userId,
+      sprintId,
+      standupDate: {
+        $gte: start,
+        $lt: end
+      }
+    });
+
+    return doc ? this._toDomain(doc) : null;
+  }
+
+  async findBySprint(sprintId: string): Promise<Standup[]> {
+    const docs = await StandupModel.find({ sprintId }).sort({ standupDate: -1 })
+
+    return docs.map(doc => this._toDomain(doc))
+  }
+
+  async findByUserWithFilters(
+    userId: string,
+    filters?: {
+      sprintId?: string;
+      startDate?: Date;
+      endDate?: Date;
+    }
+  ): Promise<Standup[]> {
+
+    const query: StandupQuery = { userId };
+
+    if (filters?.sprintId) {
+      query.sprintId = filters.sprintId;
+    }
+
+    if (filters?.startDate || filters?.endDate) {
+      query.standupDate = {};
+
+      if (filters.startDate) {
+        query.standupDate.$gte = filters.startDate;
+      }
+
+      if (filters.endDate) {
+        query.standupDate.$lte = filters.endDate;
+      }
+    }
+
+    const docs = await StandupModel
+      .find(query)
+      .sort({ standupDate: -1 })
+      .lean();
+
+    return docs.map(doc => this._toDomain(doc));
+  }
+
+
+
+  async update(standup: Standup): Promise<Standup> {
     const doc = await StandupModel.findByIdAndUpdate(
       standup.id,
       {
@@ -117,14 +133,29 @@ async findByUserWithFilters(
     return this._toDomain(doc);
   }
 
-  async findBySprintAndDate(sprintId: string, standupDate: Date): Promise<Standup[]> {
-      const docs=await StandupModel.find({sprintId,standupDate})
-      return docs.map((doc)=>this._toDomain(doc))
-  }
+async findBySprintAndDate(
+  sprintId: string,
+  date: Date
+): Promise<Standup[]> {
+
+  const start = toUTCDateOnly(date);
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 1);
+
+  const docs = await StandupModel.find({
+    sprintId,
+    standupDate: {
+      $gte: start,
+      $lt: end
+    }
+  });
+
+  return docs.map(doc => this._toDomain(doc));
+}
 
   async findById(id: string): Promise<Standup | null> {
-  const doc = await StandupModel.findById(id);
-  if (!doc) return null;
-  return this._toDomain(doc);
-}
+    const doc = await StandupModel.findById(id);
+    if (!doc) return null;
+    return this._toDomain(doc);
+  }
 }

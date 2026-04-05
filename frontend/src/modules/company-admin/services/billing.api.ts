@@ -1,22 +1,23 @@
 import { http } from "../../../core/api/http"
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { BillingCycle, CreatePaymentResponse, PaymentHistory, Plan, Subscription } from "../types/billing.types";
 
 export const billingApi = {
     getCurrentSubscription() {
         return http.get<{ success: boolean; data: Subscription }>(
-            "/company/subscription"
+            API_ROUTES.COMPANY.SUBSCRIPTION
         )
     },
 
     getAvailablePlans() {
         return http.get<{ success: boolean; data: Plan[] }>(
-            "/company/plans"
+            API_ROUTES.COMPANY.PLANS
         )
     },
 
     getPaymentHistory() {
         return http.get<{ success: boolean; data: PaymentHistory[] }>(
-            "/company/payments"
+            API_ROUTES.COMPANY.PAYMENTS
         )
     },
 
@@ -25,7 +26,7 @@ export const billingApi = {
         billingCycle: BillingCycle
     }) {
         return http.post<{ success: boolean; data: CreatePaymentResponse }>(
-            "/company/payment/create",
+            API_ROUTES.COMPANY.CREATE_PAYMENT,
             data
         )
     },
@@ -36,14 +37,14 @@ export const billingApi = {
         signature: string;
     }) {
         return http.post<{ success: boolean; message: string }>(
-            "/company/payment/verify",
+            API_ROUTES.COMPANY.VERIFY_PAYMENT,
             data
         )
     },
 
         downloadInvoice(invoiceId: string) {
         return http.get(
-            `/company/invoice/${invoiceId}`,
+            API_ROUTES.COMPANY.DOWNLOAD_INVOICE(invoiceId),
             {
                 responseType: "blob"
             }

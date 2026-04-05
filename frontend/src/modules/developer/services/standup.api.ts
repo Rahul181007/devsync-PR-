@@ -1,10 +1,11 @@
 import { http } from "../../../core/api/http"
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { DeveloperStandupResponse, StandupMood } from "../types/standup.type";
 
 export const devStandupApi = {
     getmyStandup(projectId: string) {
         return http.get<{ success: boolean; data: DeveloperStandupResponse }>(
-            `/developer/projects/${projectId}/standups`
+            API_ROUTES.DEVELOPER.STANDUPS(projectId)
         )
     },
 
@@ -15,7 +16,7 @@ export const devStandupApi = {
         mood: StandupMood
     }) {
         return http.post<{ success: boolean; message: string }>(
-            `/developer/projects/${projectId}/standups`, data
+             API_ROUTES.DEVELOPER.STANDUPS(projectId), data
         )
     },
 
@@ -27,7 +28,7 @@ export const devStandupApi = {
 
     }){
        return http.put<{success:boolean;message:string}>(
-            `/developer/projects/${projectId}/standups`, data
+            API_ROUTES.DEVELOPER.STANDUPS(projectId), data
         )
     }
 }

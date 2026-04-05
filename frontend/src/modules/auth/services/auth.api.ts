@@ -1,19 +1,20 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { AuthUser, OnboardingStep } from "../auth.slice";
 
-export interface MeResponse{
-    user:AuthUser;
-    requiresOnboarding: boolean;
-    waitingForApproval: boolean;
-    rejectedCompany:boolean;
-    rejectionReason:string|null;
-    suspendedCompany:boolean
-    onboardingStep:OnboardingStep;
+export interface MeResponse {
+  user: AuthUser;
+  requiresOnboarding: boolean;
+  waitingForApproval: boolean;
+  rejectedCompany: boolean;
+  rejectionReason: string | null;
+  suspendedCompany: boolean
+  onboardingStep: OnboardingStep;
 }
 
-export interface LoginRequest{
-    email:string;
-    password:string;
+export interface LoginRequest {
+  email: string;
+  password: string;
 }
 
 export interface LoginResponse {
@@ -39,67 +40,67 @@ export interface LoginResponse {
   };
 }
 
-export const authApi={
-       superAdminLogin(data:LoginRequest){
-        return http.post<LoginResponse>('/auth/superadmin/login',data)
-       },
+export const authApi = {
+  superAdminLogin(data: LoginRequest) {
+    return http.post<LoginResponse>(API_ROUTES.AUTH.SUPERADMIN_LOGIN, data)
+  },
 
-       // company admin & developer login
+  // company admin & developer login
 
-       userLogin(data:LoginRequest){
-        return http.post<LoginResponse>('/auth/login',data)
-       },
-       getMe(){
-            return http.get<{data:MeResponse}>('/auth/me')
-       },
-       refresh(){
-        return http.post('/auth/refresh')
-       },
+  userLogin(data: LoginRequest) {
+    return http.post<LoginResponse>(API_ROUTES.AUTH.LOGIN, data)
+  },
+  getMe() {
+    return http.get<{ data: MeResponse }>(API_ROUTES.AUTH.ME)
+  },
+  refresh() {
+    return http.post(API_ROUTES.AUTH.REFRESH)
+  },
 
-       //password reset
-       forgotPassword(email:string){
-         return http.post ('/auth/forgot-password',{email})
-       },
+  //password reset
+  forgotPassword(email: string) {
+    return http.post(API_ROUTES.AUTH.FORGOT_PASSWORD, { email })
+  },
 
-       resendSignupOtp(email:string){
-        return http.post('/auth/resend-signup-otp',{email})
-       },
-       
-       verifyOtp(data:{email:string;otp:string}){
-        return http.post ('/auth/verify-otp',data)
-       },
+  resendSignupOtp(email: string) {
+    return http.post(API_ROUTES.AUTH.RESEND_SIGNUP_OTP, { email })
+  },
 
-       resetPassword(data:{
-        email:string;
-        otp:string;
-        newPassword:string;
-       }){
-        return http.post('/auth/reset-password',data)
-       },
+  verifyOtp(data: { email: string; otp: string }) {
+    return http.post(API_ROUTES.AUTH.VERIFY_OTP, data)
+  },
 
-       logout(){
-        return http.post('/auth/logout')
-       },
-       signup(data:{name:string;email:string;password:string}){
-        return http.post<{data:{email:string}}>('/auth/signup',data)
-       },
+  resetPassword(data: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }) {
+    return http.post(API_ROUTES.AUTH.RESET_PASSWORD, data)
+  },
 
-       googleSignup(idToken:string){
-        return http.post<{data:{email:string}}>('/auth/google/signup',{idToken})
-       },
+  logout() {
+    return http.post(API_ROUTES.AUTH.LOGOUT)
+  },
+  signup(data: { name: string; email: string; password: string }) {
+    return http.post<{ data: { email: string } }>(API_ROUTES.AUTH.SIGNUP, data)
+  },
 
-       verifySignupOtp(data:{email:string;otp:string}){
-        return http.post('/auth/verify-signup-otp',data)
-       },
-       googleLogin(idToken:string){
-        return http.post ('/auth/google/login',{idToken})
-       },
-       reapplyCompany() {
-  return http.post<{ success: boolean; message: string }>(
-    "/company/reapply"
-  );
-}
-        
+  googleSignup(idToken: string) {
+    return http.post<{ data: { email: string } }>(API_ROUTES.AUTH.GOOGLE_SIGNUP, { idToken })
+  },
 
-        
+  verifySignupOtp(data: { email: string; otp: string }) {
+    return http.post(API_ROUTES.AUTH.VERIFY_SIGNUP_OTP, data)
+  },
+  googleLogin(idToken: string) {
+    return http.post(API_ROUTES.AUTH.GOOGLE_LOGIN, { idToken })
+  },
+  reapplyCompany() {
+    return http.post<{ success: boolean; message: string }>(
+      API_ROUTES.COMPANY.REAPPLY
+    );
+  }
+
+
+
 }

@@ -11,16 +11,16 @@ import { GetSprintHistorySummaryResponseDTO, SprintHistorySummaryItemDTO } from 
 import { IGetSprintHistorySummaryUseCase } from "../../interface/standup/IGetSprintHistorySummaryUseCase";
 
 export class GetSprintHistorySummaryUseCase implements IGetSprintHistorySummaryUseCase {
-    constructor(
-        private _standupRepo: IStandupRepository,
-        private _sprintRepo: ISprintRepository,
-        private _projectRepo: IProjectRepository,
-        private _userRepo: IUserRepository,
-        private _projectMemberRepo: IProjectMemberRepository
-    ) { }
+  constructor(
+    private _standupRepo: IStandupRepository,
+    private _sprintRepo: ISprintRepository,
+    private _projectRepo: IProjectRepository,
+    private _userRepo: IUserRepository,
+    private _projectMemberRepo: IProjectMemberRepository
+  ) { }
 
-    async execute(userId: string, companyId: string, projectId: string): Promise<GetSprintHistorySummaryResponseDTO> {
-     const user = await this._userRepo.findById(userId);
+  async execute(userId: string, companyId: string, projectId: string): Promise<GetSprintHistorySummaryResponseDTO> {
+    const user = await this._userRepo.findById(userId);
     if (!user) {
       throw new AppError(
         RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,
@@ -50,48 +50,48 @@ export class GetSprintHistorySummaryUseCase implements IGetSprintHistorySummaryU
       );
     }
 
-    const sprints=await this._sprintRepo.findByProjectId(projectId);
+    const sprints = await this._sprintRepo.findByProjectId(projectId);
 
-    const members=await this._projectMemberRepo.findMembersByProject(projectId);
-    const developerMembers=members.filter((m)=>m.role===Role.DEVELOPER)
+    const members = await this._projectMemberRepo.findMembersByProject(projectId);
+    const developerMembers = members.filter((m) => m.role === Role.DEVELOPER)
 
-    const totalMembers=developerMembers.length;
+    const totalMembers = developerMembers.length;
 
-    const summaryItems:SprintHistorySummaryItemDTO[]=[];
+    const summaryItems: SprintHistorySummaryItemDTO[] = [];
 
-    for(const sprint of sprints){
-        const start=new Date(sprint.startDate);
-        const end=new Date(sprint.endDate);
+    for (const sprint of sprints) {
+      const start = new Date(sprint.startDate);
+      const end = new Date(sprint.endDate);
 
-        const diffTime=end.getTime()-start.getTime();
-        const totalSprintDays=Math.floor(diffTime/(1000*60*60*24))+1
+      const diffTime = end.getTime() - start.getTime();
+      const totalSprintDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1
 
-        const totalStandupsExpected=totalSprintDays*totalMembers;
+      const totalStandupsExpected = totalSprintDays * totalMembers;
 
-        const sprintStandups=await this._standupRepo.findBySprint(sprint.id);
+      const sprintStandups = await this._standupRepo.findBySprint(sprint.id);
 
-        const totalStandupsSubmitted=sprintStandups.length;
+      const totalStandupsSubmitted = sprintStandups.length;
 
-        const totalStandupsMissed=totalStandupsExpected-totalStandupsSubmitted;
+      const totalStandupsMissed = totalStandupsExpected - totalStandupsSubmitted;
 
-        const completionPercentage=totalStandupsExpected===0?0:Math.round((totalStandupsSubmitted/totalStandupsExpected)*100);
+      const completionPercentage = totalStandupsExpected === 0 ? 0 : Math.round((totalStandupsSubmitted / totalStandupsExpected) * 100);
 
-        summaryItems.push({
-            sprintId:sprint.id,
-            sprintName:sprint.name,
-            sprintStatus:sprint.status,
-            totalMembers,
-            sprintStartDate:sprint.startDate,
-            sprintEndDate:sprint.endDate,
-            totalSprintDays,
-            totalStandupsExpected,
-            totalStandupsSubmitted,
-            totalStandupsMissed,
-            completionPercentage
-        })
+      summaryItems.push({
+        sprintId: sprint.id,
+        sprintName: sprint.name,
+        sprintStatus: sprint.status,
+        totalMembers,
+        sprintStartDate: sprint.startDate,
+        sprintEndDate: sprint.endDate,
+        totalSprintDays,
+        totalStandupsExpected,
+        totalStandupsSubmitted,
+        totalStandupsMissed,
+        completionPercentage
+      })
     }
     return {
-        sprints:summaryItems
+      sprints: summaryItems
     }
-    }
+  }
 }

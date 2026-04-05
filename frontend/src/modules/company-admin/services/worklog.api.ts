@@ -1,21 +1,22 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { AdminWorklogItem, ProjectTimesheetItem, ProjectWorklogItem } from "../types/wroklog.types";
 
 export const adminWorklogApi = {
   getTaskWorklogs(projectId: string, taskId: string) {
     return http.get<{ data: AdminWorklogItem[] }>(
-      `/projects/${projectId}/tasks/${taskId}/worklogs`
+      API_ROUTES.COMPANY.TASK_WORKLOGS(projectId,taskId)
     );
   },
 
   getProjectWorklogs(projectId: string) {
   return http.get<{ data: ProjectWorklogItem[] }>(
-    `/company/projects/${projectId}/worklogs`
+    API_ROUTES.COMPANY.PROJECT_WORKLOGS(projectId)
   );
 },
 getProjectTimesheet(projectId: string) {
   return http.get<{ data: ProjectTimesheetItem[] }>(
-    `/company/projects/${projectId}/timesheet`
+    API_ROUTES.COMPANY.PROJECT_TIMESHEET(projectId)
   );
 }
 };

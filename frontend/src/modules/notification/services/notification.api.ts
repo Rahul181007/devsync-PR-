@@ -1,24 +1,25 @@
 import { http } from "../../../core/api/http"
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { Notification } from "../types/notification.types";
 
 export const notificationApi={
     getNotifications(){
         return http.get<{success:boolean;data:Notification[]}>(
-            "/notifications"
+            API_ROUTES.COMMON.NOTIFICATIONS
         )
     },
 
     getUnreadCount(){
         return http.get<{success:boolean;data:{count:number}}>(
-            "/notifications/unread-count"
+            API_ROUTES.COMMON.UNREAD_COUNT
         )
     },
 
     markAsRead(notificationId:string){
-        return http.patch(`/notifications/${notificationId}/read`)
+        return http.patch(API_ROUTES.COMMON.MARK_AS_READ(notificationId))
     },
 
     markAllAsRead(){
-        return http.patch("/notifications/read-all")
+        return http.patch(API_ROUTES.COMMON.MARK_ALL_AS_READ)
     }
 }

@@ -17,17 +17,20 @@ import { ISignupUseCase } from "../application/interface/auth/ISignupUseCase";
 import { IVerifySignupOtpUseCase } from "../application/interface/auth/IVerifySignupOtpUseCase";
 import { IResendSignupOtpUseCase } from "../application/interface/auth/IResendSignupOtpUseCase";
 import { ResendSignupOtpUseCase } from "../application/use-cases/auth/ResendSignupOtpUseCase";
+import { ICheckUserStatusUseCase } from "../application/interface/user/ICheckUserStatusUseCase";
+import { CheckUserStatusUseCase } from "../application/use-cases/user/checkUserStatus.usecase";
+import { SuperAdminRepository } from "../infrastructure/repositories/superAdmin.repository";
 const userRepository=new UserRepository();
 const companyRepository=new CompanyRepository();
 const passwordHasher=new BcryptPasswordHasher();
 const googleAuthService=new GoogleAuthService();
 const emailService=new NodemailerService();
-
+const superAdminRepository=new SuperAdminRepository()
 const googleSignupUseCase:IGoogleSignupUseCase=new GoogleSignupUseCase(userRepository,googleAuthService,emailService);
 const verifySignupOtpUseCase:IVerifySignupOtpUseCase=new VerifySignupOtpUseCase(userRepository)
 const loginUserUseCase:ILoginUserUseCase=new LoginUserUseCase(userRepository,passwordHasher,companyRepository);
 const signupUseCase:ISignupUseCase=new SignupUseCase(userRepository,passwordHasher,emailService)
 const googleLoginUseCase:IGoogleLoginUseCase=new GoogleLoginUseCase(userRepository,companyRepository,googleAuthService);
 const resendSignupOtpUseCase:IResendSignupOtpUseCase=new ResendSignupOtpUseCase(userRepository,emailService)
-
+export const checkUserStatusUseCase:ICheckUserStatusUseCase=new CheckUserStatusUseCase(userRepository,superAdminRepository)
 export const userAuthController=new UserAuthController(loginUserUseCase,refreshTokenUseCase,signupUseCase,googleSignupUseCase,verifySignupOtpUseCase,googleLoginUseCase,resendSignupOtpUseCase)

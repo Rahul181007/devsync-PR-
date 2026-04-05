@@ -24,6 +24,7 @@ export const ROUTES={
     COMPANIES: "/super-admin/companies",
     COMPANY_DETAIL: (companyId: string) =>
       `/super-admin/companies/${companyId}`,
+    
 
   },
 
