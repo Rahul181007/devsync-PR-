@@ -152,6 +152,19 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             parentId = parentTask.id;
         }
 
+        const type = data.type ?? "TASK";
+
+        if (type === "STORY" && data.storyPoints == null) {
+            throw new AppError(
+                RESPONSE_MESSAGES.TASK.STORY_POINTS_REQUIRED,
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        if (type !== "STORY") {
+            data.storyPoints = undefined;
+        }
+
 
 
         const createdTask = await this._taskRepo.create({
@@ -164,11 +177,16 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             title: data.title.trim(),
             description: data.description.trim(),
 
-            type: data.type ?? "TASK",
+            type: type,
 
             status: "BACKLOG",
             priority: data.priority,
-            estimatedTime:data.estimatedTime??null,
+            estimatedTime: data.estimatedTime ?? null,
+            storyPoints:
+                type === "STORY"
+                    ? data.storyPoints
+                    : undefined,
+
 
             assigneeId,
             reporterId: user.id,
@@ -190,7 +208,8 @@ export class CreateTaskUseCase implements ICreateTaskUseCase {
             type: createdTask.type,
             status: createdTask.status,
             priority: createdTask.priority,
-            estimatedTime:createdTask.estimatedTime,
+            estimatedTime: createdTask.estimatedTime,
+            storyPoints: createdTask.storyPoints,
 
             assigneeId: createdTask.assigneeId,
             reporterId: createdTask.reporterId,

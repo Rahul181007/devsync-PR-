@@ -1,21 +1,55 @@
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import NotificationBell from "../../notification/components/NotificationBell"; 
+import { useAppSelector } from "../../../store/hook";
 
-const TopBar = () => {
+type TopBarProps = {
+  onMenuClick: () => void;
+};
+const TopBar = ({ onMenuClick }: TopBarProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+const slug = user?.companySlug;
   return (
-    <header className="h-14 bg-white border-b flex items-center justify-between px-6 shadow-sm">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
       
-      <h1 className="text-lg font-semibold text-slate-800 tracking-wide">
-        Company Admin
-      </h1>
+      <div className="flex items-center space-x-3">
+                <button
+          onClick={onMenuClick}
+          className="md:hidden p-2 rounded-md hover:bg-gray-100"
+        >
+          ☰
+        </button>
+        <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+          <span className="text-white text-sm font-bold">CA</span>
+        </div>
+        <h1 className="text-xl font-bold text-gray-800 tracking-tight">
+          Company Admin
+        </h1>
+        <span className="px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-600 rounded-full">
+          Admin
+        </span>
+      </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
         
         {/* Real Notification Bell */}
-        <NotificationBell />
+        <div className="relative">
+          <NotificationBell />
+        </div>
 
         {/* Profile Icon */}
-        <HiOutlineUserCircle className="text-2xl text-gray-600 hover:text-slate-800 cursor-pointer transition duration-200" />
+        <div className="h-8 w-px bg-gray-200"></div>
+        <a href={`/company/${slug}/settings`} className="group">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+              <HiOutlineUserCircle className="text-xl text-gray-600 group-hover:text-gray-800 transition-colors" />
+            </div>
+            <div className="hidden md:block text-left">
+              <p className="text-xs font-medium text-gray-700">Admin User</p>
+              
+            </div>
+          </div>
+        </a>
+        
       </div>
     </header>
   );

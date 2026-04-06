@@ -8,4 +8,5 @@ export interface UpdateTaskRequestDTO{
     assigneeId?:string|null;
     dueDate?:Date|null
     estimatedTime?: number;
+    storyPoints?:number|null;
 }

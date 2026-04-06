@@ -13,4 +13,5 @@ export interface CreateTaskRequestDTO {
     assigneeId?: string | null;
     dueDate?: Date | null
     estimatedTime?: number;
+    storyPoints?:number|null;
 }

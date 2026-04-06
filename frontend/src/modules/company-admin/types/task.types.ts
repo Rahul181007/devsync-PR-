@@ -52,6 +52,8 @@ export interface TaskDetail {
   status: TaskStatus;
   priority: TaskPriority;
   estimatedTime: number | null;
+  storyPoints?: number | null;
+  
 
   sprint: TaskSprint | null;
 

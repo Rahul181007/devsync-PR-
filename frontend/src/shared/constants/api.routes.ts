@@ -85,9 +85,11 @@ export const API_ROUTES = {
     STANDUP_DETAIL: (projectId: string, standupId: string) =>
       `/company/projects/${projectId}/standups/${standupId}`,
 
+    
     // Tasks
     TASKS: (projectId: string) =>
       `/company/projects/${projectId}/tasks`,
+
     TASK_BY_ID: (projectId: string, taskId: string) =>
       `/company/projects/${projectId}/tasks/${taskId}`,
     TASK_STATUS: (projectId: string, taskId: string) =>
@@ -143,9 +145,11 @@ export const API_ROUTES = {
 
   // Worklogs
   TASK_WORKLOGS: (projectId: string, taskId: string) =>
-    `/projects/${projectId}/tasks/${taskId}/worklogs`,
+    `/developer/projects/${projectId}/tasks/${taskId}/worklogs`,
   WORKLOG_BY_ID: (projectId: string, worklogId: string) =>
     `/developer/projects/${projectId}/worklogs/${worklogId}`,
+  GET_TASK_WORKLOGS: (projectId: string, taskId: string) =>
+      `/projects/${projectId}/tasks/${taskId}/worklogs`,
 },
 
 AUTH: {

@@ -32,7 +32,8 @@ export class TaskRepository implements ITaskRepository {
                     submittedAt: doc.submission.submittedAt,
                 }
                 : null,
-            doc.estimatedTime ?? null
+            doc.estimatedTime ?? null,
+            doc.storyPoints ?? null
         )
     }
 
@@ -55,6 +56,10 @@ export class TaskRepository implements ITaskRepository {
 
             dueDate: task.dueDate ?? null,
             estimatedTime: task.estimatedTime ?? null,
+            storyPoints:
+                task.type === "STORY"
+                    ? task.storyPoints
+                    : undefined,
 
         })
         return this._toDomain(doc)
@@ -87,6 +92,11 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async update(task: Task): Promise<Task> {
+        console.log("UPDATE TASK:", {
+    id: task.id,
+    type: task.type,
+    storyPoints: task.storyPoints
+});
         const doc = await TaskModel.findByIdAndUpdate(
             task.id,
             {
@@ -101,6 +111,10 @@ export class TaskRepository implements ITaskRepository {
 
                 submission: task.submission ?? null,
                 estimatedTime: task.estimatedTime ?? null,
+                storyPoints:
+                    task.type === "STORY"
+                        ? task.storyPoints ?? null
+                        : null,
             },
             { new: true }
         );
@@ -207,67 +221,67 @@ export class TaskRepository implements ITaskRepository {
         return result;
     }
 
-async countTasksByStatusForUser(userId: string): Promise<
-  { _id: TaskStatus; count: number }[]
-> {
-    const objectUserId = new mongoose.Types.ObjectId(userId);
+    async countTasksByStatusForUser(userId: string): Promise<
+        { _id: TaskStatus; count: number }[]
+    > {
+        const objectUserId = new mongoose.Types.ObjectId(userId);
 
-    const result = await TaskModel.aggregate([
-        {
-            $match: {
-                assigneeId: objectUserId,
-                type: { $in: ["TASK", "BUG"] } // keep consistency with your other methods
+        const result = await TaskModel.aggregate([
+            {
+                $match: {
+                    assigneeId: objectUserId,
+                    type: { $in: ["TASK", "BUG"] } // keep consistency with your other methods
+                }
+            },
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
             }
-        },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 }
-            }
-        }
-    ]);
+        ]);
 
-    return result;
-}
+        return result;
+    }
 
-async getPriorityTasks(userId: string): Promise<{
-  id: string;
-  title: string;
-  projectName: string;
-  status: string;
-  priority: string;
-  dueDate: Date | null;
-}[]> {
+    async getPriorityTasks(userId: string): Promise<{
+        id: string;
+        title: string;
+        projectName: string;
+        status: string;
+        priority: string;
+        dueDate: Date | null;
+    }[]> {
 
-  const docs = await TaskModel.find({
-    assigneeId: new mongoose.Types.ObjectId(userId),
-    status: { $ne: "COMPLETED" },
-    type: { $in: ["TASK", "BUG"] }
-  })
-    .sort({
-      dueDate: 1,
-      priority: -1
-    })
-    .limit(5)
-    .populate("projectId", "name")
-    .lean<{
-      _id: mongoose.Types.ObjectId;
-      title: string;
-      status: string;
-      priority: string;
-      dueDate?: Date | null;
-      projectId: {
-        name: string;
-      };
-    }[]>();
+        const docs = await TaskModel.find({
+            assigneeId: new mongoose.Types.ObjectId(userId),
+            status: { $ne: "COMPLETED" },
+            type: { $in: ["TASK", "BUG"] }
+        })
+            .sort({
+                dueDate: 1,
+                priority: -1
+            })
+            .limit(5)
+            .populate("projectId", "name")
+            .lean<{
+                _id: mongoose.Types.ObjectId;
+                title: string;
+                status: string;
+                priority: string;
+                dueDate?: Date | null;
+                projectId: {
+                    name: string;
+                };
+            }[]>();
 
-  return docs.map((doc) => ({
-    id: doc._id.toString(),
-    title: doc.title,
-    status: doc.status,
-    priority: doc.priority,
-    dueDate: doc.dueDate ?? null,
-    projectName: doc.projectId?.name || "Unknown"
-  }));
-}
+        return docs.map((doc) => ({
+            id: doc._id.toString(),
+            title: doc.title,
+            status: doc.status,
+            priority: doc.priority,
+            dueDate: doc.dueDate ?? null,
+            projectName: doc.projectId?.name || "Unknown"
+        }));
+    }
 }

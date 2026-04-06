@@ -132,6 +132,26 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
         task.assigneeId = assigneeId;
 
 
+        const type = task.type;
+
+        if (type === "STORY" && data.storyPoints == null && task.storyPoints == null) {
+            throw new AppError(
+                RESPONSE_MESSAGES.TASK.STORY_POINTS_REQUIRED,
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        if (type !== "STORY") {
+            task.storyPoints = undefined;
+        }
+
+        if (type === "STORY") {
+            if (data.storyPoints !== undefined) {
+                task.storyPoints = data.storyPoints;
+            }
+        }
+
+
         const updatedTask = await this._taskRepo.update(task);
 
         return {
@@ -149,7 +169,8 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
             type: updatedTask.type,
             status: updatedTask.status,
             priority: updatedTask.priority,
-            estimatedTime:updatedTask.estimatedTime,
+            estimatedTime: updatedTask.estimatedTime,
+            storyPoints: updatedTask.storyPoints,
 
             assigneeId: updatedTask.assigneeId,
             reporterId: updatedTask.reporterId,

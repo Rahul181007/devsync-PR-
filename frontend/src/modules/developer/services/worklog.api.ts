@@ -23,7 +23,7 @@ export const worklogApi = {
   
   getWorklogsByTask(projectId: string, taskId: string) {
     return http.get<{ success: boolean; data: WorklogItem[] }>(
-       API_ROUTES.DEVELOPER.TASK_WORKLOGS(projectId,taskId)
+       API_ROUTES.DEVELOPER.GET_TASK_WORKLOGS(projectId,taskId)
     );
   },
 

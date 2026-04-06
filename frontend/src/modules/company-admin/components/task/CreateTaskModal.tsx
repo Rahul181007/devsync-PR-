@@ -25,7 +25,7 @@ export const CreateTaskModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parentId, setParentId] = useState<string | null>(null);
   const [estimatedTime, setEstimatedTime] = useState<number | "">("");
-
+  const [storyPoints, setStoryPoints] = useState<number | "">("");
   const { tasks } = useAppSelector((state) => state.companyAdminTask);
 
   const parentTypeMap = {
@@ -40,7 +40,7 @@ export const CreateTaskModal = ({
     requiredParentType
       ? tasks.filter((t) => t.type === requiredParentType)
       : [];
-  
+
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
@@ -54,9 +54,14 @@ export const CreateTaskModal = ({
     });
 
     if ((type === "TASK" || type === "BUG") && !parentId) {
-  toast.error(`${type} must have a parent Story`);
-  return;
-}
+      toast.error(`${type} must have a parent Story`);
+      return;
+    }
+
+    if (type === "STORY" && !storyPoints) {
+      toast.error("Story points required");
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -74,6 +79,10 @@ export const CreateTaskModal = ({
               estimatedTime !== ""
                 ? Math.round(estimatedTime * 60)
                 : undefined,
+            storyPoints:
+              type === "STORY"
+                ? Number(storyPoints)
+                : null,
           },
         })
       );
@@ -101,7 +110,7 @@ export const CreateTaskModal = ({
   ];
 
   const getPriorityColor = (p: string) => {
-    switch(p) {
+    switch (p) {
       case "HIGH": return "bg-red-50 text-red-700 border-red-200";
       case "MEDIUM": return "bg-yellow-50 text-yellow-700 border-yellow-200";
       default: return "bg-green-50 text-green-700 border-green-200";
@@ -173,6 +182,10 @@ export const CreateTaskModal = ({
                   const newType = e.target.value as "EPIC" | "STORY" | "TASK" | "BUG";
                   setType(newType);
                   setParentId(null);
+
+                  if (newType !== "STORY") {
+                    setStoryPoints("");
+                  }
                 }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-gray-50 hover:bg-white focus:bg-white"
               >
@@ -276,6 +289,31 @@ export const CreateTaskModal = ({
                 Enter time in hours
               </p>
             </div>
+
+            {type === "STORY" && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600">
+                  Story Points
+                </label>
+                <select
+                  value={storyPoints}
+                  onChange={(e) =>
+                    setStoryPoints(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"
+                >
+                  <option value="">Select points</option>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={5}>5</option>
+                  <option value={8}>8</option>
+                  <option value={13}>13</option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
 

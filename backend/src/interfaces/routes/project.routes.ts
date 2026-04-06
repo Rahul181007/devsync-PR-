@@ -28,7 +28,7 @@ router.post ('/company/projects/:projectId/members',verifyAccessToken,checkUserS
 router.delete('/company/projects/:projectId/members/:memberId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.removeProjectMember)
 
 //task module
-router.post("/company/projects/:projectId/task",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.createTask)
+router.post("/company/projects/:projectId/tasks",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.createTask)
 router.get("/company/projects/:projectId/tasks",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.getProjectTasks)
 router.get('/company/projects/:projectId/tasks/:taskId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.getTaskDetail);
 router.patch("/company/projects/:projectId/tasks/:taskId/status",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.updateTaskStatus)
@@ -79,8 +79,8 @@ router.get("/projects/:projectId/ai-summary",verifyAccessToken,checkUserStatus,a
 
 // worklog module
 
-router.post("/developer/projects/:projectId/tasks/:taskId/worklogs",checkUserStatus,verifyAccessToken,requireRole(Role.DEVELOPER),worklogController.createWorklog);
-router.patch("/developer/projects/:projectId/worklogs/:worklogId",checkUserStatus,verifyAccessToken,requireRole(Role.DEVELOPER),worklogController.updateWorklog);
+router.post("/developer/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.createWorklog);
+router.patch("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.updateWorklog);
 
 router.delete("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.deleteWorklog);
 router.get("/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,checkUserStatus,worklogController.getByTask);

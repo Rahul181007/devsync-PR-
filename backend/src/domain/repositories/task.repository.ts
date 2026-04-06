@@ -13,6 +13,7 @@ export interface CreateTaskInput {
     status: TaskStatus;
     priority: TaskPriority;
     estimatedTime?: number | null;
+    storyPoints?:number|null
 
     reporterId: string;
     assigneeId?: string | null;

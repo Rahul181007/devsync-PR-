@@ -116,7 +116,7 @@ export const RESPONSE_MESSAGES = {
         ASSIGNED_USER: "Assigned user must be a developer",
         DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date",
         CANNOT_CHANGE_TYPE_WITH_CHILDREN:"cannot change the type it has children task",
-
+        STORY_POINTS_REQUIRED:"story points required for story"
     },
 
     SPRINT: {

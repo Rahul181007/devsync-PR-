@@ -18,6 +18,7 @@ interface EditTaskForm {
     priority: TaskPriority;
     dueDate: string | null
     estimatedTime: number | "";
+    storyPoints: string | "";
 }
 
 export const EditTaskModal = ({
@@ -32,6 +33,8 @@ export const EditTaskModal = ({
         (state) => state.companyAdminTask
     );
 
+    console.log(selectedTask)
+
 
 
     const [form, setForm] = useState<EditTaskForm>({
@@ -40,7 +43,8 @@ export const EditTaskModal = ({
         type: "TASK",
         priority: "MEDIUM",
         dueDate: null,
-        estimatedTime: ""
+        estimatedTime: "",
+        storyPoints: ""
     });
 
     // Fetch task when modal opens
@@ -54,7 +58,6 @@ export const EditTaskModal = ({
     useEffect(() => {
         if (!isOpen || !selectedTask) return;
 
-        console.log(selectedTask)
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setForm({
             title: selectedTask.title,
@@ -66,12 +69,16 @@ export const EditTaskModal = ({
                 selectedTask.estimatedTime != null
                     ? selectedTask.estimatedTime / 60
                     : "",
+            storyPoints:
+                selectedTask.storyPoints != null
+                    ? String(selectedTask.storyPoints)
+                    : "",
         });
     }, [isOpen, selectedTask]);
 
 
 
-    const handleChange = (field: keyof EditTaskForm, value: number|string | null) => {
+    const handleChange = (field: keyof EditTaskForm, value: number | string | null) => {
         setForm((prev) => ({
             ...prev,
             [field]: value
@@ -80,17 +87,26 @@ export const EditTaskModal = ({
 
     const handleUpdate = async () => {
         try {
+            if (form.type === "STORY" && !form.storyPoints) {
+                toast.error("Story points required");
+                return;
+            }
             const result = await dispatch(
                 updateTask({
                     projectId,
                     taskId,
-                    data:  {
-          ...form,
-          estimatedTime:
-            form.estimatedTime !== ""
-              ? Math.round((form.estimatedTime as number) * 60)
-              : undefined,
-        },
+                    data: {
+                        ...form,
+                        estimatedTime:
+                            form.estimatedTime !== ""
+                                ? Math.round((form.estimatedTime as number) * 60)
+                                : undefined,
+
+                        storyPoints:
+                            form.type === "STORY"
+                                ? Number(form.storyPoints)
+                                : undefined,
+                    },
                 })
             );
 
@@ -138,9 +154,14 @@ export const EditTaskModal = ({
 
                         <select
                             value={form.type}
-                            onChange={(e) =>
-                                handleChange("type", e.target.value as TaskType)
-                            }
+                            onChange={(e) => {
+                                const newType = e.target.value as TaskType;
+                                handleChange("type", newType);
+
+                                if (newType !== "STORY") {
+                                    handleChange("storyPoints", ""); // reset
+                                }
+                            }}
                             className="w-full border rounded-lg px-3 py-2 text-sm"
                         >
                             <option value="TASK">Task</option>
@@ -171,20 +192,38 @@ export const EditTaskModal = ({
                         />
 
                         {/* Estimated Time */}
-<input
-  type="number"
-  min="0"
-  step="0.5"
-  value={form.estimatedTime}
-  onChange={(e) =>
-    handleChange(
-      "estimatedTime",
-      e.target.value === "" ? "" : Number(e.target.value)
-    )
-  }
-  className="w-full border rounded-lg px-3 py-2 text-sm"
-  placeholder="Estimated time (hours)"
-/>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.5"
+                            value={form.estimatedTime}
+                            onChange={(e) =>
+                                handleChange(
+                                    "estimatedTime",
+                                    e.target.value === "" ? "" : Number(e.target.value)
+                                )
+                            }
+                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                            placeholder="Estimated time (hours)"
+                        />
+
+                        {form.type === "STORY" && (
+                            <select
+                                value={form.storyPoints}
+                                onChange={(e) =>
+                                    handleChange("storyPoints", e.target.value)
+                                }
+                                className="w-full border rounded-lg px-3 py-2 text-sm"
+                            >
+                                <option value="">Select Story Points</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="5">5</option>
+                                <option value="8">8</option>
+                                <option value="13">13</option>
+                            </select>
+                        )}
 
                         <div className="flex justify-end gap-2 pt-2">
                             <button

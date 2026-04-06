@@ -25,7 +25,7 @@ export const taskApi = {
 
   getTaskDetail(projectId: string, taskId: string) {
     return http.get<{ message: string; data: TaskDetail }>(
-      API_ROUTES.COMPANY.TASK_BY_ID(projectId,taskId)
+      API_ROUTES.COMPANY.TASK_BY_ID(projectId, taskId)
     );
   },
   updateTaskStatus(
@@ -34,7 +34,7 @@ export const taskApi = {
     status: TaskStatus
   ) {
     return http.patch<{ message: string; data: TaskDetail }>(
-      API_ROUTES.COMPANY.TASK_STATUS(projectId,taskId),
+      API_ROUTES.COMPANY.TASK_STATUS(projectId, taskId),
       { status }
     );
   },
@@ -49,10 +49,12 @@ export const taskApi = {
       priority?: "LOW" | "MEDIUM" | "HIGH"
       assigneeId?: string | null
       dueDate?: string | null
+      estimatedTime?: number | null
+      storyPoints?: number | null
     }
   ) {
     return http.patch<{ message: string; data: TaskDetail }>(
-      API_ROUTES.COMPANY.TASK_BY_ID(projectId,taskId),
+      API_ROUTES.COMPANY.TASK_BY_ID(projectId, taskId),
       data
     );
   },
@@ -60,20 +62,20 @@ export const taskApi = {
 
   getTaskComment(projectId: string, taskId: string) {
     return http.get<{ message: string; data: TaskComment[] }>(
-      API_ROUTES.COMPANY.TASK_COMMENTS(projectId,taskId)
+      API_ROUTES.COMPANY.TASK_COMMENTS(projectId, taskId)
     );
   },
 
   addComment(projectId: string, taskId: string, message: string) {
     return http.post<{ message: string; data: TaskComment }>(
-      API_ROUTES.COMPANY.TASK_COMMENTS(projectId,taskId),
+      API_ROUTES.COMPANY.TASK_COMMENTS(projectId, taskId),
       { message }
     );
   },
 
   getTaskAttachments(projectId: string, taskId: string) {
     return http.get<{ data: TaskAttachment[] }>(
-      API_ROUTES.COMPANY.TASK_ATTACHMENTS(projectId,taskId)
+      API_ROUTES.COMPANY.TASK_ATTACHMENTS(projectId, taskId)
     );
   },
 
@@ -86,7 +88,7 @@ export const taskApi = {
     formData.append("file", file);
 
     return http.post(
-      API_ROUTES.COMPANY.TASK_ATTACHMENTS(projectId,taskId),
+      API_ROUTES.COMPANY.TASK_ATTACHMENTS(projectId, taskId),
       formData,
       {
         headers: {

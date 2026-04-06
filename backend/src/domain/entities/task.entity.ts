@@ -50,5 +50,6 @@ export class Task {
 
         public submission?: TaskSubmission | null,
         public estimatedTime?: number | null,
+        public storyPoints?:number|null
     ) { }
 }
