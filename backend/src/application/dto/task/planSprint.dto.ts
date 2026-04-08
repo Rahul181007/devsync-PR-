@@ -3,7 +3,12 @@ export interface PlanSprintTaskItemDTO{
     developerId:string
 }
 
-export interface PlanSprintRequestDTO{
+export interface PlanSprintRequestDTOS{
     sprintId:string;
     tasks:PlanSprintTaskItemDTO[]
+}
+
+export interface PlanSprintRequestDTO{
+    sprintId:string;
+    storyIds: string[];
 }

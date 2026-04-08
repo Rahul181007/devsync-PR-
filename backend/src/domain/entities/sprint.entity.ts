@@ -21,6 +21,7 @@ export class Sprint {
     public readonly createdBy: string,
 
     public readonly createdAt: Date,
-    public updatedAt: Date
-  ) {}
+    public updatedAt: Date,
+    public stories: string[] = []
+  ) { }
 }

@@ -5,13 +5,14 @@ export interface CreateSprintInput {
   companyId: string;
 
   name: string;
-  goal?: string|null ;
+  goal?: string | null;
 
   startDate: Date;
   endDate: Date;
-  createdBy:string
+  createdBy: string
 
   status: "PLANNED";
+  stories?: string[];
 }
 
 export interface ISprintRepository {

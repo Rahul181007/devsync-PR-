@@ -25,7 +25,9 @@ export interface PlanSprintTaskItem{
     taskId:string;
     developerId:string
 }
-export interface PlanSprintRequest{
-    sprintId:string;
-    tasks:PlanSprintTaskItem[];
+export interface PlanSprintRequest {
+  sprintId: string;
+  storyIds: string[];
 }
+
+

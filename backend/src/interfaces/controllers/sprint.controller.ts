@@ -8,6 +8,7 @@ import { IListSprintUseCase } from "../../application/interface/sprint/IListSpri
 import { IGetSprintDetailUseCase } from "../../application/interface/sprint/IGetSprintDetailUseCase";
 import { IActivateSprintUseCase } from "../../application/interface/sprint/IActivateSprintUseCase";
 import { ICompleteSprintUseCase } from "../../application/interface/sprint/ICompleteSprintUseCase";
+import { IPlanSprintUseCase } from "../../application/interface/sprint/IPlanSprintUseCase";
 
 export class SprintController {
     constructor(
@@ -15,7 +16,8 @@ export class SprintController {
         private _lisstSprintUseCase: IListSprintUseCase,
         private _getSprintDetailUseCase: IGetSprintDetailUseCase,
         private _activateSprintUseCase: IActivateSprintUseCase,
-        private _completeSprintUseCase: ICompleteSprintUseCase
+        private _completeSprintUseCase: ICompleteSprintUseCase,
+        private _planSprintUseCase: IPlanSprintUseCase
     ) { }
 
     createSprint = async (req: Request, res: Response) => {
@@ -140,5 +142,40 @@ export class SprintController {
             return handleError(error, res);
         }
 
+
+
+    }
+
+    planSprint = async (req: Request, res: Response) => {
+        try {
+            const userId = req.user?.id;
+            const companyId = req.user?.companyId;
+            const { projectId,sprintId } = req.params;
+
+            if (!userId || !companyId) {
+                return res.status(HttpStatus.FORBIDDEN).json({
+                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
+                });
+            }
+
+            const { storyIds } = req.body;
+            const result = await this._planSprintUseCase.execute(
+                userId,
+                companyId,
+                projectId,
+                {
+                    sprintId,
+                    storyIds
+                }
+            )
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                data: result,
+            });
+
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
     }
 }

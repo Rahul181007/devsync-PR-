@@ -39,7 +39,7 @@ router.patch("/developer/projects/:projectId/tasks/:taskId/status",verifyAccessT
 router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),taskController.submitTask)
 
 
-router.patch("/company/projects/:projectId/sprints/plan",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.planSprintTasks);
+
 router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.updateTask);
 
 router.post("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,checkUserStatus,taskCommentController.addComment)
@@ -56,6 +56,7 @@ router.get("/company/projects/:projectId/sprints",verifyAccessToken,checkUserSta
 router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.getSprintDetail);
 router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.activateSprint)
 router.patch("/company/projects/:projectId/sprints/:sprintId/complete",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.completeSprint)
+router.patch("/company/projects/:projectId/sprints/:sprintId/plan",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.planSprint)
 
 
 //standup-module-developer

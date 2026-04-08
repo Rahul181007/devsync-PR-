@@ -11,8 +11,8 @@ import { IGetDeveloperTasksUseCase } from "../../application/interface/task/IGet
 import { IUpdateDeveloperTaskStatusUseCase } from "../../application/interface/task/IUpdateDeveloperTaskStatusUseCase";
 import { ISubmitTaskUseCase } from "../../application/interface/task/ISubmitTaskUseCase";
 import { IGetDeveloperTaskDetailUseCase } from "../../application/interface/task/IGetDeveloperTaskDetailUseCase";
-import { IPlanSprintTasksUseCase } from "../../application/interface/task/IPlanSprintTasksUseCase";
-import { planSprintSchema } from "../../application/validators/task/planSprint.validator";
+// import { IPlanSprintTasksUseCase } from "../../application/interface/task/IPlanSprintTasksUseCase";
+// import { planSprintSchema } from "../../application/validators/task/planSprint.validator";
 import { IupdateTaskUseCase } from "../../application/interface/task/IUpdateTask.usecase";
 import { updateTaskSchema } from "../../application/validators/task/updateTask.validator";
 
@@ -31,7 +31,7 @@ export class TaskController {
         private _updateDeveloperTaskStatusUseCase: IUpdateDeveloperTaskStatusUseCase,
         private _submitTaskUseCase: ISubmitTaskUseCase,
         private _getDeveloperTaskDetailUseCase: IGetDeveloperTaskDetailUseCase,
-        private _planSprintTasksUseCase: IPlanSprintTasksUseCase,
+        // private _planSprintTasksUseCase: IPlanSprintTasksUseCase,
         private _updateTaskUseCase: IupdateTaskUseCase
     ) { }
 
@@ -246,34 +246,4 @@ export class TaskController {
         }
     }
 
-    planSprintTasks = async (req: Request, res: Response) => {
-        try {
-            const userId = req.user?.id;
-            const companyId = req.user?.companyId;
-            const { projectId } = req.params;
-
-            if (!userId || !companyId) {
-                return res.status(HttpStatus.FORBIDDEN).json({
-                    message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,
-                });
-            }
-
-            const parsed = planSprintSchema.parse(req.body);
-
-            await this._planSprintTasksUseCase.execute(
-                userId,
-                companyId,
-                projectId,
-                parsed
-            );
-
-            return res.status(HttpStatus.OK).json({
-                success: true,
-                message: "Tasks successfully planned for sprint",
-            });
-
-        } catch (error: unknown) {
-            return handleError(error, res);
-        }
-    }
 }

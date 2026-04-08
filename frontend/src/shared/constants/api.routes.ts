@@ -73,8 +73,8 @@ export const API_ROUTES = {
       `/company/projects/${projectId}/sprints/${sprintId}/activate`,
     COMPLETE_SPRINT: (projectId: string, sprintId: string) =>
       `/company/projects/${projectId}/sprints/${sprintId}/complete`,
-    PLAN_SPRINT: (projectId: string) =>
-      `/company/projects/${projectId}/sprints/plan`,
+    PLAN_SPRINT: (projectId: string,sprintId:string) =>
+      `/company/projects/${projectId}/sprints/${sprintId}/plan`,
 
     // Standups
     STANDUP_TODAY: (projectId: string) =>

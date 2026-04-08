@@ -77,7 +77,7 @@ export class GetSprintTodayStandupSummaryUseCase implements IGetSprintTodayStand
             users.map((u) => [u.id, u])
         )
 
-const today = toUTCDateOnly(new Date());
+        const today = toUTCDateOnly(new Date());
 
         const todayStandups = await this._standupRepo.findBySprintAndDate(sprint.id, today)
 
@@ -97,8 +97,8 @@ const today = toUTCDateOnly(new Date());
             if (standup) {
 
                 const isPartial =
-                    standup.blockers !== null &&
-                    standup.blockers.trim() !== "";
+                    !standup.yesterday?.trim() ||
+                    !standup.today?.trim();
 
                 const status = isPartial ? "PARTIAL" : "SUBMITTED";
 

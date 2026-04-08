@@ -2,83 +2,106 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { getProjectTasks } from "../../store/task.slice";
 import toast from "react-hot-toast";
-import { planSprintTasks } from "../../store/sprint.slice";
+import { planSprint } from "../../store/sprint.slice";
+import { 
+  X, 
+  CheckCircle, 
+  Circle, 
+  TrendingUp, 
+  Layers, 
+  CheckSquare,
+  AlertCircle,
+  Loader2,
+  Sparkles,
 
-interface Props{
-    isOpen:boolean;
-    onClose:()=>void;
-    projectId:string;
-    sprintId:string
-}
-interface Selection {
-    taskId:string;
-    developerId:string
+} from "lucide-react";
+
+interface Props {
+    isOpen: boolean;
+    onClose: () => void;
+    projectId: string;
+    sprintId: string;
 }
 
-export const PlanSprintModal=({
+export const PlanSprintModal = ({
     isOpen,
     onClose,
     projectId,
-    sprintId
-}:Props)=>{
-    const dispatch=useAppDispatch();
+    sprintId,
+}: Props) => {
+    const dispatch = useAppDispatch();
 
-    const {tasks}=useAppSelector((state)=>state.companyAdminTask)
-    const {selectedProject}=useAppSelector((state)=>state.project)
-    const [selectedTasks,setSelectedTasks]=useState<Selection[]>([])
+    const { tasks } = useAppSelector((state) => state.companyAdminTask);
+
+    const [selectedStories, setSelectedStories] = useState<string[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const developers=selectedProject?.members.filter((member)=>member.role==="DEVELOPER")??[]
-    
-    useEffect(()=>{
-        if(isOpen){
-            dispatch(getProjectTasks(projectId))
-            // Reset selection when modal opens
-            setSelectedTasks([]);
+
+
+    useEffect(() => {
+        if (isOpen) {
+            dispatch(getProjectTasks(projectId));
+            setSelectedStories([]);
         }
-    },[dispatch,isOpen,projectId])
+    }, [dispatch, isOpen, projectId]);
 
-    if(!isOpen)return null
+    if (!isOpen) return null;
 
-const backlogTasks = tasks.filter(
-  (task) =>
-    task.status === "BACKLOG" &&
-    !task.sprintId &&
-    (task.type === "TASK" || task.type === "BUG")
-);
+    // ✅ Only STORIES
+    const backlogStories = tasks.filter(
+        (task) => task.type === "STORY" && !task.sprintId
+    );
 
-    const handleAssign=(taskId:string,developerId:string)=>{
-        setSelectedTasks((prev)=>{
-            const existing=prev.find((t)=>t.taskId===taskId)
-            if(existing){
-                return prev.map((t)=>t.taskId===taskId?{...t,developerId}:t)
+    console.log(backlogStories);
+
+    const MAX_POINTS = 20;
+
+    const toggleStory = (storyId: string) => {
+        setSelectedStories((prev) => {
+            // remove if already selected
+            if (prev.includes(storyId)) {
+                return prev.filter((id) => id !== storyId);
             }
-            return [...prev,{taskId,developerId}]
-        })
-    }
 
-    const handleSubmit=async()=>{
-        if(selectedTasks.length===0){
-            toast.error("Select at least one task");
+            const story = backlogStories.find((s) => s.id === storyId);
+            const newTotal = totalPoints + (story?.storyPoints || 0);
+
+            if (newTotal > MAX_POINTS) {
+                toast.error("Sprint capacity exceeded!");
+                return prev;
+            }
+
+            return [...prev, storyId];
+        });
+    };
+
+    // ✅ Total Story Points (LIVE)
+    const totalPoints = selectedStories.reduce((sum, id) => {
+        const story = backlogStories.find((s) => s.id === id);
+        return sum + (story?.storyPoints || 0);
+    }, 0);
+
+    const handleSubmit = async () => {
+        if (selectedStories.length === 0) {
+            toast.error("Select at least one story");
             return;
         }
 
         setIsSubmitting(true);
         try {
-            const result=await dispatch(
-                planSprintTasks({
-                    projectId,data:{
-                        sprintId,
-                        tasks:selectedTasks
-                    }
+            const result = await dispatch(
+                planSprint({
+                    projectId,
+                    sprintId,
+                    storyIds: selectedStories,
                 })
             );
 
-            if (planSprintTasks.fulfilled.match(result)) {
-                toast.success("Tasks added to sprint");
+            if (planSprint.fulfilled.match(result)) {
+                toast.success("Stories added to sprint");
                 onClose();
             }
 
-            if (planSprintTasks.rejected.match(result)) {
+            if (planSprint.rejected.match(result)) {
                 toast.error(result.payload as string);
             }
         } finally {
@@ -86,120 +109,175 @@ const backlogTasks = tasks.filter(
         }
     };
 
-    const getSelectedCount = () => {
-        return selectedTasks.length;
-    };
+    const percentageUsed = Math.min((totalPoints / MAX_POINTS) * 100, 100);
+    const isOverCapacity = totalPoints > MAX_POINTS;
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh]">
-                {/* Header with gradient */}
-                <div className="bg-linear-to-r from-gray-50 to-white border-b border-gray-200 px-6 py-4">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/70 to-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-4 duration-300">
+                
+                {/* Header with Gradient */}
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 rounded-t-2xl">
                     <div className="flex justify-between items-center">
-                        <div>
-                            <h2 className="text-xl font-semibold text-gray-900">Plan Sprint Tasks</h2>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Select backlog tasks to add to this sprint
-                            </p>
+                        <div className="flex items-center gap-3">
+                            <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
+                                <Sparkles className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-white">
+                                    Plan Sprint
+                                </h2>
+                                <p className="text-blue-100 text-sm mt-0.5">
+                                    Select stories for this sprint
+                                </p>
+                            </div>
                         </div>
                         <button
                             onClick={onClose}
-                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg p-2 transition-colors text-xl font-medium"
-                            aria-label="Close"
+                            className="text-white/70 hover:text-white hover:bg-white/10 rounded-xl p-2 transition-all duration-200"
                         >
-                            ×
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
-                    
-                    {/* Stats Bar */}
-                    <div className="flex items-center gap-4 mt-3 pt-2 border-t border-gray-100">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-gray-500">Backlog Tasks:</span>
-                            <span className="text-sm font-semibold text-gray-900">{backlogTasks.length}</span>
+
+                    {/* Stats Cards */}
+                    <div className="grid grid-cols-3 gap-3 mt-5">
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                            <div className="flex items-center gap-2 text-blue-100 text-xs mb-1">
+                                <Layers className="w-3.5 h-3.5" />
+                                <span>Available Stories</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">
+                                {backlogStories.length}
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-gray-500">Selected:</span>
-                            <span className="text-sm font-semibold text-blue-600">{getSelectedCount()}</span>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                            <div className="flex items-center gap-2 text-blue-100 text-xs mb-1">
+                                <CheckSquare className="w-3.5 h-3.5" />
+                                <span>Selected</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">
+                                {selectedStories.length}
+                            </div>
+                        </div>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+                            <div className="flex items-center gap-2 text-blue-100 text-xs mb-1">
+                                <TrendingUp className="w-3.5 h-3.5" />
+                                <span>Total Points</span>
+                            </div>
+                            <div className="text-2xl font-bold text-white">
+                                {totalPoints}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Task List - Scrollable */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-3">
-                    {backlogTasks.length === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="bg-gray-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
+                {/* Capacity Section */}
+                <div className="px-6 pt-5 pb-3 border-b border-gray-100">
+                    <div className="flex justify-between items-end mb-2">
+                        <div>
+                            <span className="text-sm font-medium text-gray-700">Sprint Capacity</span>
+                            <span className="text-xs text-gray-500 ml-2">Max {MAX_POINTS} points</span>
+                        </div>
+                        <div className="text-right">
+                            <span className={`text-sm font-semibold ${isOverCapacity ? 'text-red-600' : 'text-green-600'}`}>
+                                {totalPoints}
+                            </span>
+                            <span className="text-xs text-gray-500"> / {MAX_POINTS}</span>
+                            <span className={`text-xs ml-2 font-medium ${isOverCapacity ? 'text-red-500' : 'text-gray-500'}`}>
+                                ({Math.round(percentageUsed)}%)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div className="relative">
+                        <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                            <div
+                                className={`h-full rounded-full transition-all duration-500 ease-out ${
+                                    isOverCapacity
+                                        ? "bg-gradient-to-r from-red-500 to-red-600"
+                                        : percentageUsed > 80
+                                        ? "bg-gradient-to-r from-yellow-500 to-orange-500"
+                                        : "bg-gradient-to-r from-green-500 to-emerald-500"
+                                }`}
+                                style={{ width: `${percentageUsed}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    {isOverCapacity && (
+                        <div className="mt-2 flex items-center gap-1.5 text-red-600 bg-red-50 p-2 rounded-lg">
+                            <AlertCircle className="w-4 h-4" />
+                            <p className="text-xs font-medium">
+                                Exceeds sprint capacity by {totalPoints - MAX_POINTS} points
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Story List */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+                    {backlogStories.length === 0 ? (
+                        <div className="text-center py-16">
+                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Layers className="w-8 h-8 text-gray-400" />
                             </div>
-                            <h3 className="text-sm font-medium text-gray-900 mb-1">No backlog tasks available</h3>
-                            <p className="text-sm text-gray-500">All tasks are already assigned to sprints</p>
+                            <p className="text-gray-500 font-medium">No backlog stories available</p>
+                            <p className="text-sm text-gray-400 mt-1">Create stories to plan your sprint</p>
                         </div>
                     ) : (
-                        backlogTasks.map((task) => {
-                            const selectedTask = selectedTasks.find((t) => t.taskId === task.id);
-                            
+                        backlogStories.map((story) => {
+                            const isSelected = selectedStories.includes(story.id);
+                            const storyPoints = story.storyPoints || 0;
+
                             return (
                                 <div
-                                    key={task.id}
-                                    className={`border rounded-xl p-4 transition-all ${
-                                        selectedTask 
-                                            ? "border-blue-300 bg-blue-50/50 shadow-sm" 
-                                            : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                                    key={story.id}
+                                    className={`group relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+                                        isSelected
+                                            ? "border-blue-400 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md shadow-blue-100"
+                                            : "border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white"
                                     }`}
+                                    onClick={() => toggleStory(story.id)}
                                 >
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                        {/* Task Info */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1.5">
-                                                <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
-                                                    {task.title}
-                                                </h3>
-                                                {task.priority && (
-                                                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                                                        task.priority === "HIGH" ? "bg-red-100 text-red-700" :
-                                                        task.priority === "MEDIUM" ? "bg-yellow-100 text-yellow-700" :
-                                                        "bg-green-100 text-green-700"
-                                                    }`}>
-                                                        {task.priority}
-                                                    </span>
+                                    <div className="p-4">
+                                        <div className="flex items-start justify-between gap-4">
+                                            {/* Checkbox */}
+                                            <div className="flex-shrink-0 pt-0.5">
+                                                {isSelected ? (
+                                                    <CheckCircle className="w-5 h-5 text-blue-600" />
+                                                ) : (
+                                                    <Circle className="w-5 h-5 text-gray-300 group-hover:text-gray-400" />
                                                 )}
                                             </div>
-                                            {task.code && (
-                                                <p className="text-xs text-gray-400 font-mono">
-                                                    {task.code}
-                                                </p>
-                                            )}
-                                        </div>
 
-                                        {/* Assignee Selection */}
-                                        <div className="flex items-center gap-2">
-                                            <select
-                                                value={selectedTask?.developerId || ""}
-                                                onChange={(e) =>
-                                                    handleAssign(task.id, e.target.value)
-                                                }
-                                                className="w-48 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors bg-white"
-                                            >
-                                                <option value="">Select Developer</option>
-                                                {developers.map((member) => (
-                                                    <option
-                                                        key={member.user.id}
-                                                        value={member.user.id}
-                                                    >
-                                                        {member.user.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            
-                                            {selectedTask && (
-                                                <div className="text-blue-600">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
+                                            {/* Story Info */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                                        {story.code}
+                                                    </span>
+                                                    {storyPoints > 0 && (
+                                                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                                            storyPoints <= 3 ? 'bg-green-100 text-green-700' :
+                                                            storyPoints <= 8 ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-red-100 text-red-700'
+                                                        }`}>
+                                                            {storyPoints} pts
+                                                        </span>
+                                                    )}
                                                 </div>
-                                            )}
+                                                <h3 className={`text-sm font-semibold ${isSelected ? 'text-gray-900' : 'text-gray-800'} line-clamp-2`}>
+                                                    {story.title}
+                                                </h3>
+                                            </div>
+
+                                            {/* Arrow indicator */}
+                                            <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -208,43 +286,54 @@ const backlogTasks = tasks.filter(
                     )}
                 </div>
 
-                {/* Footer with Actions */}
-                <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 rounded-b-2xl">
+                {/* Footer */}
+                <div className="border-t border-gray-200 px-6 py-4 bg-gray-50/50 rounded-b-2xl">
                     <div className="flex justify-between items-center">
-                        <div className="text-sm text-gray-500">
-                            {getSelectedCount() > 0 ? (
-                                <span className="flex items-center gap-1">
-                                    <span className="font-medium text-blue-600">{getSelectedCount()}</span>
-                                    {" "}task{getSelectedCount() !== 1 ? 's' : ''} selected
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-100 rounded-lg px-3 py-1.5">
+                                <span className="text-sm font-semibold text-blue-700">
+                                    {selectedStories.length}
                                 </span>
-                            ) : (
-                                <span>No tasks selected</span>
+                                <span className="text-xs text-blue-600 ml-1">
+                                    story{selectedStories.length !== 1 ? 's' : ''} selected
+                                </span>
+                            </div>
+                            {selectedStories.length > 0 && !isOverCapacity && (
+                                <div className="flex items-center gap-1 text-green-600">
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span className="text-xs font-medium">Ready to plan</span>
+                                </div>
                             )}
                         </div>
-                        
+
                         <div className="flex gap-3">
                             <button
                                 onClick={onClose}
                                 disabled={isSubmitting}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-5 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50"
                             >
                                 Cancel
                             </button>
+
                             <button
                                 onClick={handleSubmit}
-                                disabled={selectedTasks.length === 0 || isSubmitting}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 flex items-center gap-2"
+                                disabled={
+                                    selectedStories.length === 0 ||
+                                    isSubmitting ||
+                                    totalPoints > MAX_POINTS
+                                }
+                                className="relative px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
                             >
                                 {isSubmitting ? (
-                                    <>
-                                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Planning...
-                                    </>
+                                    <div className="flex items-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Planning...</span>
+                                    </div>
                                 ) : (
-                                    'Plan Sprint'
+                                    <div className="flex items-center gap-2">
+                                        <Sparkles className="w-4 h-4" />
+                                        <span>Plan Sprint</span>
+                                    </div>
                                 )}
                             </button>
                         </div>
@@ -254,3 +343,64 @@ const backlogTasks = tasks.filter(
         </div>
     );
 };
+
+// Add this to your global CSS or component CSS
+const styles = `
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-from-bottom-4 {
+    from {
+        transform: translateY(1rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-in {
+    animation-duration: 0.2s;
+    animation-fill-mode: both;
+}
+
+.fade-in {
+    animation-name: fade-in;
+}
+
+.slide-in-from-bottom-4 {
+    animation-name: slide-in-from-bottom-4;
+}
+`;
+
+// Inject styles (optional - add to your main CSS file instead)
+if (typeof document !== 'undefined') {
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+}

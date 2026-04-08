@@ -44,6 +44,8 @@ const CompaniesPage = () => {
                 return "bg-gray-100 text-gray-800";
         }
     };
+console.log("total",total,limit)
+const totalPages = Math.ceil((total || 0) / (limit || 1));
 
 
     if (loading) {
@@ -267,20 +269,41 @@ const CompaniesPage = () => {
                         <div className="text-sm text-gray-500">
                             Showing <span className="font-medium">{items.length}</span> companies
                         </div>
-                        <div className="flex space-x-2">
-                            <button disabled={page === 1} onClick={() => dispatch(setPage(page - 1))} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Previous
-                            </button>
-                            <button className="px-3 py-1 border border-blue-500 bg-blue-50 rounded-md text-sm font-medium text-blue-600">
-                                1
-                            </button>
-                            <button className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                2
-                            </button>
-                            <button disabled={page * limit >= total} onClick={() => dispatch(setPage(page + 1))} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                Next
-                            </button>
-                        </div>
+                       <div className="flex space-x-2">
+    <button
+        disabled={page === 1}
+        onClick={() => dispatch(setPage(page - 1))}
+        className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+    >
+        Previous
+    </button>
+
+    {[...Array(totalPages)].map((_, i) => {
+        const pageNumber = i + 1;
+
+        return (
+            <button
+                key={pageNumber}
+                onClick={() => dispatch(setPage(pageNumber))}
+                className={`px-3 py-1 border rounded-md text-sm ${
+                    page === pageNumber
+                        ? "border-blue-500 bg-blue-50 text-blue-600"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+            >
+                {pageNumber}
+            </button>
+        );
+    })}
+
+    <button
+        disabled={page * limit >= total}
+        onClick={() => dispatch(setPage(page + 1))}
+        className="px-3 py-1 border border-gray-300 rounded-md text-sm"
+    >
+        Next
+    </button>
+</div>
                     </div>
                 </div>
             </div>

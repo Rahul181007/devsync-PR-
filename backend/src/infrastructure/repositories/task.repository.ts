@@ -284,4 +284,11 @@ export class TaskRepository implements ITaskRepository {
             projectName: doc.projectId?.name || "Unknown"
         }));
     }
+
+    async findByIds(ids: string[]): Promise<Task[]> {
+        const docs=await TaskModel.find({
+            _id:{$in:ids}
+        })
+        return docs.map((doc)=>this._toDomain(doc))
+    }
 }

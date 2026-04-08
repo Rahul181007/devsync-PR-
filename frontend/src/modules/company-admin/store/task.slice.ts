@@ -119,6 +119,7 @@ export const updateTask = createAsyncThunk<
             dueDate?: string | null
             estimatedTime?:number|null
             storyPoints?: number | null;
+            assigneeId?: string | null 
         }
     },
     { rejectValue: string }
