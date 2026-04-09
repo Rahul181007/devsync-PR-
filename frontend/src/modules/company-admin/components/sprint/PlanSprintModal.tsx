@@ -113,11 +113,11 @@ export const PlanSprintModal = ({
     const isOverCapacity = totalPoints > MAX_POINTS;
 
     return (
-        <div className="fixed inset-0 bg-gradient-to-br from-black/70 to-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-linear-to-br from-black/70 to-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-4 duration-300">
                 
                 {/* Header with Gradient */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-5 rounded-t-2xl">
+                <div className="bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-5 rounded-t-2xl">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
@@ -195,10 +195,10 @@ export const PlanSprintModal = ({
                             <div
                                 className={`h-full rounded-full transition-all duration-500 ease-out ${
                                     isOverCapacity
-                                        ? "bg-gradient-to-r from-red-500 to-red-600"
+                                        ? "bg-linear-to-r from-red-500 to-red-600"
                                         : percentageUsed > 80
-                                        ? "bg-gradient-to-r from-yellow-500 to-orange-500"
-                                        : "bg-gradient-to-r from-green-500 to-emerald-500"
+                                        ? "bg-linear-to-r from-yellow-500 to-orange-500"
+                                        : "bg-linear-to-r from-green-500 to-emerald-500"
                                 }`}
                                 style={{ width: `${percentageUsed}%` }}
                             />
@@ -235,7 +235,7 @@ export const PlanSprintModal = ({
                                     key={story.id}
                                     className={`group relative rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                                         isSelected
-                                            ? "border-blue-400 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md shadow-blue-100"
+                                            ? "border-blue-400 bg-linear-to-r from-blue-50 to-indigo-50 shadow-md shadow-blue-100"
                                             : "border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white"
                                     }`}
                                     onClick={() => toggleStory(story.id)}
@@ -243,7 +243,7 @@ export const PlanSprintModal = ({
                                     <div className="p-4">
                                         <div className="flex items-start justify-between gap-4">
                                             {/* Checkbox */}
-                                            <div className="flex-shrink-0 pt-0.5">
+                                            <div className="shrink-0 pt-0.5">
                                                 {isSelected ? (
                                                     <CheckCircle className="w-5 h-5 text-blue-600" />
                                                 ) : (
@@ -273,7 +273,7 @@ export const PlanSprintModal = ({
                                             </div>
 
                                             {/* Arrow indicator */}
-                                            <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -322,7 +322,7 @@ export const PlanSprintModal = ({
                                     isSubmitting ||
                                     totalPoints > MAX_POINTS
                                 }
-                                className="relative px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
+                                className="relative px-6 py-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md"
                             >
                                 {isSubmitting ? (
                                     <div className="flex items-center gap-2">

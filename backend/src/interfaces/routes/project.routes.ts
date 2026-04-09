@@ -13,6 +13,7 @@ import { upload } from "../middleware/upload.middleware";
 import { taskAttachmentController } from "../../di/taskAttachment.di";
 import { worklogController } from "../../di/worklog.di";
 import { checkUserStatus } from "../middleware/checkUserStatus.middleware";
+import { meetingController } from "../../di/meeting.di";
 
 
 const router=Router();
@@ -89,4 +90,9 @@ router.get("/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,check
 // Admin → project timesheet
 router.get("/company/projects/:projectId/worklogs",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),worklogController.getByProject);
 router.get("/company/projects/:projectId/timesheet",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),worklogController.getTimesheetByProject)
+
+//meeting
+router.post("/company/projects/:projectId/meetings",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),meetingController.createMeeting);
+router.get("/company/projects/:projectId/meetings",verifyAccessToken,checkUserStatus,meetingController.getMeetings);
+router.patch("/company/projects/:projectId/meetings/:meetingId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),meetingController.updateMeeting);
 export default router;

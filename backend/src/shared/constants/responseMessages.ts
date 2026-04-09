@@ -201,4 +201,8 @@ export const RESPONSE_MESSAGES = {
         INTERNAL_ERROR: "Something went wrong",
 
     },
+
+    MEETINGS:{
+        NOT_FOUND:"Meeting not found"
+    }
 } as const;

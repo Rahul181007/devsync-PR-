@@ -486,7 +486,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
         ) : (
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             {/* Header with Month Navigation */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-linear-to-r from-gray-50 to-white">
               <div className="flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5 text-gray-500" />
                 <h3 className="text-sm font-semibold text-gray-700">Monthly Calendar</h3>
@@ -624,7 +624,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-linear-to-r from-blue-50 to-white">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-xl">
                   <CalendarIcon className="w-5 h-5 text-blue-600" />
@@ -669,7 +669,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                             <span className="text-xs font-semibold text-white">
                               {entry.userName?.charAt(0).toUpperCase() || "U"}
                             </span>
@@ -734,7 +734,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
             </div>
           </div>
         </div>
-      )}
+     )}
     </div>
   );
 };

@@ -73,7 +73,7 @@ export const API_ROUTES = {
       `/company/projects/${projectId}/sprints/${sprintId}/activate`,
     COMPLETE_SPRINT: (projectId: string, sprintId: string) =>
       `/company/projects/${projectId}/sprints/${sprintId}/complete`,
-    PLAN_SPRINT: (projectId: string,sprintId:string) =>
+    PLAN_SPRINT: (projectId: string, sprintId: string) =>
       `/company/projects/${projectId}/sprints/${sprintId}/plan`,
 
     // Standups
@@ -81,11 +81,11 @@ export const API_ROUTES = {
       `/company/projects/${projectId}/standups/today`,
     STANDUP_HISTORY: (projectId: string) =>
       `/company/projects/${projectId}/standups/history`,
-    
+
     STANDUP_DETAIL: (projectId: string, standupId: string) =>
       `/company/projects/${projectId}/standups/${standupId}`,
 
-    
+
     // Tasks
     TASKS: (projectId: string) =>
       `/company/projects/${projectId}/tasks`,
@@ -108,98 +108,109 @@ export const API_ROUTES = {
       `/company/projects/${projectId}/worklogs`,
     PROJECT_TIMESHEET: (projectId: string) =>
       `/company/projects/${projectId}/timesheet`,
-    REAPPLY:"/company/reapply",
+    REAPPLY: "/company/reapply",
+
+    //meeting
+    MEETINGS: (projectId: string) =>
+      `/company/projects/${projectId}/meetings`,
+
+    MEETING_BY_ID: (projectId: string, meetingId: string) =>
+      `/company/projects/${projectId}/meetings/${meetingId}`,
   },
 
   DEVELOPER: {
-  BASE: "/developer",
+    BASE: "/developer",
 
-  DASHBOARD: "/developer/dashboard",
+    DASHBOARD: "/developer/dashboard",
 
-  // Projects
-  PROJECTS: "/company/projects",
-  PROJECT_BY_ID: (projectId: string) =>
-    `/company/projects/${projectId}`,
+    // Projects
+    PROJECTS: "/company/projects",
+    PROJECT_BY_ID: (projectId: string) =>
+      `/company/projects/${projectId}`,
 
-  // Standups
-  STANDUPS: (projectId: string) =>
-    `/developer/projects/${projectId}/standups`,
+    // Standups
+    STANDUPS: (projectId: string) =>
+      `/developer/projects/${projectId}/standups`,
 
-  // Tasks
-  TASKS: (projectId: string) =>
-    `/developer/projects/${projectId}/tasks`,
-  TASK_BY_ID: (projectId: string, taskId: string) =>
-    `/developer/projects/${projectId}/tasks/${taskId}`,
-  TASK_STATUS: (projectId: string, taskId: string) =>
-    `/developer/projects/${projectId}/tasks/${taskId}/status`,
-  SUBMIT_TASK: (projectId: string, taskId: string) =>
-    `/developer/projects/${projectId}/tasks/${taskId}/submit`,
+    // Tasks
+    TASKS: (projectId: string) =>
+      `/developer/projects/${projectId}/tasks`,
+    TASK_BY_ID: (projectId: string, taskId: string) =>
+      `/developer/projects/${projectId}/tasks/${taskId}`,
+    TASK_STATUS: (projectId: string, taskId: string) =>
+      `/developer/projects/${projectId}/tasks/${taskId}/status`,
+    SUBMIT_TASK: (projectId: string, taskId: string) =>
+      `/developer/projects/${projectId}/tasks/${taskId}/submit`,
 
-  // Comments
-  TASK_COMMENTS: (projectId: string, taskId: string) =>
-    `/projects/${projectId}/tasks/${taskId}/comments`,
+    // Comments
+    TASK_COMMENTS: (projectId: string, taskId: string) =>
+      `/projects/${projectId}/tasks/${taskId}/comments`,
 
-  // Attachments
-  TASK_ATTACHMENTS: (projectId: string, taskId: string) =>
-    `/projects/${projectId}/tasks/${taskId}/attachments`,
+    // Attachments
+    TASK_ATTACHMENTS: (projectId: string, taskId: string) =>
+      `/projects/${projectId}/tasks/${taskId}/attachments`,
 
-  // Worklogs
-  TASK_WORKLOGS: (projectId: string, taskId: string) =>
-    `/developer/projects/${projectId}/tasks/${taskId}/worklogs`,
-  WORKLOG_BY_ID: (projectId: string, worklogId: string) =>
-    `/developer/projects/${projectId}/worklogs/${worklogId}`,
-  GET_TASK_WORKLOGS: (projectId: string, taskId: string) =>
+    // Worklogs
+    TASK_WORKLOGS: (projectId: string, taskId: string) =>
+      `/developer/projects/${projectId}/tasks/${taskId}/worklogs`,
+    WORKLOG_BY_ID: (projectId: string, worklogId: string) =>
+      `/developer/projects/${projectId}/worklogs/${worklogId}`,
+    GET_TASK_WORKLOGS: (projectId: string, taskId: string) =>
       `/projects/${projectId}/tasks/${taskId}/worklogs`,
-},
 
-AUTH: {
-  BASE: "/auth",
+    //meeting
+        MEETINGS: (projectId: string) =>
+      `/company/projects/${projectId}/meetings`,
+  },
 
-  SUPERADMIN_LOGIN: "/auth/superadmin/login",
-  LOGIN: "/auth/login",
-  ME: "/auth/me",
-  REFRESH: "/auth/refresh",
-  LOGOUT: "/auth/logout",
+  AUTH: {
+    BASE: "/auth",
 
-  FORGOT_PASSWORD: "/auth/forgot-password",
-  VERIFY_OTP: "/auth/verify-otp",
-  RESET_PASSWORD: "/auth/reset-password",
+    SUPERADMIN_LOGIN: "/auth/superadmin/login",
+    LOGIN: "/auth/login",
+    ME: "/auth/me",
+    REFRESH: "/auth/refresh",
+    LOGOUT: "/auth/logout",
 
-  SIGNUP: "/auth/signup",
-  GOOGLE_SIGNUP: "/auth/google/signup",
-  VERIFY_SIGNUP_OTP: "/auth/verify-signup-otp",
-  RESEND_SIGNUP_OTP: "/auth/resend-signup-otp",
-  GOOGLE_LOGIN: "/auth/google/login",
-},
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    VERIFY_OTP: "/auth/verify-otp",
+    RESET_PASSWORD: "/auth/reset-password",
 
-INVITE: {
-  VERIFY: "/invite/verify",
-  ACCEPT: "/invite/accept",
-},
+    SIGNUP: "/auth/signup",
+    GOOGLE_SIGNUP: "/auth/google/signup",
+    VERIFY_SIGNUP_OTP: "/auth/verify-signup-otp",
+    RESEND_SIGNUP_OTP: "/auth/resend-signup-otp",
+    GOOGLE_LOGIN: "/auth/google/login",
+  },
 
-COLLAB: {
-  PROJECT_CHAT: (projectId: string) =>
-    `/projects/${projectId}/chat`,
-  AI_SUMMARY: (projectId: string) =>
-    `/projects/${projectId}/ai-summary`,
-},
+  INVITE: {
+    VERIFY: "/invite/verify",
+    ACCEPT: "/invite/accept",
+  },
 
-COMMON: {
-  NOTIFICATIONS: "/notifications",
-  UNREAD_COUNT: "/notifications/unread-count",
-  MARK_AS_READ: (id: string) => `/notifications/${id}/read`,
-  MARK_ALL_AS_READ: "/notifications/read-all",
-},
+  COLLAB: {
+    PROJECT_CHAT: (projectId: string) =>
+      `/projects/${projectId}/chat`,
+    AI_SUMMARY: (projectId: string) =>
+      `/projects/${projectId}/ai-summary`,
+  },
 
-SETTINGS: {
-  PROFILE: "/settings/profile",
-  UPDATE_AVATAR: "/settings/profile/avatar",
-  UPDATE_PROFILE: "/settings/profile",
-  UPDATE_COMPANY_LOGO: "/settings/company/logo",
+  COMMON: {
+    NOTIFICATIONS: "/notifications",
+    UNREAD_COUNT: "/notifications/unread-count",
+    MARK_AS_READ: (id: string) => `/notifications/${id}/read`,
+    MARK_ALL_AS_READ: "/notifications/read-all",
+  },
 
-  SEND_OTP: "/settings/send-otp",
-  VERIFY_OTP: "/settings/verify-otp",
-  CHANGE_PASSWORD: "/settings/change-password",
-},
+  SETTINGS: {
+    PROFILE: "/settings/profile",
+    UPDATE_AVATAR: "/settings/profile/avatar",
+    UPDATE_PROFILE: "/settings/profile",
+    UPDATE_COMPANY_LOGO: "/settings/company/logo",
+
+    SEND_OTP: "/settings/send-otp",
+    VERIFY_OTP: "/settings/verify-otp",
+    CHANGE_PASSWORD: "/settings/change-password",
+  },
 
 } as const;

@@ -12,9 +12,10 @@ import Spinner from "../../../../shared/components/LoadingSpinner";
 import ProjectChat from "../../../chat/components/ProjectChat";
 import ProjectAISummary from "../../../ai/components/ProjectAISummary";
 import { ProjectWorklogTab } from "../../components/worklog/ProjectWorklogTab";
+import MeetingPage from "../meeting/MeetingPage";
 
 /* ================= Types ================= */
-type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP" | "AI"| "WORKLOG";
+type ProjectDetailTab = "TASKS" | "CHAT" | "SPRINT" | "STANDUP" | "AI"| "WORKLOG"|"MEETINGS";
 
 export const ProjectDetailPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -135,7 +136,7 @@ export const ProjectDetailPage = () => {
 
       {/* ================= Tabs ================= */}
       <div className="border-b flex gap-6 px-2">
-        {(["TASKS", "CHAT", "SPRINT", "STANDUP", "AI", "WORKLOG"] as ProjectDetailTab[]).map(
+        {(["TASKS", "CHAT", "SPRINT", "STANDUP", "AI", "WORKLOG","MEETINGS"] as ProjectDetailTab[]).map(
           (tab) => (
             <button
               key={tab}
@@ -177,6 +178,9 @@ export const ProjectDetailPage = () => {
       {activeTab === "WORKLOG" && (
   <ProjectWorklogTab projectId={project.id} />
 )}
+      {activeTab === "MEETINGS" && (
+        <MeetingPage projectId={project.id} />
+      )}
 
       {/* ================= Modals ================= */}
       <ProjectMembersModal
