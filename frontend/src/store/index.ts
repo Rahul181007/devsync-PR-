@@ -24,6 +24,8 @@ import transactionReducer from "../modules/super-admin/store/transaction.slice"
 import superAdminDashboardReducer from "../modules/super-admin/store/dashboard.slice"
 import companyAdminDashboardReducer from "../modules/company-admin/store/dashboard.slice"
 import developerDashboardReducer from "../modules/developer/store/dashboard.slice"
+import companyMeetingReducer from "../modules/company-admin/store/meeting.slice";
+import devMeetingReducer from "../modules/developer/store/meeting.slice"
 /* ================= Combine ================= */
 
 const appReducer = combineReducers({
@@ -49,7 +51,9 @@ const appReducer = combineReducers({
   transaction:transactionReducer,
   superAdminDashboard:superAdminDashboardReducer,
   companyAdminDashboard:companyAdminDashboardReducer,
-  developerDashboard:developerDashboardReducer
+  developerDashboard:developerDashboardReducer,
+  companyMeeting:companyMeetingReducer,
+  devMeeting:devMeetingReducer
 });
 
 /* ================= RootState ================= */

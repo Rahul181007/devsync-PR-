@@ -1,3 +1,4 @@
+import { IMeetingRepository } from "../../../domain/repositories/meeting.repository";
 import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
@@ -11,6 +12,12 @@ import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
 import { ICompleteSprintUseCase } from "../../interface/sprint/ICompleteSprintUseCase";
 
+
+function setTime(date: Date, hours: number, minutes: number = 0): Date {
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate;
+}
 export class CompleteSprintUseCase implements ICompleteSprintUseCase {
     constructor(
         private _sprintRepo: ISprintRepository,
@@ -18,7 +25,8 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         private _taskRepo: ITaskRepository,
         private _userRepo: IUserRepository,
         private _projectMemberRepository: IProjectMemberRepository,
-        private _notificationRepository: INotificationRepository
+        private _notificationRepository: INotificationRepository,
+        private _meetingRepo: IMeetingRepository
     ) { }
 
     async execute(userId: string, companyid: string, projectId: string, sprintId: string): Promise<void> {
@@ -80,6 +88,69 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         }
         sprint.status = "COMPLETED";
         await this._sprintRepo.update(sprint);
+
+        const existingMeetings = await this._meetingRepo.findAll({
+            projectId: sprint.projectId,
+            page: 1,
+            limit: 10,
+            sprintId: sprint.id
+        });
+
+        const hasReviewMeeting = existingMeetings.items.some(
+            (m) => m.title === `${sprint.name} - Sprint Review`
+        );
+
+        if (!hasReviewMeeting) {
+            const meeting = await this._meetingRepo.create({
+                projectId: sprint.projectId,
+                createdBy: userId,
+                sprintId: sprint.id,
+
+                title: `${sprint.name} - Sprint Review`,
+                description: "Sprint review meeting",
+
+                scheduledAt: setTime(sprint.endDate, 17),
+                durationMinutes: 60,
+
+                meetingLink: null,
+                meetingType: null,
+            });
+
+            // 🔹 get project members
+            const members = await this._projectMemberRepository.findMembersByProject(projectId);
+
+            const memberIds = members.map(m => m.userId);
+
+            const users = await this._userRepo.findByIds(memberIds);
+
+            const developers = users.filter(u => u.role === Role.DEVELOPER);
+
+            // 🔹 send notification
+            for (const dev of developers) {
+                const notification = await this._notificationRepository.create({
+                    userId: dev.id,
+                    type: "SPRINT_REVIEW_SCHEDULED",
+                    title: "Sprint Completed",
+                    message: `Sprint "${sprint.name}" completed. Review meeting scheduled.`,
+                    metadata: {
+                        meetingId: meeting.id,
+                        projectId: meeting.projectId
+                    }
+                });
+
+                const io = getSocketInstance();
+
+                io.to(`user:${dev.id}`).emit("new_notification", {
+                    id: notification.id,
+                    type: notification.type,
+                    title: notification.title,
+                    message: notification.message,
+                    metadata: notification.metadata,
+                    isRead: false,
+                    createdAt: notification.createdAt,
+                });
+            }
+        }
 
         await this._projectRepo.update(projectId, {
             currentSprintId: null

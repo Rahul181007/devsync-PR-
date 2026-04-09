@@ -8,6 +8,7 @@ import DevStandupPanel from "../../components/standup/DevStandupPanel";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import ProjectChat from "../../../chat/components/ProjectChat";
 import ProjectAISummary from "../../../ai/components/ProjectAISummary";
+import MeetingPage from "../Meeting/MeetingPage";
 
 
 
@@ -15,7 +16,8 @@ type ProjectDetailTab =
   | "TASKS"
   | "CHAT"
   | "AI"
-  | "STANDUP";
+  | "STANDUP"
+  |"MEETINGS";
 
 
 const TABS: { key: ProjectDetailTab; label: string }[] = [
@@ -23,6 +25,7 @@ const TABS: { key: ProjectDetailTab; label: string }[] = [
   { key: "CHAT", label: "Chat" },
   { key: "AI", label: "AI Summary" },
   { key: "STANDUP", label: "StandUp" },
+  { key: "MEETINGS", label: "Meetings" },
 ];
 
 /* ================= Page ================= */
@@ -147,6 +150,10 @@ export const DevProjectDetailPage = () => {
 
       {activeTab === "AI" && projectId && (
         <ProjectAISummary projectId={projectId} />
+      )}
+
+            {activeTab === "MEETINGS" && projectId && (
+        <MeetingPage projectId={projectId} />
       )}
 
     </div>

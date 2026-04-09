@@ -38,7 +38,9 @@ const NotificationSchema = new Schema<INotificationDocument>(
                 "SPRINT_COMPLETED",
                 "AI_PROJECT_DELAYED",
                 "COMPANY_SUBMITTED_FOR_APPROVAL",
-                "COMPANY_REAPPLIED"
+                "COMPANY_REAPPLIED",
+                "MEETING_CREATED",
+                "SPRINT_REVIEW_SCHEDULED"
             ],
             required: true,
         },
