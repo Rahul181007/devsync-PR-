@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../../store/hook";
 import { createSprint } from "../../store/sprint.slice";
 import toast from "react-hot-toast";
+import InputField from "../../../../shared/components/InputField";
 
 interface Props {
     isOpen: boolean;
@@ -20,24 +21,44 @@ export const CreateSprintModal = ({
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<{
+        name?: string;
+        startDate?: string;
+        endDate?: string;
+    }>({});
 
+    useEffect(() => {
+        if (!isOpen) {
+            setName("");
+            setGoal("");
+            setStartDate("");
+            setEndDate("");
+            setErrors({});
+        }
+    }, [isOpen]);
     if (!isOpen) return null;
 
     const handleSubmit = async () => {
+        const newErrors: typeof errors = {};
         if (!name.trim()) {
-            toast.error("Sprint name is required");
-            return;
+            newErrors.name = "Sprint name is required";
         }
 
-        if (!startDate || !endDate) {
-            toast.error("Start date and end date are required");
-            return;
+        if (!startDate) {
+            newErrors.startDate = "Start date is required";
         }
 
-        if (new Date(startDate) > new Date(endDate)) {
-            toast.error("End date must be after start date");
-            return;
+        if (!endDate) {
+            newErrors.endDate = "End date is required";
         }
+
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            newErrors.endDate = "End date must be after start date";
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
 
         setIsSubmitting(true);
         try {
@@ -71,6 +92,8 @@ export const CreateSprintModal = ({
         }
     };
 
+
+
     const isFormValid = name.trim() && startDate && endDate;
 
     return (
@@ -101,13 +124,14 @@ export const CreateSprintModal = ({
                             Sprint Name
                             <span className="text-red-500">*</span>
                         </label>
-                        <input
-                            type="text"
-                            placeholder="e.g., Sprint 1, Q1 Planning"
+                        <InputField
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
-                            autoFocus
+                            onChange={(value) => {
+                                setName(value);
+                                setErrors((prev) => ({ ...prev, name: undefined }));
+                            }}
+                            placeholder="e.g., Sprint 1, Q1 Planning"
+                            error={errors.name}
                         />
                         {!name.trim() && name.length > 0 && (
                             <p className="text-xs text-red-500 mt-1">Sprint name is required</p>
@@ -138,12 +162,14 @@ export const CreateSprintModal = ({
                                 <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <input
+                                <InputField
                                     type="date"
                                     value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    min={new Date().toISOString().split('T')[0]}
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                    onChange={(value) => {
+                                        setStartDate(value);
+                                        setErrors((prev) => ({ ...prev, startDate: undefined }));
+                                    }}
+                                    error={errors.startDate}
                                 />
                             </div>
                         </div>
@@ -155,12 +181,14 @@ export const CreateSprintModal = ({
                                 <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <input
+                                <InputField
                                     type="date"
                                     value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    min={startDate || new Date().toISOString().split('T')[0]}
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                    onChange={(value) => {
+                                        setEndDate(value);
+                                        setErrors((prev) => ({ ...prev, startDate: undefined }));
+                                    }}
+                                    error={errors.endDate}
                                 />
                             </div>
                         </div>

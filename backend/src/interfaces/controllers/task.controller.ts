@@ -31,7 +31,6 @@ export class TaskController {
         private _updateDeveloperTaskStatusUseCase: IUpdateDeveloperTaskStatusUseCase,
         private _submitTaskUseCase: ISubmitTaskUseCase,
         private _getDeveloperTaskDetailUseCase: IGetDeveloperTaskDetailUseCase,
-        // private _planSprintTasksUseCase: IPlanSprintTasksUseCase,
         private _updateTaskUseCase: IupdateTaskUseCase
     ) { }
 

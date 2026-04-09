@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import type { TaskPriority, TaskType } from "../../types/task.types";
 import toast from "react-hot-toast";
 import { getTaskDetail, updateTask } from "../../store/task.slice";
+import InputField from "../../../../shared/components/InputField";
 
 interface Props {
     isOpen: boolean;
@@ -47,6 +48,25 @@ export const EditTaskModal = ({
         storyPoints: ""
     });
 
+    const [errors, setErrors] = useState<{
+        title?: string;
+        description?: string;
+        storyPoints?: string;
+    }>({});
+const handleClose = () => {
+  setErrors({});
+  setForm({
+    title: "",
+    description: "",
+    type: "TASK",
+    priority: "MEDIUM",
+    dueDate: null,
+    estimatedTime: "",
+    storyPoints: ""
+  });
+  onClose();
+};
+
     // Fetch task when modal opens
     useEffect(() => {
         if (isOpen && taskId) {
@@ -86,11 +106,25 @@ export const EditTaskModal = ({
     };
 
     const handleUpdate = async () => {
+        const newErrors: typeof errors = {};
+
+        if (!form.title.trim()) {
+            newErrors.title = "Title is required";
+        }
+
+        if (!form.description.trim()) {
+            newErrors.description = "Description is required";
+        }
+
+        if (form.type === "STORY" && !form.storyPoints) {
+            newErrors.storyPoints = "Story points required";
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
+
         try {
-            if (form.type === "STORY" && !form.storyPoints) {
-                toast.error("Story points required");
-                return;
-            }
             const result = await dispatch(
                 updateTask({
                     projectId,
@@ -101,7 +135,6 @@ export const EditTaskModal = ({
                             form.estimatedTime !== ""
                                 ? Math.round((form.estimatedTime as number) * 60)
                                 : undefined,
-
                         storyPoints:
                             form.type === "STORY"
                                 ? Number(form.storyPoints)
@@ -112,7 +145,7 @@ export const EditTaskModal = ({
 
             if (updateTask.fulfilled.match(result)) {
                 toast.success("Task updated");
-                onClose();
+                handleClose()
             }
 
             if (updateTask.rejected.match(result)) {
@@ -124,6 +157,10 @@ export const EditTaskModal = ({
         }
     };
 
+    const isFormValid =
+  form.title.trim() &&
+  form.description.trim() &&
+  (form.type === "STORY" ? form.storyPoints : true);
 
     if (!isOpen) return null;
 
@@ -137,20 +174,31 @@ export const EditTaskModal = ({
                     <p className="text-sm text-gray-500">Loading task...</p>
                 ) : (
                     <>
-                        <input
+                        <InputField
                             value={form.title}
-                            onChange={(e) => handleChange("title", e.target.value)}
-                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                            onChange={(value) => {
+                                handleChange("title", value);
+                                setErrors((prev) => ({ ...prev, title: undefined }));
+                            }}
                             placeholder="Task title"
+                            error={errors.title}
                         />
 
                         <textarea
                             value={form.description}
-                            onChange={(e) => handleChange("description", e.target.value)}
+                            onChange={(e) => {
+                                handleChange("description", e.target.value);
+                                setErrors((prev) => ({ ...prev, description: undefined }));
+                            }}
                             className="w-full border rounded-lg px-3 py-2 text-sm"
                             rows={4}
                             placeholder="Task description"
                         />
+                        {errors.description && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.description}
+                            </p>
+                        )}
 
                         <select
                             value={form.type}
@@ -210,9 +258,10 @@ export const EditTaskModal = ({
                         {form.type === "STORY" && (
                             <select
                                 value={form.storyPoints}
-                                onChange={(e) =>
-                                    handleChange("storyPoints", e.target.value)
-                                }
+                                onChange={(e) => {
+                                    handleChange("storyPoints", e.target.value);
+                                    setErrors((prev) => ({ ...prev, storyPoints: undefined }));
+                                }}
                                 className="w-full border rounded-lg px-3 py-2 text-sm"
                             >
                                 <option value="">Select Story Points</option>
@@ -223,11 +272,20 @@ export const EditTaskModal = ({
                                 <option value="8">8</option>
                                 <option value="13">13</option>
                             </select>
+
+
+
+                        )}
+
+                        {errors.storyPoints && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.storyPoints}
+                            </p>
                         )}
 
                         <div className="flex justify-end gap-2 pt-2">
                             <button
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="px-4 py-2 text-sm border rounded-lg"
                             >
                                 Cancel
@@ -235,6 +293,7 @@ export const EditTaskModal = ({
 
                             <button
                                 onClick={handleUpdate}
+                                  disabled={!isFormValid}
                                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg"
                             >
                                 Update Task

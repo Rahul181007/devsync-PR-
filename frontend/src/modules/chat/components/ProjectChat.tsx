@@ -25,6 +25,7 @@ const ProjectChat = ({ projectId }: Props) => {
   const { messages, loading, error } = useAppSelector(
     (state) => state.companyChat
   );
+  const [isJoined, setIsJoined] = useState(false);
 
   const { user } = useAppSelector((state) => state.auth);
 
@@ -49,12 +50,33 @@ const ProjectChat = ({ projectId }: Props) => {
       dispatch(addMessage(message));
     };
 
-    socket.on("receive_message", receiveHandler);
-    socket.emit("join_project", { projectId });
+const joinRoom = () => {
+  console.log("Joining room:", projectId);
+  socket.emit("join_project", { projectId });
+};
 
-    return () => {
-      socket.off("receive_message", receiveHandler);
-    };
+// prevent duplicate listeners
+socket.off("receive_message");
+socket.on("receive_message", receiveHandler);
+
+// initial join
+joinRoom();
+
+
+// 🔥 IMPORTANT: rejoin after reconnect
+socket.on("connect", () => {
+  console.log("Reconnected:", socket.id);
+  joinRoom();
+});
+
+socket.on("joined_project", () => {
+  console.log("✅ Joined room confirmed");
+  setIsJoined(true);
+});
+return () => {
+  socket.off("receive_message", receiveHandler);
+  socket.off("connect");
+};
   }, [dispatch, user?.id, projectId]);
 
   // Auto-scroll with user scroll detection
@@ -79,14 +101,16 @@ const ProjectChat = ({ projectId }: Props) => {
   }, [messages, isUserScrolling]);
 
 const handleSend = (message: string, file?: File | null) => {
+  if (!isJoined) {
+  return;
+}
   if (!file) {
-    // ✅ TEXT → socket
+
     socketRef.current?.emit("send_message", {
       projectId,
       message,
     });
   } else {
-    // ✅ FILE → REST (thunk)
     const formData = new FormData();
     formData.append("message", message);
     formData.append("file", file);

@@ -67,4 +67,7 @@ export interface ITaskRepository {
     dueDate: Date | null;
   }[]>
 findByIds(ids: string[]): Promise<Task[]>;
+
+updateStatus(taskId: string, status: TaskStatus): Promise<void>;
+findBySprintId(sprintId: string): Promise<Task[]>;
 }

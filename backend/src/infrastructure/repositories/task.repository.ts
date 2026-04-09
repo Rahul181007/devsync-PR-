@@ -144,7 +144,8 @@ export class TaskRepository implements ITaskRepository {
     ): Promise<number> {
         return await TaskModel.countDocuments({
             companyId,
-            status
+            status,
+            type: { $in: ["TASK", "BUG"] }
         });
     }
 
@@ -289,6 +290,14 @@ export class TaskRepository implements ITaskRepository {
         const docs=await TaskModel.find({
             _id:{$in:ids}
         })
+        return docs.map((doc)=>this._toDomain(doc))
+    }
+
+    async updateStatus(taskId: string, status: TaskStatus): Promise<void> {
+        await TaskModel.findByIdAndUpdate(taskId, { status });
+    }
+    async findBySprintId(sprintId: string): Promise<Task[]> {
+        const docs=await TaskModel.find({ sprintId });
         return docs.map((doc)=>this._toDomain(doc))
     }
 }

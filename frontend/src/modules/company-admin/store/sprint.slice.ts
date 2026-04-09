@@ -122,25 +122,6 @@ export const completeSprint = createAsyncThunk<
     }
 )
 
-// export const planSprintTasks=createAsyncThunk<
-// void,
-// {projectId:string;data:PlanSprintRequest},
-// {rejectValue:string}
-// >(
-//     "sprint/planSprintTasks",
-//     async({projectId,data},{dispatch,rejectWithValue})=>{
-//         try {
-//             await sprintApi.planSprintTasks(projectId,data);
-//             dispatch(getSprintDetail({
-//                 projectId,sprintId:data.sprintId
-//             }))
-//         } catch (error:unknown) {
-//             return rejectWithValue(getErrorMessage(error))
-//         }
-//     }
-// )
-
-
 export const planSprint = createAsyncThunk<
     void,
     { projectId: string; sprintId: string; storyIds: string[] },

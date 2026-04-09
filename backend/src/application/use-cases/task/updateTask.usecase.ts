@@ -1,7 +1,9 @@
+import { INotificationRepository } from "../../../domain/repositories/notification.repository";
 import { IProjectRepository } from "../../../domain/repositories/project.repository";
 import { IProjectMemberRepository } from "../../../domain/repositories/projectMember.repository";
 import { ITaskRepository } from "../../../domain/repositories/task.repository";
 import { IUserRepository } from "../../../domain/repositories/user.repository";
+import { getSocketInstance } from "../../../infrastructure/websocket/socket.instance";
 import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
@@ -15,8 +17,11 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
         private _taskRepo: ITaskRepository,
         private _userRepo: IUserRepository,
         private _projectRepo: IProjectRepository,
-        private _projectMemberRepo: IProjectMemberRepository
+        private _projectMemberRepo: IProjectMemberRepository,
+        private _notificationRepository: INotificationRepository
     ) { }
+
+
 
     async execute(userId: string, companyId: string, projectId: string, taskId: string, data: UpdateTaskRequestDTO): Promise<TaskResponseDTO> {
         const user = await this._userRepo.findById(userId);
@@ -69,6 +74,13 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
         let assigneeId: string | null = task.assigneeId;
 
         if (data.assigneeId) {
+
+            if (!task.sprintId) {
+                throw new AppError(
+                    "Please add task to active sprint before assigning",
+                    HttpStatus.BAD_REQUEST
+                );
+            }
             const assignee = await this._userRepo.findById(data.assigneeId);
 
             if (!assignee) {
@@ -124,6 +136,7 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
         if (data.description) task.description = data.description.trim();
         if (data.type) task.type = data.type;
         if (data.priority) task.priority = data.priority;
+
         if (data.estimatedTime !== undefined) {
             task.estimatedTime = data.estimatedTime ?? null;
         }
@@ -153,6 +166,31 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
 
 
         const updatedTask = await this._taskRepo.update(task);
+        // Send notification if assigned
+        if (updatedTask.assigneeId) {
+            const notification = await this._notificationRepository.create({
+                userId: updatedTask.assigneeId,
+                type: "TASK_ASSIGNED",
+                title: "New Task Assigned",
+                message: `You have been assigned task "${updatedTask.title}"`,
+                metadata: {
+                    taskId: updatedTask.id,
+                    projectId: updatedTask.projectId,
+                },
+            });
+
+            const io = getSocketInstance();
+
+            io.to(`user:${updatedTask.assigneeId}`).emit("new_notification", {
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+                isRead: false,
+                createdAt: notification.createdAt,
+            });
+        }
 
         return {
             id: updatedTask.id,

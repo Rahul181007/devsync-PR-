@@ -25,7 +25,7 @@ export const EditProjectModal = ({
 
   const toDateInputValue = (date?: string | null) => {
     if (!date) return "";
-    return date.split("T")[0]; 
+    return date.split("T")[0];
   };
 
   const [form, setForm] = useState(() => ({
@@ -54,20 +54,20 @@ export const EditProjectModal = ({
 
 
   const handleSubmit = () => {
-const validation = validateZod(projectSchema, {
-    name: form.name,
-    description: form.description,
-    startDate: form.startDate,
-    endDate: form.endDate,
-  });
+    const validation = validateZod(projectSchema, {
+      name: form.name,
+      description: form.description,
+      startDate: form.startDate,
+      endDate: form.endDate,
+    });
 
-  if (!validation.success) {
-    setErrors(validation.errors);
-    return;
-  }
+    if (!validation.success) {
+      setErrors(validation.errors);
+      return;
+    }
 
-  setErrors({});
-    
+    setErrors({});
+
     dispatch(
       updateProject({
         projectId,
@@ -147,16 +147,16 @@ const validation = validateZod(projectSchema, {
                     Project Name
                     <span className="text-red-500">*</span>
                   </label>
-<InputField
+                  <InputField
 
-  value={form.name}
-  onChange={(val) => {
-    setForm((prev) => ({ ...prev, name: val }));
-    setErrors((prev) => ({ ...prev, name: "" }));
-  }}
-  error={errors.name}
-  placeholder="Enter project name"
-/>
+                    value={form.name}
+                    onChange={(val) => {
+                      setForm((prev) => ({ ...prev, name: val }));
+                      setErrors((prev) => ({ ...prev, name: "" }));
+                    }}
+                    error={errors.name}
+                    placeholder="Enter project name"
+                  />
                 </div>
 
                 {/* Description */}
@@ -204,18 +204,17 @@ const validation = validateZod(projectSchema, {
                         value={form.endDate}
                         onChange={handleChange}
                         min={form.startDate}
-                        className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors ${
-                          errors.endDate 
-                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20" 
+                        className={`w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors ${errors.endDate
+                            ? "border-red-300 focus:border-red-500 focus:ring-red-500/20"
                             : "border-gray-300 focus:border-blue-500"
-                        }`}
+                          }`}
                       />
                       {errors.endDate && (
                         <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Date Preview */}
                   {form.startDate && form.endDate && !errors.endDate && (
                     <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-2">
@@ -260,12 +259,11 @@ const validation = validateZod(projectSchema, {
                       </svg>
                     </div>
                   </div>
-                  
+
                   {/* Status Preview */}
                   <div className="mt-2">
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                      statusOptions.find(opt => opt.value === form.status)?.color
-                    }`}>
+                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusOptions.find(opt => opt.value === form.status)?.color
+                      }`}>
                       {statusOptions.find(opt => opt.value === form.status)?.label} status
                     </span>
                   </div>

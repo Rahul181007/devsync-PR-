@@ -376,8 +376,10 @@ export const TaskDetailModal = ({
                                                 <select
                                                     value={selectedTask.assignee?.id || ""}
                                                     onChange={(e) => handleAssign(e.target.value)}
+                                                    disabled={!selectedTask.sprint}
                                                     className="w-full border border-gray-200 rounded-lg px-2 py-1 text-sm"
                                                 >
+
                                                     <option value="">Unassigned</option>
 
                                                     {developers.map((dev) => (
@@ -386,6 +388,11 @@ export const TaskDetailModal = ({
                                                         </option>
                                                     ))}
                                                 </select>
+                                                {!selectedTask.sprint && (
+                                                    <p className="text-xs text-red-500 mt-1">
+                                                        Assign only when task is in an active sprint
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                     )}

@@ -152,9 +152,11 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 
 // Due date indicator component
-const DueDateIndicator = ({ dueDate }: { dueDate: string | null }) => {
+const DueDateIndicator = ({ dueDate,status }: { dueDate: string | null;status: string; }) => {
     if (!dueDate) return <span className="text-gray-400">—</span>;
 
+
+    const isCompleted=status==="COMPLETED"
     const today = new Date();
     const due = new Date(dueDate);
     const diffDays = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
@@ -163,7 +165,7 @@ const DueDateIndicator = ({ dueDate }: { dueDate: string | null }) => {
     let bgColor = "bg-gray-50";
     let icon = CalendarIcon;
 
-    if (diffDays < 0) {
+    if (!isCompleted &&  diffDays < 0) {
         color = "text-red-600";
         bgColor = "bg-red-50";
         icon = ExclamationCircleIcon;
@@ -184,9 +186,9 @@ const DueDateIndicator = ({ dueDate }: { dueDate: string | null }) => {
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium ${bgColor} ${color}`}>
             <Icon className="w-3.5 h-3.5" />
             {formattedDate}
-            {diffDays < 0 && <span className="ml-1">(Overdue)</span>}
-            {diffDays === 0 && <span className="ml-1">(Today)</span>}
-            {diffDays === 1 && <span className="ml-1">(Tomorrow)</span>}
+            {!isCompleted&&diffDays < 0 && <span className="ml-1">(Overdue)</span>}
+            {!isCompleted &&diffDays === 0 && <span className="ml-1">(Today)</span>}
+            {!isCompleted &&diffDays === 1 && <span className="ml-1">(Tomorrow)</span>}
         </span>
     );
 };
@@ -349,7 +351,10 @@ const ProjectTasksPage = ({ projectId }: ProjectTasksPageProps) => {
 
                         {/* Due Date */}
                         <div className="md:col-span-2">
-                            <DueDateIndicator dueDate={task.dueDate} />
+                            <DueDateIndicator 
+                            dueDate={task.dueDate}
+                            status={task.status} 
+                            />
                         </div>
 
                         {/* Actions */}

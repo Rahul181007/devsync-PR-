@@ -43,7 +43,7 @@ const submitTaskUseCase:ISubmitTaskUseCase=new SubmitTaskUseCase(userRepository,
 const getDeveloperTaskDetailUseCase:IGetDeveloperTaskDetailUseCase=new GetDeveloperTaskDetailUseCase(userRepository,projectRepository,taskRepository,projectMemberRepository);
 
 
-const updateTaskUseCase:IupdateTaskUseCase=new UpdateTaskUseCase(taskRepository,userRepository,projectRepository,projectMemberRepository)
+const updateTaskUseCase:IupdateTaskUseCase=new UpdateTaskUseCase(taskRepository,userRepository,projectRepository,projectMemberRepository,notificationRepository)
 export const taskController=new TaskController(createTaskUseCase,
     getProjectTasksUseCase,
     getTaskDetailUseCase,

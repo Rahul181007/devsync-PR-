@@ -104,9 +104,11 @@ export const SprintBoard = ({ projectId }: Props) => {
     const handleCompleteSprint = () => {
         if (!selectedSprint) return;
 
-        const unfinishedTasks = sprintTasks.filter(
-            (task) => task.status !== "COMPLETED"
-        );
+const unfinishedTasks = sprintTasks.filter(
+  (task) =>
+    (task.type === "TASK" || task.type === "BUG") &&
+    task.status !== "COMPLETED"
+);
 
         if (unfinishedTasks.length > 0) {
             setUnfinishedCount(unfinishedTasks.length);
