@@ -1,4 +1,5 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { ChatMessagesResponse } from "../types/chat.types";
 
 export const chatApi={
@@ -9,9 +10,9 @@ export const chatApi={
             cursor?:string
         }
     ){
-        return http.get<ChatMessagesResponse>(`/projects/${projectId}/chat`,{params})
+        return http.get<ChatMessagesResponse>(API_ROUTES.COLLAB.PROJECT_CHAT(projectId),{params})
     },
     sendMessage(projectId:string,formData:FormData){
-        return http.post(`/projects/${projectId}/chat`,formData)
+        return http.post(API_ROUTES.COLLAB.PROJECT_CHAT(projectId),formData)
     }
 }

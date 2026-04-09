@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import type { TaskPriority, TaskType } from "../../types/task.types";
 import toast from "react-hot-toast";
 import { getTaskDetail, updateTask } from "../../store/task.slice";
+import InputField from "../../../../shared/components/InputField";
 
 interface Props {
     isOpen: boolean;
@@ -18,6 +19,7 @@ interface EditTaskForm {
     priority: TaskPriority;
     dueDate: string | null
     estimatedTime: number | "";
+    storyPoints: string | "";
 }
 
 export const EditTaskModal = ({
@@ -32,6 +34,8 @@ export const EditTaskModal = ({
         (state) => state.companyAdminTask
     );
 
+    console.log(selectedTask)
+
 
 
     const [form, setForm] = useState<EditTaskForm>({
@@ -40,8 +44,28 @@ export const EditTaskModal = ({
         type: "TASK",
         priority: "MEDIUM",
         dueDate: null,
-        estimatedTime: ""
+        estimatedTime: "",
+        storyPoints: ""
     });
+
+    const [errors, setErrors] = useState<{
+        title?: string;
+        description?: string;
+        storyPoints?: string;
+    }>({});
+const handleClose = () => {
+  setErrors({});
+  setForm({
+    title: "",
+    description: "",
+    type: "TASK",
+    priority: "MEDIUM",
+    dueDate: null,
+    estimatedTime: "",
+    storyPoints: ""
+  });
+  onClose();
+};
 
     // Fetch task when modal opens
     useEffect(() => {
@@ -54,7 +78,6 @@ export const EditTaskModal = ({
     useEffect(() => {
         if (!isOpen || !selectedTask) return;
 
-        console.log(selectedTask)
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setForm({
             title: selectedTask.title,
@@ -66,12 +89,16 @@ export const EditTaskModal = ({
                 selectedTask.estimatedTime != null
                     ? selectedTask.estimatedTime / 60
                     : "",
+            storyPoints:
+                selectedTask.storyPoints != null
+                    ? String(selectedTask.storyPoints)
+                    : "",
         });
     }, [isOpen, selectedTask]);
 
 
 
-    const handleChange = (field: keyof EditTaskForm, value: number|string | null) => {
+    const handleChange = (field: keyof EditTaskForm, value: number | string | null) => {
         setForm((prev) => ({
             ...prev,
             [field]: value
@@ -79,24 +106,46 @@ export const EditTaskModal = ({
     };
 
     const handleUpdate = async () => {
+        const newErrors: typeof errors = {};
+
+        if (!form.title.trim()) {
+            newErrors.title = "Title is required";
+        }
+
+        if (!form.description.trim()) {
+            newErrors.description = "Description is required";
+        }
+
+        if (form.type === "STORY" && !form.storyPoints) {
+            newErrors.storyPoints = "Story points required";
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) return;
+
         try {
             const result = await dispatch(
                 updateTask({
                     projectId,
                     taskId,
-                    data:  {
-          ...form,
-          estimatedTime:
-            form.estimatedTime !== ""
-              ? Math.round((form.estimatedTime as number) * 60)
-              : undefined,
-        },
+                    data: {
+                        ...form,
+                        estimatedTime:
+                            form.estimatedTime !== ""
+                                ? Math.round((form.estimatedTime as number) * 60)
+                                : undefined,
+                        storyPoints:
+                            form.type === "STORY"
+                                ? Number(form.storyPoints)
+                                : undefined,
+                    },
                 })
             );
 
             if (updateTask.fulfilled.match(result)) {
                 toast.success("Task updated");
-                onClose();
+                handleClose()
             }
 
             if (updateTask.rejected.match(result)) {
@@ -108,6 +157,10 @@ export const EditTaskModal = ({
         }
     };
 
+    const isFormValid =
+  form.title.trim() &&
+  form.description.trim() &&
+  (form.type === "STORY" ? form.storyPoints : true);
 
     if (!isOpen) return null;
 
@@ -121,26 +174,42 @@ export const EditTaskModal = ({
                     <p className="text-sm text-gray-500">Loading task...</p>
                 ) : (
                     <>
-                        <input
+                        <InputField
                             value={form.title}
-                            onChange={(e) => handleChange("title", e.target.value)}
-                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                            onChange={(value) => {
+                                handleChange("title", value);
+                                setErrors((prev) => ({ ...prev, title: undefined }));
+                            }}
                             placeholder="Task title"
+                            error={errors.title}
                         />
 
                         <textarea
                             value={form.description}
-                            onChange={(e) => handleChange("description", e.target.value)}
+                            onChange={(e) => {
+                                handleChange("description", e.target.value);
+                                setErrors((prev) => ({ ...prev, description: undefined }));
+                            }}
                             className="w-full border rounded-lg px-3 py-2 text-sm"
                             rows={4}
                             placeholder="Task description"
                         />
+                        {errors.description && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.description}
+                            </p>
+                        )}
 
                         <select
                             value={form.type}
-                            onChange={(e) =>
-                                handleChange("type", e.target.value as TaskType)
-                            }
+                            onChange={(e) => {
+                                const newType = e.target.value as TaskType;
+                                handleChange("type", newType);
+
+                                if (newType !== "STORY") {
+                                    handleChange("storyPoints", ""); // reset
+                                }
+                            }}
                             className="w-full border rounded-lg px-3 py-2 text-sm"
                         >
                             <option value="TASK">Task</option>
@@ -171,24 +240,52 @@ export const EditTaskModal = ({
                         />
 
                         {/* Estimated Time */}
-<input
-  type="number"
-  min="0"
-  step="0.5"
-  value={form.estimatedTime}
-  onChange={(e) =>
-    handleChange(
-      "estimatedTime",
-      e.target.value === "" ? "" : Number(e.target.value)
-    )
-  }
-  className="w-full border rounded-lg px-3 py-2 text-sm"
-  placeholder="Estimated time (hours)"
-/>
+                        <input
+                            type="number"
+                            min="0"
+                            step="0.5"
+                            value={form.estimatedTime}
+                            onChange={(e) =>
+                                handleChange(
+                                    "estimatedTime",
+                                    e.target.value === "" ? "" : Number(e.target.value)
+                                )
+                            }
+                            className="w-full border rounded-lg px-3 py-2 text-sm"
+                            placeholder="Estimated time (hours)"
+                        />
+
+                        {form.type === "STORY" && (
+                            <select
+                                value={form.storyPoints}
+                                onChange={(e) => {
+                                    handleChange("storyPoints", e.target.value);
+                                    setErrors((prev) => ({ ...prev, storyPoints: undefined }));
+                                }}
+                                className="w-full border rounded-lg px-3 py-2 text-sm"
+                            >
+                                <option value="">Select Story Points</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="5">5</option>
+                                <option value="8">8</option>
+                                <option value="13">13</option>
+                            </select>
+
+
+
+                        )}
+
+                        {errors.storyPoints && (
+                            <p className="text-xs text-red-500 mt-1">
+                                {errors.storyPoints}
+                            </p>
+                        )}
 
                         <div className="flex justify-end gap-2 pt-2">
                             <button
-                                onClick={onClose}
+                                onClick={handleClose}
                                 className="px-4 py-2 text-sm border rounded-lg"
                             >
                                 Cancel
@@ -196,6 +293,7 @@ export const EditTaskModal = ({
 
                             <button
                                 onClick={handleUpdate}
+                                  disabled={!isFormValid}
                                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg"
                             >
                                 Update Task

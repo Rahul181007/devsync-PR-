@@ -11,6 +11,7 @@ export interface ISprintDocument extends Document {
   endDate: Date;
 
   status: "PLANNED" | "ACTIVE" | "COMPLETED";
+  stories: mongoose.Types.ObjectId[];
 
   createdBy: mongoose.Types.ObjectId;
 
@@ -53,6 +54,13 @@ const SprintSchema = new Schema<ISprintDocument>(
       enum: ["PLANNED", "ACTIVE", "COMPLETED"],
       default: "PLANNED",
     },
+
+    stories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Task",
+      },
+    ],
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",

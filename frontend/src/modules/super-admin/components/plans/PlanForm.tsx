@@ -6,6 +6,7 @@ interface PlanFormProps {
   onSubmit: (data: PlanFormValues) => void;
   loading?: boolean;
   onClose: () => void;
+  backendErrors?: Record<string, string>;
 }
 
 export interface PlanFormValues {
@@ -20,14 +21,15 @@ export interface PlanFormValues {
     maxDevelopers: number;
     maxStorageGB: number;
   };
+
 }
 
-const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) => {
+const PlanForm = ({ defaultValues, onSubmit, loading, onClose, backendErrors }: PlanFormProps) => {
   const {
     register,
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<PlanFormValues>({
     defaultValues: {
       name: defaultValues?.name ?? "",
@@ -38,8 +40,8 @@ const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) 
       features:
         defaultValues?.features?.map((f) => ({ value: f })) ?? [{ value: "" }],
       limits: {
-        maxProjects: defaultValues?.limits?.maxProjects ,
-        maxDevelopers: defaultValues?.limits?.maxDevelopers ,
+        maxProjects: defaultValues?.limits?.maxProjects,
+        maxDevelopers: defaultValues?.limits?.maxDevelopers,
         maxStorageGB: defaultValues?.limits?.maxStorageGB
       }
     }
@@ -63,6 +65,12 @@ const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5">
 
+
+      {backendErrors?.general && (
+        <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-2 rounded-lg">
+          {backendErrors.general}
+        </div>
+      )}
       {isInactive && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex gap-3">
@@ -89,8 +97,10 @@ const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) 
           className="w-full border border-gray-300 rounded-lg px-4 py-2.5"
           placeholder="e.g., Pro Plan"
         />
-        {errors.name && (
-          <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
+        {(errors.name || backendErrors?.name) && (
+          <p className="mt-1 text-xs text-red-500">
+            {errors.name?.message || backendErrors?.name}
+          </p>
         )}
       </div>
 
@@ -171,6 +181,12 @@ const PlanForm = ({ defaultValues, onSubmit, loading, onClose }: PlanFormProps) 
 
           </div>
         ))}
+
+        {backendErrors?.features && (
+          <p className="text-xs text-red-500 mt-1">
+            {backendErrors.features}
+          </p>
+        )}
 
         <button
           type="button"

@@ -16,6 +16,7 @@ export interface ITaskDocument extends Document {
     status: "BACKLOG" | "TODO" | "IN_PROGRESS" | "SUBMITTED" | "COMPLETED";
     priority: "LOW" | "MEDIUM" | "HIGH";
     estimatedTime?: number | null;
+    storyPoints: number | null;
 
     assigneeId?: mongoose.Types.ObjectId | null;
     reporterId: mongoose.Types.ObjectId;
@@ -96,6 +97,21 @@ const TaskSchema = new Schema<ITaskDocument>(
         estimatedTime: {
             type: Number,
             default: null
+        },
+        storyPoints: {
+            type: Number,
+            enum: [1, 2, 3, 5, 8, 13],
+            validate: {
+                validator: function (value: number | undefined) {
+                    const doc = this as unknown as ITaskDocument;
+
+                    if (doc.type === "STORY") {
+                        return value != null;
+                    }
+                    return true;
+                },
+                message: "Story points required for STORY",
+            },
         },
 
 

@@ -3,17 +3,17 @@ import { GetTransactionOptions, ITransactionQueryRepository, Transaction, Transa
 import { PaymentModel } from "../db/models/payment.model";
 
 type DateFilter = {
-  $gte?: Date;
-  $lte?: Date;
+    $gte?: Date;
+    $lte?: Date;
 };
 
 type MatchFilter = {
-  status?: "PENDING" | "SUCCESS" | "FAILED";
-  createdAt?: DateFilter;
+    status?: "PENDING" | "SUCCESS" | "FAILED";
+    createdAt?: DateFilter;
 };
 export class TransactionQueryRepository implements ITransactionQueryRepository {
     async getAllTransactions(options: GetTransactionOptions): Promise<TransactionListResult> {
-        const { page, limit, status, search,fromDate,toDate} = options;
+        const { page, limit, status, search, fromDate, toDate } = options;
         const skip = (page - 1) * limit;
 
         const match: MatchFilter = {};
@@ -23,18 +23,18 @@ export class TransactionQueryRepository implements ITransactionQueryRepository {
         }
 
         if (fromDate || toDate) {
-  match.createdAt = {};
+            match.createdAt = {};
 
-  if (fromDate) {
-    match.createdAt.$gte = new Date(fromDate);
-  }
+            if (fromDate) {
+                match.createdAt.$gte = new Date(fromDate);
+            }
 
-  if (toDate) {
-    match.createdAt.$lte = new Date(toDate);
-  }
-}
+            if (toDate) {
+                match.createdAt.$lte = new Date(toDate);
+            }
+        }
 
-        
+
 
         const pipeline: PipelineStage[] = [];
 
@@ -122,7 +122,7 @@ export class TransactionQueryRepository implements ITransactionQueryRepository {
                             status: 1,
 
                             invoiceNumber: "$invoice.invoiceNumber",
-                            invoiceId: "$invoice._id", 
+                            invoiceId: "$invoice._id",
 
                             subtotal: "$invoice.subtotal",
                             tax: "$invoice.tax",
@@ -139,92 +139,92 @@ export class TransactionQueryRepository implements ITransactionQueryRepository {
             }
         } as PipelineStage);
 
-        const result=await PaymentModel.aggregate(pipeline);
+        const result = await PaymentModel.aggregate(pipeline);
 
-         const data:Transaction[]=result[0]?.data||[];
-         const total:number=result[0]?.totalCount?.[0]?.total ||0
+        const data: Transaction[] = result[0]?.data || [];
+        const total: number = result[0]?.totalCount?.[0]?.total || 0
 
-         return {
+        return {
             data,
             total,
             page,
             limit
-         }
+        }
     }
 
     async getTotalRevenue(): Promise<number> {
-    const result = await PaymentModel.aggregate([
-        {
-            $match: {
-                status: "SUCCESS"
+        const result = await PaymentModel.aggregate([
+            {
+                $match: {
+                    status: "SUCCESS"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$amount" }
+                }
             }
-        },
-        {
-            $group: {
-                _id: null,
-                total: { $sum: "$amount" }
-            }
-        }
-    ]);
+        ]);
 
-    return result[0]?.total || 0;
-}
-
-async getRevenueByMonth(): Promise<{ month: string; revenue: number }[]> {
-  const result = await PaymentModel.aggregate([
-    {
-      $match: {
-        status: "SUCCESS"
-      }
-    },
-    {
-      $group: {
-        _id: {
-          year: { $year: "$createdAt" },
-          month: { $month: "$createdAt" }
-        },
-        revenue: { $sum: "$amount" }
-      }
-    },
-    {
-      $sort: {
-        "_id.year": 1,
-        "_id.month": 1
-      }
+        return result[0]?.total || 0;
     }
-  ]);
 
-const monthNames = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
+    async getRevenueByMonth(): Promise<{ month: string; revenue: number }[]> {
+        const result = await PaymentModel.aggregate([
+            {
+                $match: {
+                    status: "SUCCESS"
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: "$createdAt" },
+                        month: { $month: "$createdAt" }
+                    },
+                    revenue: { $sum: "$amount" }
+                }
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1
+                }
+            }
+        ]);
 
-// Convert aggregation result to map
-const revenueMap = new Map<string, number>();
+        const monthNames = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
 
-result.forEach((item) => {
-  const key = `${item._id.year}-${item._id.month}`;
-  revenueMap.set(key, item.revenue);
-});
+        // Convert aggregation result to map
+        const revenueMap = new Map<string, number>();
 
-// Get last 6 months
-const now = new Date();
-const months = [];
+        result.forEach((item) => {
+            const key = `${item._id.year}-${item._id.month}`;
+            revenueMap.set(key, item.revenue);
+        });
 
-for (let i = 5; i >= 0; i--) {
-  const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        // Get last 6 months
+        const now = new Date();
+        const months = [];
 
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
 
-  const key = `${year}-${month}`;
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
 
-  months.push({
-    month: monthNames[month - 1],
-    revenue: revenueMap.get(key) || 0
-  });
-}
+            const key = `${year}-${month}`;
 
-return months;
-}
+            months.push({
+                month: monthNames[month - 1],
+                revenue: revenueMap.get(key) || 0
+            });
+        }
+
+        return months;
+    }
 }

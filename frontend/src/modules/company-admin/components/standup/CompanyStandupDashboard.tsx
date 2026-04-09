@@ -124,7 +124,7 @@ const CompanyStandupDashboard = ({ projectId }: Props) => {
                                             <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm shadow-sm">
                                                 {member.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                                             </div>
-                                            
+
                                             <div>
                                                 <div className="flex items-center gap-2">
                                                     <p className="font-medium text-gray-800">
@@ -192,31 +192,45 @@ const CompanyStandupDashboard = ({ projectId }: Props) => {
                                 {history.map((sprint) => (
                                     <div
                                         key={sprint.sprintId}
-                                        className="border border-gray-100 rounded-xl p-4 hover:border-gray-200 hover:shadow-sm transition-all"
+                                        className={`rounded-xl p-4 transition-all border ${sprint.sprintStatus === "ACTIVE"
+                                                ? "border-green-300 bg-green-50 shadow-sm"
+                                                : "border-gray-100 hover:border-gray-200 hover:shadow-sm"
+                                            }`}
                                     >
-                                        <p className="font-medium text-gray-900 mb-2">
-                                            {sprint.sprintName}
-                                        </p>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <p className="font-medium text-gray-900">
+                                                {sprint.sprintName}
+                                            </p>
+
+                                            <span
+                                                className={`text-xs px-2 py-1 rounded-full font-medium ${sprint.sprintStatus === "ACTIVE"
+                                                    ? "bg-green-100 text-green-700"
+                                                    : sprint.sprintStatus === "COMPLETED"
+                                                        ? "bg-gray-100 text-gray-600"
+                                                        : "bg-yellow-100 text-yellow-700"
+                                                    }`}
+                                            >
+                                                {sprint.sprintStatus}
+                                            </span>
+                                        </div>
 
                                         {/* Progress Bar */}
                                         <div className="space-y-1.5">
                                             <div className="flex justify-between text-xs">
                                                 <span className="text-gray-500">Completion</span>
-                                                <span className={`font-medium ${
-                                                    sprint.completionPercentage >= 75 ? "text-green-600" :
+                                                <span className={`font-medium ${sprint.completionPercentage >= 75 ? "text-green-600" :
                                                     sprint.completionPercentage >= 50 ? "text-yellow-600" :
-                                                    "text-red-600"
-                                                }`}>
+                                                        "text-red-600"
+                                                    }`}>
                                                     {sprint.completionPercentage}%
                                                 </span>
                                             </div>
                                             <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                                                 <div
-                                                    className={`h-1.5 rounded-full ${
-                                                        sprint.completionPercentage >= 75 ? "bg-green-500" :
+                                                    className={`h-1.5 rounded-full ${sprint.completionPercentage >= 75 ? "bg-green-500" :
                                                         sprint.completionPercentage >= 50 ? "bg-yellow-500" :
-                                                        "bg-red-500"
-                                                    }`}
+                                                            "bg-red-500"
+                                                        }`}
                                                     style={{ width: `${sprint.completionPercentage}%` }}
                                                 />
                                             </div>

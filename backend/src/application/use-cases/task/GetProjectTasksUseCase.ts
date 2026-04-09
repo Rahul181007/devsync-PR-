@@ -76,7 +76,8 @@ export class GetProjectTasksUseCase implements IGetProjectTasksUseCase {
                     estimatedTime: task.estimatedTime ?? null,
                     dueDate: task.dueDate,
                     sprintId: task.sprintId ? task.sprintId.toString() : null,
-                    assignee
+                    assignee,
+                    storyPoints: task.storyPoints ?? 0 
                 }
             })
         )

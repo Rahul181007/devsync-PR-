@@ -78,7 +78,7 @@ export class GetTaskDetailUseCase implements IGetTaskDetailUseCase {
             parentId: task.parentId,
             priority: task.priority,
             estimatedTime:task.estimatedTime??null,
-
+            storyPoints: task.storyPoints ?? null, 
             sprint: task.sprintId
                 ? { id: task.sprintId, name: "Active sprint" }
                 : null,

@@ -7,6 +7,7 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
+import { toUTCDateOnly } from "../../../shared/utils/date.util";
 import { CreateStandupRequestDTO } from "../../dto/standup/createStandupRequest.dto";
 import { ICreateStandupUseCase } from "../../interface/standup/ICreateStandupUseCase";
 
@@ -54,14 +55,17 @@ export class CreateStandupUseCase implements ICreateStandupUseCase {
             throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_ACTIVE, HttpStatus.BAD_REQUEST)
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = toUTCDateOnly(new Date());
 
-        if (today < sprint.startDate || today > sprint.endDate) {
+
+        const start = toUTCDateOnly(sprint.startDate);
+        const end = toUTCDateOnly(sprint.endDate);
+
+        if (today < start || today > end) {
             throw new AppError(
                 RESPONSE_MESSAGES.STANDUP.OUTSIDE_SPRINT_RANGE,
                 HttpStatus.BAD_REQUEST
-            )
+            );
         }
 
         const existing = await this._standupRepo.findByUserSprintAndDate(

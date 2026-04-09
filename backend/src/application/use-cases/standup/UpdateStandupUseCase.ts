@@ -7,6 +7,7 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
+import { toUTCDateOnly } from "../../../shared/utils/date.util";
 import { updateStandupRequestDTO } from "../../dto/standup/updateStandupRequest.dto";
 import { IUpdateStandupUseCase } from "../../interface/standup/IUpdateStandupUseCase";
 
@@ -68,8 +69,7 @@ export class UpdateStandupUseCase implements IUpdateStandupUseCase{
  
 
 
-        const today=new Date();
-        today.setHours(0,0,0,0);
+const today = toUTCDateOnly(new Date());
         const standup=await this._standupRepo.findByUserSprintAndDate(
             userId,
             sprint.id,

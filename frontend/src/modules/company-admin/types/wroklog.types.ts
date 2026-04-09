@@ -21,4 +21,9 @@ export interface ProjectWorklogItem {
 export interface ProjectTimesheetItem {
   date: string;
   totalHours: number;
+  userName?: string;
+  tasks?: {
+    taskTitle: string;
+    timeSpent: number;
+  }[];
 }

@@ -12,4 +12,12 @@ export const updateTaskSchema = z.object({
 
   dueDate: z.coerce.date().optional().nullable(),
   estimatedTime: z.number().min(0).optional(),
+  storyPoints: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(5),
+    z.literal(8),
+    z.literal(13),
+  ]).optional().nullable()
 });

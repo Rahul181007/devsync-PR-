@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { createTask, getProjectTasks } from "../../store/task.slice";
 import toast from "react-hot-toast";
+import InputField from "../../../../shared/components/InputField";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -25,8 +26,25 @@ export const CreateTaskModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parentId, setParentId] = useState<string | null>(null);
   const [estimatedTime, setEstimatedTime] = useState<number | "">("");
-
+  const [storyPoints, setStoryPoints] = useState<number | "">("");
   const { tasks } = useAppSelector((state) => state.companyAdminTask);
+
+  const [errors, setErrors] = useState<{
+    title?: string;
+    description?: string;
+    parentId?: string;
+    storyPoints?: string;
+  }>({});
+
+  useEffect(() => {
+  if (!isOpen) {
+    setTitle("");
+    setDescription("");
+    setParentId(null);
+    setStoryPoints("");
+    setErrors({});
+  }
+}, [isOpen]);
 
   const parentTypeMap = {
     STORY: "EPIC",
@@ -40,23 +58,31 @@ export const CreateTaskModal = ({
     requiredParentType
       ? tasks.filter((t) => t.type === requiredParentType)
       : [];
-  
+
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
-    if (!title.trim() || !description.trim()) return;
-    console.log({
-      title,
-      description,
-      type,
-      priority,
-      dueDate
-    });
+    const newErrors: typeof errors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Description is required";
+    }
 
     if ((type === "TASK" || type === "BUG") && !parentId) {
-  toast.error(`${type} must have a parent Story`);
-  return;
-}
+      newErrors.parentId = `${type} must have a parent Story`;
+    }
+
+    if (type === "STORY" && !storyPoints) {
+      newErrors.storyPoints = "Story points required";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
     setIsSubmitting(true);
 
     try {
@@ -74,6 +100,10 @@ export const CreateTaskModal = ({
               estimatedTime !== ""
                 ? Math.round(estimatedTime * 60)
                 : undefined,
+            storyPoints:
+              type === "STORY"
+                ? Number(storyPoints)
+                : null,
           },
         })
       );
@@ -92,7 +122,11 @@ export const CreateTaskModal = ({
     }
   };
 
-  const isFormValid = title.trim() && description.trim();
+ const isFormValid =
+  title.trim() &&
+  description.trim() &&
+  (type === "STORY" ? storyPoints : true) &&
+  (type === "TASK" || type === "BUG" ? parentId : true);
 
   const priorityOptions = [
     { value: "LOW", label: "Low", color: "text-green-600 bg-green-50 border-green-200" },
@@ -101,7 +135,7 @@ export const CreateTaskModal = ({
   ];
 
   const getPriorityColor = (p: string) => {
-    switch(p) {
+    switch (p) {
       case "HIGH": return "bg-red-50 text-red-700 border-red-200";
       case "MEDIUM": return "bg-yellow-50 text-yellow-700 border-yellow-200";
       default: return "bg-green-50 text-green-700 border-green-200";
@@ -138,12 +172,14 @@ export const CreateTaskModal = ({
               Title
               <span className="text-red-500">*</span>
             </label>
-            <input
+            <InputField
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors bg-gray-50 hover:bg-white focus:bg-white"
+              onChange={(value) => {
+                setTitle(value);
+                setErrors((prev) => ({ ...prev, title: undefined }));
+              }}
               placeholder="Enter task title"
-              autoFocus
+              error={errors.title}
             />
           </div>
 
@@ -160,6 +196,11 @@ export const CreateTaskModal = ({
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors bg-gray-50 hover:bg-white focus:bg-white resize-none"
               placeholder="Describe the task in detail..."
             />
+            {errors.description && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.description}
+              </p>
+            )}
           </div>
 
           {/* Two Column Grid */}
@@ -173,6 +214,10 @@ export const CreateTaskModal = ({
                   const newType = e.target.value as "EPIC" | "STORY" | "TASK" | "BUG";
                   setType(newType);
                   setParentId(null);
+
+                  if (newType !== "STORY") {
+                    setStoryPoints("");
+                  }
                 }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-gray-50 hover:bg-white focus:bg-white"
               >
@@ -225,6 +270,11 @@ export const CreateTaskModal = ({
                   </option>
                 ))}
               </select>
+              {errors.parentId && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.parentId}
+                </p>
+              )}
               {parentTasks.length === 0 && (
                 <p className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md mt-1">
                   No {requiredParentType} available in this project
@@ -276,6 +326,36 @@ export const CreateTaskModal = ({
                 Enter time in hours
               </p>
             </div>
+
+            {type === "STORY" && (
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-600">
+                  Story Points
+                </label>
+                <select
+                  value={storyPoints}
+                  onChange={(e) =>
+                    setStoryPoints(
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"
+                >
+                  <option value="">Select points</option>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={5}>5</option>
+                  <option value={8}>8</option>
+                  <option value={13}>13</option>
+                </select>
+                {errors.storyPoints && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {errors.storyPoints}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -140,8 +140,10 @@ const companiesSlice = createSlice({
             .addCase(fetchCompanies.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload.items;
-                state.total = action.payload.total;
-                state.limit = action.payload.limit
+                state.total = action.payload.pagination.totalItems;
+                state.limit = action.payload.pagination.limit
+
+                state.page=action.payload.pagination.page
             })
             .addCase(fetchCompanies.rejected, (state, action) => {
                 state.loading = false;

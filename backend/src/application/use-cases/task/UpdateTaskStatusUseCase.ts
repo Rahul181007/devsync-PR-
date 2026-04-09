@@ -15,6 +15,58 @@ export class UpdateTaskStatusUseCase implements IUpdateTaskStatusUseCase {
         private _projectRepo: IProjectRepository
     ) { }
 
+
+      private async updateStoryStatus(storyId: string) {
+            const tasks = await this._taskRepo.findByParentId(storyId);
+    
+            if (tasks.length === 0) return;
+    
+const isDone = (status: string) =>
+  status === "COMPLETED";
+    
+            const allCompleted = tasks.every(t => isDone(t.status));
+    
+            const anyInProgress = tasks.some(t => t.status === "IN_PROGRESS");
+    
+    
+            let status: "TODO" | "IN_PROGRESS" | "COMPLETED" = "TODO";
+    
+            if (allCompleted) {
+                status = "COMPLETED";
+            } else if (anyInProgress) {
+                status = "IN_PROGRESS";
+            }
+    
+            await this._taskRepo.updateStatus(storyId, status);
+    
+    
+            const story = await this._taskRepo.findById(storyId);
+    
+            if (story?.parentId) {
+                await this.updateEpicStatus(story.parentId.toString());
+            }
+        }
+    
+        private async updateEpicStatus(epicId: string) {
+            const stories = await this._taskRepo.findByParentId(epicId);
+    
+            if (stories.length === 0) return;
+const isDone = (status: string) =>
+  status === "COMPLETED";
+    
+            const allCompleted = stories.every(s => isDone(s.status));
+            const anyInProgress = stories.some(s => s.status === "IN_PROGRESS");
+    
+            let status: "TODO" | "IN_PROGRESS" | "COMPLETED" = "TODO";
+    
+            if (allCompleted) {
+                status = "COMPLETED";
+            } else if (anyInProgress) {
+                status = "IN_PROGRESS";
+            }
+    
+            await this._taskRepo.updateStatus(epicId, status);
+        }
     async execute(userId: string, companyId: string, projectId: string, taskId: string, data: UpdateTaskStatusDTO): Promise<void> {
         const user = await this._userRepo.findById(userId);
 
@@ -60,6 +112,10 @@ export class UpdateTaskStatusUseCase implements IUpdateTaskStatusUseCase {
 
         task.status = data.status;
         await this._taskRepo.update(task)
+
+        if (task.parentId) {
+    await this.updateStoryStatus(task.parentId.toString());
+}
 
     }
 }

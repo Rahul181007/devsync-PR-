@@ -3,6 +3,7 @@ import { verifyAccessToken } from "../middleware/auth.middleware";
 import { requireRole } from "../middleware/role.middleware";
 import { Role } from "../../shared/constants/roleenum";
 import { planController } from "../../di/plan.di";
+import { checkUserStatus } from "../middleware/checkUserStatus.middleware";
 
 const router=Router();
 
@@ -13,5 +14,5 @@ router.put( "/superadmin/plans/:planId",verifyAccessToken,requireRole(Role.SUPER
 router.delete("/superadmin/plans/:planId",verifyAccessToken,requireRole(Role.SUPER_ADMIN),planController.deletePlan);
 
 //company
-router.get("/company/plans",verifyAccessToken,requireRole(Role.COMPANY_ADMIN),planController.availablePlans)
+router.get("/company/plans",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),planController.availablePlans)
 export default router;

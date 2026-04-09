@@ -4,7 +4,11 @@ import { logout } from "../../auth/auth.slice";
 import { Building2, CreditCard, LayoutDashboard, LogOut, Settings, Receipt } from "lucide-react";
 import DevSyncLogo from "../../../assets/DevSync.png";
 
-const Sidebar = () => {
+type SidebarProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -14,7 +18,20 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="w-64 bg-slate-900 text-white min-h-screen p-4">
+      <>
+      {/* Overlay (mobile only) */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+<aside
+  className={`fixed top-0 left-0 w-64 h-screen bg-slate-900 text-white p-4 z-50 transform transition-transform duration-300
+  ${isOpen ? "translate-x-0" : "-translate-x-full"}
+  md:translate-x-0 md:static md:z-auto`}
+>
             {/* Logo Section */}
             <div className="flex items-center gap-3 mb-8">
                 <img 
@@ -48,6 +65,7 @@ const Sidebar = () => {
                 {/* Companies */}
                 <NavLink
                     to="/super-admin/companies"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-md transition ${
                             isActive
@@ -63,6 +81,7 @@ const Sidebar = () => {
                 {/* Plans */}
                 <NavLink
                     to="/super-admin/plans"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-md transition ${
                             isActive
@@ -77,6 +96,7 @@ const Sidebar = () => {
 
                 <NavLink
                     to="/super-admin/transactions"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-md transition ${
                             isActive
@@ -92,6 +112,7 @@ const Sidebar = () => {
                 {/* Settings */}
                 <NavLink
                     to="/super-admin/settings"
+                    onClick={onClose}
                     className={({ isActive }) =>
                         `flex items-center gap-3 px-3 py-2 rounded-md transition ${
                             isActive
@@ -105,7 +126,9 @@ const Sidebar = () => {
                 </NavLink>
 
                 <button
-                    onClick={handleLogout}
+                    onClick={()=>{handleLogout();
+                        onClose()
+                    }}
                     className="flex items-center gap-3 px-3 py-2 rounded-md text-red-400 hover:bg-slate-800 w-full transition"
                 >
                     <LogOut size={18} />
@@ -113,6 +136,8 @@ const Sidebar = () => {
                 </button>
             </nav>
         </aside>
+
+        </>
     );
 };
 

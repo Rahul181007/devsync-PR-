@@ -1,4 +1,5 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 
 export interface GetTransactionsParams {
   page: number;
@@ -9,11 +10,11 @@ export interface GetTransactionsParams {
 
 export const transactionApi = {
   getTransactions(params: GetTransactionsParams) {
-    return http.get("/superadmin/transactions", { params });
+    return http.get(API_ROUTES.SUPER_ADMIN.TRANSACTIONS, { params });
   },
 
   downloadInvoice(invoiceId: string) {
-  return http.get(`/superadmin/invoices/${invoiceId}/download`, {
+  return http.get(API_ROUTES.SUPER_ADMIN.DOWNLOAD_INVOICE(invoiceId), {
     responseType: "blob"
   });
 }

@@ -12,6 +12,7 @@ export interface TaskDetailResponsDTO {
      parentId: string | null 
     priority: TaskPriority;
     estimatedTime:number|null
+        storyPoints?:number|null;
 
     sprint: {
         id: string;

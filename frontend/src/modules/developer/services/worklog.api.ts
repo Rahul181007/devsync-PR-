@@ -1,4 +1,5 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { WorklogItem } from "../types/worklog.types";
 
 export const worklogApi = {
@@ -14,7 +15,7 @@ export const worklogApi = {
     }
   ) {
     return http.post<{ success: boolean }>(
-      `/developer/projects/${projectId}/tasks/${taskId}/worklogs`,
+      API_ROUTES.DEVELOPER.TASK_WORKLOGS(projectId,taskId),
       data
     );
   },
@@ -22,7 +23,7 @@ export const worklogApi = {
   
   getWorklogsByTask(projectId: string, taskId: string) {
     return http.get<{ success: boolean; data: WorklogItem[] }>(
-      `/projects/${projectId}/tasks/${taskId}/worklogs`
+       API_ROUTES.DEVELOPER.GET_TASK_WORKLOGS(projectId,taskId)
     );
   },
 
@@ -36,14 +37,14 @@ export const worklogApi = {
     }
   ) {
     return http.patch(
-      `/developer/projects/${projectId}/worklogs/${worklogId}`,
+      API_ROUTES.DEVELOPER.WORKLOG_BY_ID(projectId,worklogId),
       data
     );
   },
 
     deleteWorklog(projectId: string, worklogId: string) {
     return http.delete(
-      `/developer/projects/${projectId}/worklogs/${worklogId}`
+      API_ROUTES.DEVELOPER.WORKLOG_BY_ID(projectId,worklogId)
     );
   },
 

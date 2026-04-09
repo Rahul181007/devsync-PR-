@@ -10,6 +10,8 @@ import { CreateSprintModal } from "./CreateSprintModal";
 import toast from "react-hot-toast";
 import { PlanSprintModal } from "./PlanSprintModal";
 import Spinner from "../../../../shared/components/LoadingSpinner";
+import type { TaskListItem } from "../../types/task.types";
+import { TaskDetailModal } from "../task/TaskDetailModal";
 
 interface Props {
     projectId: string;
@@ -52,24 +54,35 @@ const PriorityBadge = ({ priority }: { priority: string }) => {
 export const SprintBoard = ({ projectId }: Props) => {
     const dispatch = useAppDispatch();
 
-    const { sprints, selectedSprint, sprintTasks, loading } =
+    const { sprints, selectedSprint, sprintTasks, loading,
+        totalStoryPoints,
+        completedStoryPoints,
+        progressPercentage
+    } =
         useAppSelector((state) => state.companyAdminSprint);
 
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isPlanOpen, setIsPlanOpen] = useState(false);
     const [isCompleteConfirmOpen, setIsCompleteConfirmOpen] = useState(false);
     const [unfinishedCount, setUnfinishedCount] = useState(0);
+    const [selectedTask, setSelectedTask] = useState<TaskListItem | null>(null);
+    const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
+    
     useEffect(() => {
         dispatch(getProjectSprints(projectId));
     }, [dispatch, projectId]);
 
-    const totalTasks = sprintTasks.length;
-    const completedTasks = sprintTasks.filter((task) => task.status === "COMPLETED").length;
-    const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
 
     const handleSelectSprint = (sprintId: string) => {
         dispatch(getSprintDetail({ projectId, sprintId }));
+    };
+
+
+    const handleOpenTask = (task: TaskListItem) => {
+        setSelectedTask(task);
+        setIsTaskModalOpen(true);
     };
 
     const handleActivateSprint = async () => {
@@ -91,9 +104,11 @@ export const SprintBoard = ({ projectId }: Props) => {
     const handleCompleteSprint = () => {
         if (!selectedSprint) return;
 
-        const unfinishedTasks = sprintTasks.filter(
-            (task) => task.status !== "COMPLETED"
-        );
+const unfinishedTasks = sprintTasks.filter(
+  (task) =>
+    (task.type === "TASK" || task.type === "BUG") &&
+    task.status !== "COMPLETED"
+);
 
         if (unfinishedTasks.length > 0) {
             setUnfinishedCount(unfinishedTasks.length);
@@ -123,6 +138,26 @@ export const SprintBoard = ({ projectId }: Props) => {
         }
 
         setIsCompleteConfirmOpen(false);
+    };
+
+    const groupTasksByStory = (tasks: typeof sprintTasks) => {
+        const stories = tasks.filter((t) => t.type === "STORY");
+
+        const taskMap = new Map<string, typeof sprintTasks>();
+
+        for (const task of tasks) {
+            if ((task.type === "TASK" || task.type === "BUG") && task.parentId) {
+                if (!taskMap.has(task.parentId)) {
+                    taskMap.set(task.parentId, []);
+                }
+                taskMap.get(task.parentId)?.push(task);
+            }
+        }
+
+        return stories.map((story) => ({
+            story,
+            tasks: taskMap.get(story.id) || [],
+        }));
     };
 
     return (
@@ -174,19 +209,17 @@ export const SprintBoard = ({ projectId }: Props) => {
                                 <div
                                     key={sprint.id}
                                     onClick={() => handleSelectSprint(sprint.id)}
-                                    className={`relative p-3 rounded-xl cursor-pointer border-2 transition-all overflow-hidden ${
-                                        selectedSprint?.id === sprint.id
-                                            ? "border-blue-500 bg-blue-50 shadow-sm"
-                                            : "border-transparent hover:border-gray-200 hover:bg-gray-50"
-                                    }`}
+                                    className={`relative p-3 rounded-xl cursor-pointer border-2 transition-all overflow-hidden ${selectedSprint?.id === sprint.id
+                                        ? "border-blue-500 bg-blue-50 shadow-sm"
+                                        : "border-transparent hover:border-gray-200 hover:bg-gray-50"
+                                        }`}
                                 >
                                     {/* Blue indicator line - always visible on selected, visible on hover for others */}
-                                    <div className={`absolute left-0 top-0 bottom-0 w-1 bg-blue-500 transition-opacity ${
-                                        selectedSprint?.id === sprint.id 
-                                            ? "opacity-100" 
-                                            : "opacity-0 group-hover:opacity-100"
-                                    }`} />
-                                    
+                                    <div className={`absolute left-0 top-0 bottom-0 w-1 bg-blue-500 transition-opacity ${selectedSprint?.id === sprint.id
+                                        ? "opacity-100"
+                                        : "opacity-0 group-hover:opacity-100"
+                                        }`} />
+
                                     <div className="flex justify-between items-start mb-1.5 pl-1">
                                         <p className="text-sm font-medium text-gray-900 line-clamp-1">
                                             {sprint.name}
@@ -241,15 +274,14 @@ export const SprintBoard = ({ projectId }: Props) => {
                                         <h2 className="text-xl font-semibold text-gray-900">
                                             {selectedSprint.name}
                                         </h2>
-                                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                                            selectedSprint.status === "ACTIVE" ? "bg-green-100 text-green-700" :
+                                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${selectedSprint.status === "ACTIVE" ? "bg-green-100 text-green-700" :
                                             selectedSprint.status === "PLANNED" ? "bg-gray-100 text-gray-700" :
-                                            "bg-purple-100 text-purple-700"
-                                        }`}>
+                                                "bg-purple-100 text-purple-700"
+                                            }`}>
                                             {selectedSprint.status}
                                         </span>
                                     </div>
-                                    
+
                                     {selectedSprint.goal && (
                                         <div className="flex items-start gap-2">
                                             <span className="text-xs font-medium text-gray-400 uppercase tracking-wider mt-0.5">Goal:</span>
@@ -260,18 +292,18 @@ export const SprintBoard = ({ projectId }: Props) => {
                                     )}
 
                                     {/* Progress Section */}
-                                    {selectedSprint.status !== "PLANNED" && totalTasks > 0 && (
+                                    {selectedSprint.status !== "PLANNED" && totalStoryPoints > 0 && (
                                         <div className="mt-4 max-w-md">
                                             <div className="flex justify-between text-xs text-gray-500 mb-1.5">
-                                                <span className="font-medium">
-                                                    {completedTasks} of {totalTasks} tasks completed
+                                                <span>
+                                                    {completedStoryPoints} of {totalStoryPoints} pts completed
                                                 </span>
-                                                <span className="font-medium">{progress}%</span>
+                                                <span>{progressPercentage}%</span>
                                             </div>
                                             <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
                                                 <div
                                                     className="bg-green-500 h-2.5 rounded-full transition-all duration-500 ease-out"
-                                                    style={{ width: `${progress}%` }}
+                                                    style={{ width: `${progressPercentage}%` }}
                                                 />
                                             </div>
                                         </div>
@@ -356,61 +388,58 @@ export const SprintBoard = ({ projectId }: Props) => {
                                             <div className="flex-1 overflow-y-auto p-2 space-y-2">
                                                 {tasksByStatus.length === 0 ? (
                                                     <div className="flex flex-col items-center justify-center h-24 text-center">
-                                                        <p className="text-xs text-gray-400">
-                                                            No tasks
-                                                        </p>
+                                                        <p className="text-xs text-gray-400">No tasks</p>
                                                     </div>
                                                 ) : (
-                                                    tasksByStatus.map((task) => (
-                                                        <div
-                                                            key={task.id}
-                                                            className="relative bg-white p-3 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all cursor-pointer hover:border-blue-300 group overflow-hidden"
-                                                        >
-                                                            {/* Blue indicator line - always visible for visual consistency */}
-                                                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                            
-                                                            <div className="pl-1">
-                                                                {/* Title */}
-                                                                <p className="text-sm font-medium text-gray-800 mb-2 line-clamp-2">
-                                                                    {task.title}
-                                                                </p>
+                                                    (() => {
+                                                        const grouped = groupTasksByStory(sprintTasks);
 
-                                                                {/* Task Code */}
-                                                                {task.code && (
-                                                                    <p className="text-xs text-gray-400 mb-2 font-mono">
-                                                                        {task.code}
-                                                                    </p>
-                                                                )}
+                                                        return grouped.map(({ story, tasks }) => {
+                                                            const filteredTasks = tasks.filter((t) => t.status === status);
 
-                                                                {/* Footer */}
-                                                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                                                    <PriorityBadge priority={task.priority} />
+                                                            // ❗ show story only if it belongs OR has tasks in this column
+                                                            if (filteredTasks.length === 0 && story.status !== status) return null;
 
-                                                                    {task.assignee && (
-                                                                        <div className="flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded-full">
-                                                                            <span className="text-gray-400">👤</span>
-                                                                            <span className="truncate max-w-[70px]">
-                                                                                {task.assignee.name.split(' ')[0]}
-                                                                            </span>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
+                                                            return (
+                                                                <div key={story.id} className="space-y-2 mb-3">
 
-                                                                {/* Due Date */}
-                                                                {task.dueDate && (
-                                                                    <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
-                                                                        <span>📅</span>
-                                                                        <span>
-                                                                            {new Date(task.dueDate).toLocaleDateString('en-US', {
-                                                                                month: 'short',
-                                                                                day: 'numeric'
-                                                                            })}
+                                                                    {/* STORY HEADER */}
+                                                                    <div className="bg-gray-100 px-3 py-2 rounded-lg text-xs font-semibold flex justify-between items-center">
+                                                                        <span className="truncate">{story.title}</span>
+                                                                        <span className="text-gray-600">
+                                                                            {story.storyPoints || 0} pts
                                                                         </span>
                                                                     </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    ))
+
+                                                                    {/* TASKS */}
+                                                                    {filteredTasks.length === 0 ? (
+                                                                        <div className="text-xs text-gray-400 pl-2">
+                                                                            No tasks
+                                                                        </div>
+                                                                    ) : (
+                                                                        filteredTasks.map((task) => (
+                                                                            <div
+                                                                                onClick={() => handleOpenTask(task)}
+                                                                                className="relative bg-white p-3 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition"
+                                                                            >
+                                                                                <p className="text-sm font-medium mb-2">{task.title}</p>
+                                                                                <p className="text-sm font-medium mb-2">{task.code}</p>
+                                                                                <div className="flex justify-between items-center">
+                                                                                    <PriorityBadge priority={task.priority} />
+
+                                                                                    {task.assignee && (
+                                                                                        <span className="text-xs text-gray-500">
+                                                                                            {task.assignee.name}
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        ))
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        });
+                                                    })()
                                                 )}
                                             </div>
                                         </div>
@@ -435,6 +464,15 @@ export const SprintBoard = ({ projectId }: Props) => {
                 projectId={projectId}
                 sprintId={selectedSprint?.id ?? ""}
             />
+
+            {selectedTask && (
+                <TaskDetailModal
+                    isOpen={isTaskModalOpen}
+                    onClose={() => setIsTaskModalOpen(false)}
+                    projectId={projectId}
+                    taskId={selectedTask.id}
+                />
+            )}
 
             {/* Complete Sprint Confirmation Modal */}
             {isCompleteConfirmOpen && selectedSprint && (

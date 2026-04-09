@@ -1,4 +1,5 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { ProjectDetail, ProjectListData } from "../types/project.types";
 
 interface GetProjectParams {
@@ -11,14 +12,14 @@ interface GetProjectParams {
 export const projectApi = {
   getProjects(params: GetProjectParams) {
     return http.get<ProjectListData>(
-      "/company/projects", 
+      API_ROUTES.DEVELOPER.PROJECTS, 
       { params }
     );
   },
 
   getProjectDetail(projectId: string) {
     return http.get<{ message: string; data: ProjectDetail }>(
-      `/company/projects/${projectId}` 
+      API_ROUTES.DEVELOPER.PROJECT_BY_ID(projectId) 
     );
   },
 };

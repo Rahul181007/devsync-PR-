@@ -7,9 +7,9 @@ import PlanForm from "./PlanForm";
 import { useState } from "react";
 
 interface PlanModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    plan?: Plan | null;
+  isOpen: boolean;
+  onClose: () => void;
+  plan?: Plan | null;
 }
 
 const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
@@ -17,6 +17,8 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
   const { page, limit } = useAppSelector((state) => state.plans);
 
   const [loading, setLoading] = useState(false);
+
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const isEditMode = Boolean(plan);
 
   if (!isOpen) return null;
@@ -26,10 +28,15 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
 
     try {
       if (isEditMode && plan) {
+
+        const transformedData: Parameters<typeof updatePlan>[0]["data"] = {
+          ...data,
+          features: data.features?.map((f) => f.value)
+        };
         const result = await dispatch(
           updatePlan({
             planId: plan.id,
-            data,
+            data: transformedData,
             page,
             limit
           })
@@ -41,13 +48,20 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
         }
 
         if (updatePlan.rejected.match(result)) {
-          toast.error(result.payload as string || "Failed to update plan");
+          setFormErrors({ general: result.payload as string });
         }
 
       } else {
+        const transformedData = {
+          ...data,
+          features: data.features
+            .map(f => f.value)
+            .filter(f => f && f.trim() !== "")
+        };
+
         const result = await dispatch(
           createPlan({
-            data,
+            data: transformedData,
             page,
             limit
           })
@@ -59,7 +73,7 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
         }
 
         if (createPlan.rejected.match(result)) {
-          toast.error(result.payload as string || "Failed to create plan");
+          setFormErrors({ general: result.payload as string });
         }
       }
     } finally {
@@ -70,7 +84,7 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl max-h-[90vh] flex flex-col">
-        
+
         {/* Header */}
         <div className="flex justify-between items-center border-b border-gray-200 px-6 py-4">
           <div>
@@ -108,6 +122,7 @@ const PlanModal = ({ isOpen, onClose, plan }: PlanModalProps) => {
             onSubmit={handleSubmit}
             loading={loading}
             onClose={onClose}
+            backendErrors={formErrors}
           />
         </div>
 

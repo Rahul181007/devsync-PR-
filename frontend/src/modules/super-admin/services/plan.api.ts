@@ -1,23 +1,24 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { CreatePlanRequest, GetPlansParams, UpdatePlanRequest } from "../typess/plan.types";
 
 export const planApi={
     createPlan(data:CreatePlanRequest){
-          return http.post("/superadmin/plans", data);
+          return http.post(API_ROUTES.SUPER_ADMIN.PLANS, data);
     },
       getPlans(params?: GetPlansParams) {
-    return http.get("/superadmin/plans", { params });
+    return http.get(API_ROUTES.SUPER_ADMIN.PLANS, { params });
   },
 
   getPlanById(id: string) {
-    return http.get(`/superadmin/plans/${id}`);
+    return http.get(API_ROUTES.SUPER_ADMIN.PLAN_BY_ID(id));
   },
 
   updatePlan(id: string, data: UpdatePlanRequest) {
-    return http.put(`/superadmin/plans/${id}`, data);
+    return http.put(API_ROUTES.SUPER_ADMIN.PLAN_BY_ID(id), data);
   },
 
   deletePlan(id: string) {
-    return http.delete(`/superadmin/plans/${id}`);
+    return http.delete(API_ROUTES.SUPER_ADMIN.PLAN_BY_ID(id));
   }
 }

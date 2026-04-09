@@ -59,11 +59,17 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         if (sprint.status !== "ACTIVE") {
             throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_ACTIVE, HttpStatus.BAD_REQUEST)
         }
+        const sprintTask = await this._taskRepo.findBySprintId(sprintId);
 
-        const allTasks = await this._taskRepo.findByProjectId(projectId);
-        const sprintTask = allTasks.filter((task) => task.sprintId === sprintId);
+        const leafTasks = sprintTask.filter(
+            (task) => task.type === "TASK" || task.type === "BUG"
+        );
 
-        for (const task of sprintTask) {
+        const incompleteTasks = leafTasks.filter(
+            (task) => task.status !== "COMPLETED"
+        );
+
+        for (const task of incompleteTasks) {
             if (task.status !== "COMPLETED") {
                 task.sprintId = null;
                 task.status = "BACKLOG";
@@ -88,7 +94,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
         const developers = users.filter(u => u.role === Role.DEVELOPER);
 
         for (const dev of developers) {
-            const notification=await this._notificationRepository.create({
+            const notification = await this._notificationRepository.create({
                 userId: dev.id,
                 type: "SPRINT_COMPLETED",
                 title: "Sprint Completed",
@@ -99,7 +105,7 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
                 }
             });
 
-                        const io = getSocketInstance();
+            const io = getSocketInstance();
 
             io.to(`user:${dev.id}`).emit("new_notification", {
                 id: notification.id,

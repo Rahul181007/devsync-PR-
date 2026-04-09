@@ -7,65 +7,65 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { Role } from "../../../shared/constants/roleenum";
 import { AppError } from "../../../shared/errors/AppError";
+import { toUTCDateOnly } from "../../../shared/utils/date.util";
 import { GetMyCurrentSprintStandupsResponseDTO } from "../../dto/standup/getMyCurrentSprintStandupsResponse.dto";
 import { IGetMyCurrentSprintStandupsUseCase } from "../../interface/standup/IGetMyCurrentSprintStandupsUseCase";
 
-export class GetMyCurrentSprintStandupsUseCase implements IGetMyCurrentSprintStandupsUseCase{
+export class GetMyCurrentSprintStandupsUseCase implements IGetMyCurrentSprintStandupsUseCase {
     constructor(
-        private _standupRepo:IStandupRepository,
-        private _sprintRepo:ISprintRepository,
-        private _projectRepo:IProjectRepository,
-        private _userRepo:IUserRepository,
-        private _projectMemberRepo:IProjectMemberRepository
-    ){}
+        private _standupRepo: IStandupRepository,
+        private _sprintRepo: ISprintRepository,
+        private _projectRepo: IProjectRepository,
+        private _userRepo: IUserRepository,
+        private _projectMemberRepo: IProjectMemberRepository
+    ) { }
 
     async execute(userId: string, companyId: string, projectId: string): Promise<GetMyCurrentSprintStandupsResponseDTO> {
-        const user=await this._userRepo.findById(userId);
-        if(!user){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,HttpStatus.NOT_FOUND)
+        const user = await this._userRepo.findById(userId);
+        if (!user) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND, HttpStatus.NOT_FOUND)
         }
-        if(user.role!==Role.DEVELOPER){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED,HttpStatus.FORBIDDEN)
+        if (user.role !== Role.DEVELOPER) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.UNAUTHORIZED, HttpStatus.FORBIDDEN)
         }
 
-        const project=await this._projectRepo.findById(projectId);
-        if(!project){
+        const project = await this._projectRepo.findById(projectId);
+        if (!project) {
             throw new AppError(
-                RESPONSE_MESSAGES.PROJECT.PROJECT_NOT_FOUND,HttpStatus.NOT_FOUND
+                RESPONSE_MESSAGES.PROJECT.PROJECT_NOT_FOUND, HttpStatus.NOT_FOUND
             )
         }
 
-        if(project.companyId!==companyId){
-            throw new AppError(RESPONSE_MESSAGES.PROJECT.COMPANY_ID_NOT_MATCHING,HttpStatus.FORBIDDEN)
+        if (project.companyId !== companyId) {
+            throw new AppError(RESPONSE_MESSAGES.PROJECT.COMPANY_ID_NOT_MATCHING, HttpStatus.FORBIDDEN)
         }
 
-        const isMember=await this._projectMemberRepo.isMember(projectId,userId);
+        const isMember = await this._projectMemberRepo.isMember(projectId, userId);
 
-        if(!isMember){
-            throw new AppError(RESPONSE_MESSAGES.PROJECT.MEMBER_NOT_FOUND,HttpStatus.FORBIDDEN)
+        if (!isMember) {
+            throw new AppError(RESPONSE_MESSAGES.PROJECT.MEMBER_NOT_FOUND, HttpStatus.FORBIDDEN)
         }
 
-        if(!project.currentSprintId){
-            throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_ACTIVE,HttpStatus.BAD_REQUEST)
+        if (!project.currentSprintId) {
+            throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_ACTIVE, HttpStatus.BAD_REQUEST)
         }
 
-        const sprint =await this._sprintRepo.findById(project.currentSprintId);
+        const sprint = await this._sprintRepo.findById(project.currentSprintId);
 
-        if(!sprint){
-            throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_FOUND,HttpStatus.NOT_FOUND)
+        if (!sprint) {
+            throw new AppError(RESPONSE_MESSAGES.SPRINT.SPRINT_NOT_FOUND, HttpStatus.NOT_FOUND)
         }
 
-        const today=new Date();
-        today.setHours(0,0,0,0);
-        const todayStandup=await this._standupRepo.findByUserSprintAndDate(userId,sprint.id,today)
-        
-        const history=await this._standupRepo.findByUserWithFilters(userId,{sprintId:sprint.id})
-         
-         return {
-            sprintId:sprint.id,
-            sprintStatus:sprint.status,
+        const today = toUTCDateOnly(new Date());
+        const todayStandup = await this._standupRepo.findByUserSprintAndDate(userId, sprint.id, today)
+
+        const history = await this._standupRepo.findByUserWithFilters(userId, { sprintId: sprint.id })
+
+        return {
+            sprintId: sprint.id,
+            sprintStatus: sprint.status,
             todayStandup,
             history
-         }
+        }
     }
 }

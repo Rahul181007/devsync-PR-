@@ -25,7 +25,7 @@ export const RESPONSE_MESSAGES = {
         USER_ID: 'User id is required',
         USER_ALREADY_EXISTS: 'User Already exist',
         USER_CREATED: 'User created successfully',
-        USER_BLOCKED: 'User isblocked',
+        USER_BLOCKED: 'USER_BLOCKED',
         COMPANY_NOT_FOUND: 'Company not found',
         WAITING_FOR_APPROVAL: 'Waiting for approval',
         ONBOARDING_REQUIRED: 'Onboarding required',
@@ -116,7 +116,7 @@ export const RESPONSE_MESSAGES = {
         ASSIGNED_USER: "Assigned user must be a developer",
         DUE_DATE_OUTSIDE_PROJECT:"Due date outside the project date",
         CANNOT_CHANGE_TYPE_WITH_CHILDREN:"cannot change the type it has children task",
-
+        STORY_POINTS_REQUIRED:"story points required for story"
     },
 
     SPRINT: {

@@ -18,6 +18,7 @@ export interface TaskResponseDTO{
     status:TaskStatus;
     priority:TaskPriority;
     estimatedTime?: number | null;
+    storyPoints?:number|null;
 
     assigneeId:string|null;
     reporterId:string;

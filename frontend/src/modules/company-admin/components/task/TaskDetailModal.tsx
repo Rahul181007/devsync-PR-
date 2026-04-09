@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
-import { addTaskComment, clearSelectedTask, getTaskAttachments, getTaskComments, getTaskDetail, updateTaskStatus, uploadTaskAttachment } from "../../store/task.slice";
+import { addTaskComment, clearSelectedTask, getTaskAttachments, getTaskComments, getTaskDetail, updateTask, updateTaskStatus, uploadTaskAttachment } from "../../store/task.slice";
 import Spinner from "../../../../shared/components/LoadingSpinner";
 import {
     XMarkIcon,
@@ -193,6 +193,11 @@ export const TaskDetailModal = ({
     const { worklogs, loading: worklogLoading } = useAppSelector(
         (state) => state.adminWorklog
     );
+    const { selectedProject } = useAppSelector((state) => state.project)
+
+
+    const developers =
+        selectedProject?.members.filter((u) => u.role === "DEVELOPER") || [];
 
     useEffect(() => {
         if (isOpen && taskId) {
@@ -262,6 +267,22 @@ export const TaskDetailModal = ({
         );
 
         setSelectedFile(null);
+    };
+
+    const handleAssign = (developerId: string) => {
+        if (!taskId) return;
+
+        dispatch(
+            updateTask({
+                projectId,
+                taskId,
+                data: {
+                    assigneeId: developerId || null,
+                },
+            })
+        ).then(() => {
+            dispatch(getTaskDetail({ projectId, taskId }));
+        });
     };
 
     const tabs = [
@@ -343,12 +364,38 @@ export const TaskDetailModal = ({
                                         value={selectedTask.sprint ? selectedTask.sprint.name : "Backlog"}
                                         bgColor="bg-white"
                                     />
-                                    <InfoItem
-                                        icon={UserIcon}
-                                        label="Assignee"
-                                        value={selectedTask.assignee ? selectedTask.assignee.name : "Unassigned"}
-                                        bgColor="bg-white"
-                                    />
+                                    {(selectedTask.type === "TASK" || selectedTask.type === "BUG") && (
+                                        <div className="flex items-start gap-3">
+                                            <div className="p-2 bg-white rounded-lg">
+                                                <UserIcon className="w-4 h-4 text-gray-500" />
+                                            </div>
+
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs text-gray-500 mb-1">Assignee</p>
+
+                                                <select
+                                                    value={selectedTask.assignee?.id || ""}
+                                                    onChange={(e) => handleAssign(e.target.value)}
+                                                    disabled={!selectedTask.sprint}
+                                                    className="w-full border border-gray-200 rounded-lg px-2 py-1 text-sm"
+                                                >
+
+                                                    <option value="">Unassigned</option>
+
+                                                    {developers.map((dev) => (
+                                                        <option key={dev.user.id} value={dev.user.id}>
+                                                            {dev.user.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {!selectedTask.sprint && (
+                                                    <p className="text-xs text-red-500 mt-1">
+                                                        Assign only when task is in an active sprint
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                     <InfoItem
                                         icon={ClockIcon}
                                         label="Due Date"
@@ -470,11 +517,10 @@ export const TaskDetailModal = ({
                                                     <button
                                                         onClick={handleAddComment}
                                                         disabled={!commentText.trim()}
-                                                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                                                            !commentText.trim()
-                                                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                                : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow"
-                                                        }`}
+                                                        className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${!commentText.trim()
+                                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                            : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow"
+                                                            }`}
                                                     >
                                                         Post Comment
                                                     </button>
@@ -540,11 +586,10 @@ export const TaskDetailModal = ({
                                                 <button
                                                     onClick={handleUpload}
                                                     disabled={!selectedFile}
-                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                                        !selectedFile
-                                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                            : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow"
-                                                    }`}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${!selectedFile
+                                                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow"
+                                                        }`}
                                                 >
                                                     Upload
                                                 </button>

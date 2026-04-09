@@ -17,6 +17,56 @@ export class UpdateDeveloperTaskStatusUseCase implements IUpdateDeveloperTaskSta
         private _projectMemberRepo: IProjectMemberRepository
     ) { }
 
+
+    private async updateStoryStatus(storyId: string) {
+        const tasks = await this._taskRepo.findByParentId(storyId);
+
+        if (tasks.length === 0) return;
+
+const isDone = (status: string) =>
+  status === "COMPLETED";
+
+const allCompleted = tasks.every(t => isDone(t.status));
+        const anyInProgress = tasks.some(t => t.status === "IN_PROGRESS");
+
+        let status: "TODO" | "IN_PROGRESS" | "COMPLETED" = "TODO";
+
+        if (allCompleted) {
+            status = "COMPLETED";
+        } else if (anyInProgress) {
+            status = "IN_PROGRESS";
+        }
+
+        await this._taskRepo.updateStatus(storyId, status);
+
+        const story = await this._taskRepo.findById(storyId);
+
+        if (story?.parentId) {
+            await this.updateEpicStatus(story.parentId.toString());
+        }
+    }
+
+    private async updateEpicStatus(epicId: string) {
+        const stories = await this._taskRepo.findByParentId(epicId);
+
+        if (stories.length === 0) return;
+
+const isDone = (status: string) =>
+  status === "COMPLETED";
+
+const allCompleted = stories.every(s => isDone(s.status));
+        const anyInProgress = stories.some(s => s.status === "IN_PROGRESS");
+
+        let status: "TODO" | "IN_PROGRESS" | "COMPLETED" = "TODO";
+
+        if (allCompleted) {
+            status = "COMPLETED";
+        } else if (anyInProgress) {
+            status = "IN_PROGRESS";
+        }
+
+        await this._taskRepo.updateStatus(epicId, status);
+    }
     async execute(userId: string, projectId: string, taskId: string, data: UpdateDeveloperTaskStatus): Promise<void> {
         const user = await this._userRepo.findById(userId);
 
@@ -74,7 +124,10 @@ export class UpdateDeveloperTaskStatusUseCase implements IUpdateDeveloperTaskSta
         }
 
         const isValidTransition =
-            (task.status === "BACKLOG" && data.status === "TODO") || (task.status === "TODO" && data.status === "IN_PROGRESS")
+  (task.status === "BACKLOG" && data.status === "TODO") ||
+  (task.status === "TODO" && data.status === "IN_PROGRESS") ||
+  (task.status === "IN_PROGRESS" && data.status === "SUBMITTED");
+
         if (!isValidTransition) {
             throw new AppError(
                 RESPONSE_MESSAGES.TASK.INVALID_STATUS_TRANSITION,
@@ -84,5 +137,11 @@ export class UpdateDeveloperTaskStatusUseCase implements IUpdateDeveloperTaskSta
 
         task.status = data.status;
         await this._taskRepo.update(task)
+console.log("✅ Task updated:", task.title, task.status);
+
+if (task.parentId) {
+    console.log("👉 Calling updateStoryStatus for:", task.parentId.toString());
+    await this.updateStoryStatus(task.parentId.toString());
+}
     }
 }

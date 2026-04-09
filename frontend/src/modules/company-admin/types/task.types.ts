@@ -25,6 +25,8 @@ export interface TaskListItem {
   dueDate: string | null;
   assignee: TaskAssignee | null;
   sprintId: string | null;
+
+  storyPoints?: number;
 }
 
 export interface TaskSubmission {
@@ -52,6 +54,8 @@ export interface TaskDetail {
   status: TaskStatus;
   priority: TaskPriority;
   estimatedTime: number | null;
+  storyPoints?: number | null;
+  
 
   sprint: TaskSprint | null;
 

@@ -3,11 +3,13 @@ import { ICompleteSprintUseCase } from "../application/interface/sprint/IComplet
 import { ICreateSprintUseCase } from "../application/interface/sprint/ICreateSprintUseCase";
 import { IGetSprintDetailUseCase } from "../application/interface/sprint/IGetSprintDetailUseCase";
 import { IListSprintUseCase } from "../application/interface/sprint/IListSprintUseCase";
+import { IPlanSprintUseCase } from "../application/interface/sprint/IPlanSprintUseCase";
 import { ActivateSprintUseCase } from "../application/use-cases/sprint/ActivateSprintUseCase";
 import { CompleteSprintUseCase } from "../application/use-cases/sprint/CompleteSprintUseCase";
 import { CreateSprintUseCase } from "../application/use-cases/sprint/CreateSprintUseCase";
 import { GetSprintDetailUseCase } from "../application/use-cases/sprint/GetSprintDetailUseCase.tsGetSprintDetailUseCase";
 import { ListSprintUseCase } from "../application/use-cases/sprint/ListSprintUseCase";
+import { PlanSprintUseCase } from "../application/use-cases/sprint/PlanSprintUseCase";
 import { NotificationRepository } from "../infrastructure/repositories/notification.repository";
 import { ProjectRepository } from "../infrastructure/repositories/project.repository";
 import { ProjectMemberRepository } from "../infrastructure/repositories/projectMember.repository";
@@ -27,11 +29,13 @@ const createSprintUseCase: ICreateSprintUseCase = new CreateSprintUseCase(sprint
 const listSprintUseCase: IListSprintUseCase = new ListSprintUseCase(sprintRepository, userRepository, projectRepository);
 const getSprintDetailUseCase: IGetSprintDetailUseCase = new GetSprintDetailUseCase(sprintRepository, projectRepository, taskRepository, userRepository);
 const activateSprintUseCase: IActivateSprintUseCase = new ActivateSprintUseCase(sprintRepository, projectRepository, taskRepository, userRepository,projectMemberRepository,notificationRepository)
-const completeSprintUseCase:ICompleteSprintUseCase=new CompleteSprintUseCase(sprintRepository,projectRepository,taskRepository,userRepository,projectMemberRepository,notificationRepository)
+const completeSprintUseCase:ICompleteSprintUseCase=new CompleteSprintUseCase(sprintRepository,projectRepository,taskRepository,userRepository,projectMemberRepository,notificationRepository);
+const planSprintUseCase:IPlanSprintUseCase=new PlanSprintUseCase(sprintRepository,userRepository,taskRepository)
 export const sprintController = new SprintController(
     createSprintUseCase,
     listSprintUseCase,
     getSprintDetailUseCase,
     activateSprintUseCase,
-    completeSprintUseCase
+    completeSprintUseCase,
+    planSprintUseCase
 )

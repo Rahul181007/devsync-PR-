@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import helmet  from 'helmet';
 import compression from 'compression';
@@ -8,6 +8,7 @@ import { connectDB } from './infrastructure/db/mongo';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { initSocketServer } from './infrastructure/websocket/socket.server';
+import { AppError } from './shared/errors/AppError';
 
 const app=express()
 
@@ -23,6 +24,25 @@ app.use(helmet());
 app.use(compression());
 
 app.use('/api',router);
+
+const errorHandler: ErrorRequestHandler = (err, req, res,_next) => {
+  console.error(err);
+
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      code: err.message,
+      message: err.message,
+    });
+  }
+
+  return res.status(500).json({
+    code: "INTERNAL_SERVER_ERROR",
+    message: "Something went wrong",
+  });
+};
+
+app.use(errorHandler);
+// ✅ END
 
 
 const httpServer = createServer(app);

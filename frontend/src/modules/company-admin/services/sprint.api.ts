@@ -1,51 +1,65 @@
 import { http } from "../../../core/api/http";
+import { API_ROUTES } from "../../../shared/constants/api.routes";
 import type { PlanSprintRequest, SprintDetail, SprintListItems } from "../types/sprint.types";
 import type { TaskListItem } from "../types/task.types";
 
-export const sprintApi={
-    createSprint(projectId:string,data:{
-        name:string;
-        goal?:string|null;
-        startDate:string;
-        endDate:string
-    }){
-        return http.post<{success:boolean;data:SprintDetail}>(
-                  `/company/projects/${projectId}/sprints`,data
-        )
-    },
+export const sprintApi = {
+  createSprint(projectId: string, data: {
+    name: string;
+    goal?: string | null;
+    startDate: string;
+    endDate: string
+  }) {
+    return http.post<{ success: boolean; data: SprintDetail }>(
+      API_ROUTES.COMPANY.SPRINTS(projectId), data
+    )
+  },
 
-    getProjectSprints(projectId:string){
-        return http.get<{success:boolean;data:SprintListItems[]}>(
-            `/company/projects/${projectId}/sprints`
-        )
-    },
+  getProjectSprints(projectId: string) {
+    return http.get<{ success: boolean; data: SprintListItems[] }>(
+      API_ROUTES.COMPANY.SPRINTS(projectId)
+    )
+  },
 
-    getSprintDetail(projectId:string,sprintId:string){
-        return http.get<{success:boolean;data:{
-            sprint:SprintDetail;
-            tasks:TaskListItem[]
-        }}>(`/company/projects/${projectId}/sprints/${sprintId}`)
-    },
+getSprintDetail(projectId: string, sprintId: string) {
+  return http.get<{
+    success: boolean;
+    data: {
+      sprint: SprintDetail;
+      tasks: TaskListItem[];
+      totalStoryPoints: number;
+      completedStoryPoints: number;
+      progressPercentage: number;
+    };
+  }>(API_ROUTES.COMPANY.SPRINT_BY_ID(projectId, sprintId));
+},
 
-      activateSprint(projectId: string, sprintId: string) {
+  activateSprint(projectId: string, sprintId: string) {
     return http.patch<{ success: boolean; message: string }>(
-      `/company/projects/${projectId}/sprints/${sprintId}/activate`
+      API_ROUTES.COMPANY.ACTIVATE_SPRINT(projectId, sprintId)
     );
   },
 
 
   completeSprint(projectId: string, sprintId: string) {
     return http.patch<{ success: boolean; message: string }>(
-      `/company/projects/${projectId}/sprints/${sprintId}/complete`
+      API_ROUTES.COMPANY.COMPLETE_SPRINT(projectId,sprintId)
     );
   },
 
 
-  planSprintTasks(projectId: string, data: PlanSprintRequest) {
-    return http.patch<{ success: boolean; message: string }>(
-      `/company/projects/${projectId}/sprints/plan`,
-      data
-    );
-  }
+  // planSprintTasks(projectId: string, data: PlanSprintRequest) {
+  //   return http.patch<{ success: boolean; message: string }>(
+  //     API_ROUTES.COMPANY.PLAN_SPRINT(projectId),
+  //     data
+  //   );
+  // },
+
+  planSprint(projectId: string, sprintId: string, data: PlanSprintRequest) {
+  return http.patch<{ success: boolean; data: { id: string; stories: string[] } }>(
+    API_ROUTES.COMPANY.PLAN_SPRINT(projectId, sprintId),
+    data
+  );
+}
 
 }
