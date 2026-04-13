@@ -2,6 +2,7 @@ import mongoose from "mongoose"
 import { findMessageOptions, IChatRepository } from "../../domain/repositories/chat.repository";
 import { ChatMessageModel, IChatMessageDocument } from "../db/models/chat.model";
 import { ChatMessage } from "../../domain/entities/chat.entity";
+import { ChatMapper } from "../mappers/chat/chat.mapper";
 
 type ChatQuery = {
     projectId: mongoose.Types.ObjectId;
@@ -25,35 +26,10 @@ type CreateChatMessageData = {
 
 export class ChatRepository implements IChatRepository {
 
-    private _toDomain(doc: IChatMessageDocument): ChatMessage {
-        return new ChatMessage(
-            doc._id.toString(),
-            doc.projectId.toString(),
-            doc.senderId.toString(),
-            doc.senderName,
-            doc.message,
-            doc.attachmentUrl ?? null,
-            doc.attachmentType as "image" | "file" | null,
-            doc.fileName ?? null,
-            doc.replyToMessageId ? doc.replyToMessageId.toString() : null,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
 
     async create(data: CreateChatMessageData): Promise<ChatMessage> {
-        const doc = await ChatMessageModel.create({
-            projectId: data.projectId,
-            senderId: data.senderId,
-            senderName: data.senderName,
-            message: data.message,
-            attachmentUrl: data.attachmentUrl ?? null,
-            attachmentType: data.attachmentType ?? null,
-            fileName: data.fileName ?? null,
-            replyToMessageId: data.replyToMessageId ?? undefined,
-        });
-
-        return this._toDomain(doc);
+        const doc = await ChatMessageModel.create(ChatMapper.toDocument(data));
+        return ChatMapper.toDomain(doc)
     }
 
     async findByProjectId(projectId: string, options: findMessageOptions): Promise<ChatMessage[]> {
@@ -68,11 +44,11 @@ export class ChatRepository implements IChatRepository {
         }
         const docs = await ChatMessageModel.find(query).sort({ createdAt: -1 }).limit(options.limit).lean()
 
-        return docs.reverse().map((doc) => this._toDomain(doc as IChatMessageDocument))
+        return docs.reverse().map((doc) => ChatMapper.toDomain(doc as IChatMessageDocument))
     }
 
     async findById(id: string): Promise<ChatMessage | null> {
         const doc = await ChatMessageModel.findById(id);
-        return doc ? this._toDomain(doc) : null
+        return doc ? ChatMapper.toDomain(doc) : null
     }
 }

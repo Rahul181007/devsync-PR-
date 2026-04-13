@@ -1,27 +1,19 @@
 import { Comment } from "../../domain/entities/comments.entity";
 import { CommentWithUser, ICommentRepository } from "../../domain/repositories/comment.repository";
-import { CommentModel, ICommentDocument } from "../db/models/comment.model";
+import { CommentModel } from "../db/models/comment.model";
+import { CommentMapper } from "../mappers/comments/comment.mapper";
 
 export class CommentRepository implements ICommentRepository {
-    private _toDomain(doc: ICommentDocument): Comment {
-        return new Comment(
-            doc._id.toString(),
-            doc.taskId.toString(),
-            doc.userId.toString(),
-            doc.message,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
+
 
     async create(comment: { taskId: string; userId: string; message: string; }): Promise<Comment> {
-        const doc = await CommentModel.create(comment);
-        return this._toDomain(doc)
+        const doc = await CommentModel.create(CommentMapper.toDocument(comment));
+        return CommentMapper.toDomain(doc)
     }
 
     async findByTaskId(taskId: string): Promise<Comment[]> {
         const docs = await CommentModel.find({ taskId }).sort({ createdAt: -1 })
-        return docs.map((doc) => this._toDomain(doc))
+        return docs.map((doc) => CommentMapper.toDomain(doc))
     }
 
     async findByTaskIdWithUser(taskId: string): Promise<CommentWithUser[]> {

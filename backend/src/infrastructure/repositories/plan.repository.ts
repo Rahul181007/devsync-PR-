@@ -1,41 +1,26 @@
 import { Plan } from "../../domain/entities/plan.entity";
 import { CreatePlanData, IPlanRepository, ListPlanQuery } from "../../domain/repositories/plan.repository";
-import { IPlanDocument, PlanModel } from "../db/models/plan.model";
+import {  PlanModel } from "../db/models/plan.model";
+import { PlanMapper } from "../mappers/plan/plan.mapper";
 
 export class PlanRepository implements IPlanRepository {
-    private _toDomain(doc: IPlanDocument): Plan {
-        return new Plan(
-            doc._id.toString(),
-            doc.name,
-            doc.slug,
-            doc.description,
-            doc.pricePerMonth,
-            doc.pricePerYear,
-            doc.currency,
-            doc.features,
-            doc.limits,
-            doc.isActive,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
 
     async findByName(name: string): Promise<Plan | null> {
         const doc = await PlanModel.findOne({ name });
         if (!doc) return null;
-        return this._toDomain(doc)
+        return PlanMapper.toDomain(doc)
     }
 
     async findBySlug(slug: string): Promise<Plan | null> {
         const doc = await PlanModel.findOne({ slug });
 
         if (!doc) return null;
-        return this._toDomain(doc);
+        return PlanMapper.toDomain(doc);
     }
 
     async create(data: CreatePlanData): Promise<Plan> {
-        const doc = await PlanModel.create(data);
-        return this._toDomain(doc)
+        const doc = await PlanModel.create(PlanMapper.toDocument(data));
+        return PlanMapper.toDomain(doc)
     }
 
     async findAll(query: ListPlanQuery): Promise<{ items: Plan[]; total: number }> {
@@ -67,7 +52,7 @@ export class PlanRepository implements IPlanRepository {
         const total = await PlanModel.countDocuments(filter);
 
         return {
-            items: items.map((plan) => this._toDomain(plan)),
+            items: items.map((plan) => PlanMapper.toDomain(plan)),
             total
         };
     }
@@ -75,7 +60,7 @@ export class PlanRepository implements IPlanRepository {
     async findById(planId: string): Promise<Plan | null> {
         const plan = await PlanModel.findById(planId);
         if (!plan) return null;
-        return this._toDomain(plan);
+        return PlanMapper.toDomain(plan);
     }
 
     async delete(planId: string): Promise<void> {
@@ -83,17 +68,7 @@ export class PlanRepository implements IPlanRepository {
     }
 
     async save(plan: Plan): Promise<void> {
-        await PlanModel.findByIdAndUpdate(plan.id, {
-            name: plan.name,
-            slug: plan.slug,
-            description: plan.description,
-            pricePerMonth: plan.pricePerMonth,
-            pricePerYear: plan.pricePerYear,
-            currency: plan.currency,
-            features: plan.features,
-            limits: plan.limits,
-            isActive: plan.isActive
-        }, { new: true })
+        await PlanModel.findByIdAndUpdate(plan.id, PlanMapper.toDocument(plan), { new: true })
     }
 
     async findDefaultPlan(): Promise<Plan | null> {
@@ -103,7 +78,7 @@ export class PlanRepository implements IPlanRepository {
         })
         if (!planDoc) return null
 
-        return this._toDomain(planDoc)
+        return PlanMapper.toDomain(planDoc)
     }
 
     async findAvailablePlans(): Promise<Plan[]> {
@@ -111,6 +86,6 @@ export class PlanRepository implements IPlanRepository {
             isActive: true
         }).sort({ pricePerMonth: 1 });
 
-        return docs.map((doc) => this._toDomain(doc));
+        return docs.map((doc) => PlanMapper.toDomain(doc));
     }
 }

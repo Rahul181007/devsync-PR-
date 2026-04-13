@@ -1,26 +1,14 @@
 import { Subscription } from "../../domain/entities/subscription.entity";
 import { CreateSubscriptionData, ISubscriptionRepository } from "../../domain/repositories/subscription.repository";
-import { ISubscriptionDocument, SubscriptionModel } from "../db/models/subscription.model";
+import { SubscriptionModel } from "../db/models/subscription.model";
+import { SubscriptionMapper } from "../mappers/subscription/subscription.mapper";
 
 export class SubscriptionRepository implements ISubscriptionRepository{
-    private _toDomain(doc:ISubscriptionDocument):Subscription{
-        return new Subscription(
-            doc._id.toString(),
-            doc.companyId.toString(),
-            doc.planId.toString(),
-            doc.status,
-            doc.billingCycle,
-            doc.startDate,
-            doc.endDate??null,
-            doc.renewsAt??null,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
+
 
     async create(data: CreateSubscriptionData): Promise<Subscription> {
-        const doc=await SubscriptionModel.create(data);
-        return this._toDomain(doc)
+        const doc=await SubscriptionModel.create(SubscriptionMapper.toDocument(data));
+        return SubscriptionMapper.toDomain(doc)
     }
 
     async findActiveByCompany(companyId: string): Promise<Subscription | null> {
@@ -30,14 +18,14 @@ export class SubscriptionRepository implements ISubscriptionRepository{
         })
 
         if(!doc)return null;
-        return this._toDomain(doc)
+        return SubscriptionMapper.toDomain(doc)
     }
 
 
     async findById(subscriptionId: string): Promise<Subscription | null> {
         const doc=await SubscriptionModel.findById(subscriptionId);
         if(!doc)return null;
-        return this._toDomain(doc)
+        return SubscriptionMapper.toDomain(doc)
     }
 
     async cancel(subscriptionId: string): Promise<void> {
@@ -48,12 +36,8 @@ export class SubscriptionRepository implements ISubscriptionRepository{
     }
 
     async save(subscription: Subscription): Promise<void> {
-        await SubscriptionModel.findByIdAndUpdate(subscription.id,{
-            status:subscription.status,
-            billingCycle:subscription.billingCycle,
-            startDate:subscription.startDate,
-            endDate:subscription.endDate,
-            renewsAt:subscription.renewsAt
-        })
+        await SubscriptionModel.findByIdAndUpdate(subscription.id,
+            SubscriptionMapper.toDocument(subscription)
+        )
     }
 }

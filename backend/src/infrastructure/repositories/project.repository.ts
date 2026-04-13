@@ -1,25 +1,11 @@
 import mongoose from "mongoose";
 import { Project, ProjectStatus } from "../../domain/entities/project.entity";
 import { FindProjectOptions, IProjectRepository } from "../../domain/repositories/project.repository";
-import { IProjectDocument, ProjectModel } from "../db/models/Project.model";
+import { ProjectModel } from "../db/models/Project.model";
+import { ProjectMapper } from "../mappers/project/project.mapper";
 
 export class ProjectRepository implements IProjectRepository {
-    private _toDomain(doc: IProjectDocument): Project {
-        return new Project(
-            doc._id.toString(),
-            doc.companyId.toString(),
-            doc.name,
-            doc.slug,
-            doc.description ?? null,
-            doc.status,
-            doc.startDate ?? null,
-            doc.endDate ?? null,
-            doc.currentSprintId ? doc.currentSprintId.toString() : null,
-            doc.createdBy.toString(),
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
+
 
     async findByNameInCompany(companyId: string, name: string): Promise<Project | null> {
         const doc = await ProjectModel.findOne({
@@ -27,22 +13,12 @@ export class ProjectRepository implements IProjectRepository {
             name
         })
 
-        return doc ? this._toDomain(doc) : null
+        return doc ? ProjectMapper.toDomain(doc) : null
     }
 
     async create(data: Partial<Project>): Promise<Project> {
-        const doc = await ProjectModel.create({
-            companyId: data.companyId,
-            name: data.name,
-            slug: data.slug,
-            description: data.description,
-            status: data.status,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            createdBy: data.createdBy
-
-        } as Partial<IProjectDocument>)
-        return this._toDomain(doc)
+        const doc = await ProjectModel.create(ProjectMapper.toDocument(data))
+        return ProjectMapper.toDomain(doc)
     }
     async findAllByCompany(companyId: string, options: FindProjectOptions): Promise<{ data: Project[]; total: number; }> {
         const { page, limit, search, status, projectIds } = options;
@@ -73,18 +49,18 @@ export class ProjectRepository implements IProjectRepository {
         ])
 
         return {
-            data: docs.map(doc => this._toDomain(doc)),
+            data: docs.map(doc =>  ProjectMapper.toDomain(doc)),
             total
         }
     }
     async findById(id: string): Promise<Project | null> {
         const doc = await ProjectModel.findById(id);
-        return doc ? this._toDomain(doc) : null
+        return doc ?  ProjectMapper.toDomain(doc) : null
     }
     async update(projectId: string, data: Partial<Project>): Promise<Project | null> {
         const doc = await ProjectModel.findByIdAndUpdate(
             projectId,
-            { $set: data },
+            { $set: ProjectMapper.toDocument(data) },
             { new: true }
         );
 
@@ -92,7 +68,7 @@ export class ProjectRepository implements IProjectRepository {
             return null;
         }
 
-        return this._toDomain(doc);
+        return  ProjectMapper.toDomain(doc);
     }
 
     async delete(projectId: string): Promise<void> {

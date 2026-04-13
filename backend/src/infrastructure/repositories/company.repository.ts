@@ -4,50 +4,29 @@ import { Company, CompanyStatus, OnboardingStep } from "../../domain/entities/co
 import { CompanyModel } from "../db/models/Company.models";
 import { ICompanyDocument } from "../db/models/Company.models";
 import { BaseRepository } from "./base.repository";
+import { CompanyMapper } from "../mappers/company/company.mapper";
 
 export class CompanyRepository extends BaseRepository<ICompanyDocument> implements ICompanyRepository {
     constructor() {
         super(CompanyModel)
-    }
-    private _toEntity(companyDoc: ICompanyDocument): Company { // mapper
-        return new Company(
-
-            companyDoc._id.toString(),
-            companyDoc.name,
-            companyDoc.slug,
-            companyDoc.status,
-            companyDoc.createdBy,
-            companyDoc.onboardingStep,
-            companyDoc.ownerAdminId?.toString() ?? undefined,
-            companyDoc.domain ?? undefined,
-            companyDoc.approvedBy?.toString() ?? undefined,
-            companyDoc.rejectionReason ?? undefined,
-            companyDoc.reviewedAt ?? undefined,
-            companyDoc.logoUrl ?? undefined,
-            companyDoc.themeColor ?? undefined,
-            companyDoc.currentPlanId?.toString() ?? undefined,
-            companyDoc.subscriptionId?.toString() ?? undefined,
-            companyDoc.adminEmail ?? undefined
-        );
-
     }
     async findByName(name: string): Promise<Company | null> {
         const companyDoc = await CompanyModel.findOne({ name })
         if (!companyDoc) {
             return null
         }
-        return this._toEntity(companyDoc)
+        return CompanyMapper.toDomain(companyDoc)
     }
 
     async findByDomain(domain: string): Promise<Company | null> {
         const companyDoc = await CompanyModel.findOne({ domain: domain })
         if (!companyDoc) return null;
-        return this._toEntity(companyDoc)
+        return CompanyMapper.toDomain(companyDoc)
     }
 
     async create(data: CreateCompanyData): Promise<Company> {
-        const doc = await this.model.create(data)
-        return this._toEntity(doc)
+        const doc = await this.model.create(CompanyMapper.toDocument(data))
+        return CompanyMapper.toDomain(doc)
     }
 
     async findAll(query: ListCompaniesQuery): Promise<{ items: Company[]; total: number; }> {
@@ -63,17 +42,16 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
         const total = await this.count(filter)
 
         return {
-            items: items.map(val => this._toEntity(val)),
+            items: items.map(val => CompanyMapper.toDomain(val)),
             total
         }
     }
 
     async updateStatus(companyId: string, status: CompanyStatus, approvedBy?: string): Promise<void> {
-        const update: Record<string, unknown> = { status };
-        if (approvedBy) {
-            update.approvedBy = approvedBy
-        }
-        await this.updateById(companyId, update)
+        await this.updateById(companyId, CompanyMapper.toDocument({
+            status,
+            approvedBy
+        }))
     }
 
     async findById(companyId: string): Promise<Company | null> {
@@ -81,12 +59,12 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
         if (!company) {
             return null
         } else {
-            return this._toEntity(company)
+            return CompanyMapper.toDomain(company)
         }
     }
 
     async assignOwnerAdmin(companyId: string, userId: string): Promise<void> {
-        await this.updateById(companyId, { ownerAdminId: userId })
+        await this.updateById(companyId, CompanyMapper.toDocument({ ownerAdminId: userId }))
     }
 
     async findByEmail(email: string): Promise<Company | null> {
@@ -94,7 +72,7 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
 
         if (!doc) return null;
 
-        return this._toEntity(doc);
+        return CompanyMapper.toDomain(doc);
     }
     async updateBranding(companyId: string, data: { logoUrl?: string, themeColor?: string }): Promise<void> {
         if (Object.keys(data).length === 0) {
@@ -126,10 +104,10 @@ export class CompanyRepository extends BaseRepository<ICompanyDocument> implemen
     }
 
     async updateSubscription(companyId: string, data: { currentPlanId: string; subscriptionId: string; }): Promise<void> {
-        await this.updateById(companyId, {
+        await this.updateById(companyId, CompanyMapper.toDocument({
             currentPlanId: data.currentPlanId,
             subscriptionId: data.subscriptionId
-        })
+        }))
     }
 
     async countAll(): Promise<number> {

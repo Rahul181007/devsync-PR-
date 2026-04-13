@@ -9,4 +9,5 @@ export interface UpdateTaskRequestDTO{
     dueDate?:Date|null
     estimatedTime?: number;
     storyPoints?:number|null;
+     parentId?: string | null;
 }

@@ -1,72 +1,20 @@
 import mongoose from "mongoose";
 import { Task, TaskStatus } from "../../domain/entities/task.entity";
 import { CreateTaskInput, ITaskRepository } from "../../domain/repositories/task.repository";
-import { ITaskDocument, TaskModel } from "../db/models/task.model";
+import {  TaskModel } from "../db/models/task.model";
+import { TaskMapper } from "../mappers/task/task.mapper";
 
 
 export class TaskRepository implements ITaskRepository {
-    private _toDomain(doc: ITaskDocument): Task {
-        return new Task(
-            doc._id.toString(),
-            doc.companyId.toString(),
-            doc.projectId.toString(),
-            doc.sprintId ? doc.sprintId.toString() : null,
-            doc.parentId ? doc.parentId.toString() : null,
-            doc.code,
-            doc.title,
-            doc.description,
-            doc.type,
-            doc.status,
-            doc.priority,
-            doc.assigneeId ? doc.assigneeId.toString() : null,
-            doc.reporterId.toString(),
-            doc.dueDate ?? null,
 
-            doc.createdAt,
-            doc.updatedAt,
-            doc.submission
-                ? {
-                    summary: doc.submission.summary,
-                    workDone: doc.submission.workDone,
-                    blockers: doc.submission.blockers ?? null,
-                    submittedAt: doc.submission.submittedAt,
-                }
-                : null,
-            doc.estimatedTime ?? null,
-            doc.storyPoints ?? null
-        )
-    }
 
     async create(task: CreateTaskInput): Promise<Task> {
-        const doc = await TaskModel.create({
-            companyId: task.companyId,
-            projectId: task.projectId,
-            sprintId: task.sprintId,
-            parentId: task.parentId ?? undefined,
-
-            code: task.code,
-            title: task.title,
-            description: task.description,
-            type: task.type ?? "TASK",
-            status: task.status,
-            priority: task.priority,
-
-            assigneeId: task.assigneeId,
-            reporterId: task.reporterId,
-
-            dueDate: task.dueDate ?? null,
-            estimatedTime: task.estimatedTime ?? null,
-            storyPoints:
-                task.type === "STORY"
-                    ? task.storyPoints
-                    : undefined,
-
-        })
-        return this._toDomain(doc)
+        const doc = await TaskModel.create(TaskMapper.toDocument(task))
+        return TaskMapper.toDomain(doc)
     }
     async findById(taskId: string): Promise<Task | null> {
         const doc = await TaskModel.findById(taskId);
-        return doc ? this._toDomain(doc) : null
+        return doc ? TaskMapper.toDomain(doc) : null
     }
 
     async findBacklogTasks(projectId: string): Promise<Task[]> {
@@ -75,7 +23,7 @@ export class TaskRepository implements ITaskRepository {
             sprintId: null
         }).sort({ createdAt: -1 })
 
-        return docs.map((doc) => this._toDomain(doc))
+        return docs.map((doc) => TaskMapper.toDomain(doc))
     }
 
     async findByProjectId(projectId: string): Promise<Task[]> {
@@ -83,39 +31,23 @@ export class TaskRepository implements ITaskRepository {
             projectId,
 
         }).sort({ createdAt: -1 })
-        return docs.map((doc) => this._toDomain(doc))
+        return docs.map((doc) =>TaskMapper.toDomain(doc))
     }
 
     async findByParentId(parentId: string): Promise<Task[]> {
         const docs = await TaskModel.find({ parentId }).sort({ createdAt: -1 })
-        return docs.map((doc) => this._toDomain(doc))
+        return docs.map((doc) => TaskMapper.toDomain(doc))
     }
 
     async update(task: Task): Promise<Task> {
         console.log("UPDATE TASK:", {
-    id: task.id,
-    type: task.type,
-    storyPoints: task.storyPoints
-});
+            id: task.id,
+            type: task.type,
+            storyPoints: task.storyPoints
+        });
         const doc = await TaskModel.findByIdAndUpdate(
             task.id,
-            {
-                sprintId: task.sprintId,
-                title: task.title,
-                description: task.description,
-                type: task.type,
-                status: task.status,
-                priority: task.priority,
-                assigneeId: task.assigneeId,
-                dueDate: task.dueDate ?? null,
-
-                submission: task.submission ?? null,
-                estimatedTime: task.estimatedTime ?? null,
-                storyPoints:
-                    task.type === "STORY"
-                        ? task.storyPoints ?? null
-                        : null,
-            },
+            TaskMapper.toDocument(task),
             { new: true }
         );
 
@@ -123,15 +55,15 @@ export class TaskRepository implements ITaskRepository {
             throw new Error("Task not found");
         }
 
-        return this._toDomain(doc);
+        return TaskMapper.toDomain(doc);
     }
 
     async findByAssigneeAndSprint(assigneeId: string, sprintId: string): Promise<Task[]> {
         const doc = await TaskModel.find({ assigneeId, sprintId })
-        return doc.map((doc) => this._toDomain(doc))
+        return doc.map((doc) => TaskMapper.toDomain(doc))
     }
 
-    countByCompany(companyId: string) {
+    async countByCompany(companyId: string) {
         return TaskModel.countDocuments({
             companyId,
             type: { $in: ["TASK", "BUG"] }
@@ -287,17 +219,17 @@ export class TaskRepository implements ITaskRepository {
     }
 
     async findByIds(ids: string[]): Promise<Task[]> {
-        const docs=await TaskModel.find({
-            _id:{$in:ids}
+        const docs = await TaskModel.find({
+            _id: { $in: ids }
         })
-        return docs.map((doc)=>this._toDomain(doc))
+        return docs.map((doc) => TaskMapper.toDomain(doc))
     }
 
     async updateStatus(taskId: string, status: TaskStatus): Promise<void> {
         await TaskModel.findByIdAndUpdate(taskId, { status });
     }
     async findBySprintId(sprintId: string): Promise<Task[]> {
-        const docs=await TaskModel.find({ sprintId });
-        return docs.map((doc)=>this._toDomain(doc))
+        const docs = await TaskModel.find({ sprintId });
+        return docs.map((doc) => TaskMapper.toDomain(doc))
     }
 }

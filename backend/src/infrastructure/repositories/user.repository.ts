@@ -3,39 +3,22 @@ import { User, UserStatus } from "../../domain/entities/user.entity";
 import { UserModel } from "../db/models/User.model";
 import { IUserDocument } from "../db/models/User.model";
 import { BaseRepository } from "./base.repository";
+import { UserMapper } from "../mappers/user/user.mapper";
 
 
 export class UserRepository extends BaseRepository<IUserDocument> implements IUserRepository {
     constructor() {
         super(UserModel)
     }
-    private _toDomain(doc: IUserDocument): User { //mapper
-        return new User(
-            doc._id.toString(),
-            doc.companyId ? doc.companyId.toString() : null,
-            doc.name,
-            doc.email,
-            doc.passwordHash,
-            doc.role,
-            doc.avatarUrl,
-            doc.status,
-            doc.authProvider,
-            doc.otp,
-            doc.otpExpiresAt,
-            doc.settings,
-            doc.createdAt,
-            doc.updatedAt,
-            doc.lastLoginAt
-        );
-    }
+
 
     async findByEmail(email: string): Promise<User | null> {
         const doc = await this.model.findOne({ email });
-        return doc ? this._toDomain(doc) : null;
+        return doc ? UserMapper.toDomain(doc) : null;
     }
     async findById(id: string): Promise<User | null> {
         const doc = await this.model.findById(id);
-        return doc ? this._toDomain(doc) : null;
+        return doc ? UserMapper.toDomain(doc) : null;
     }
 
     async create(data: {
@@ -55,21 +38,21 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
         };
     }): Promise<User> {
 
-        const doc = await this.model.create({
+        const doc = await this.model.create(UserMapper.toDocument({
             companyId: data.companyId ?? null,
             name: data.name,
             email: data.email,
-            passwordHash: data.passwordHash ?? undefined, // ✅ FIX
+            passwordHash: data.passwordHash ?? null,
             role: data.role,
             authProvider: data.authProvider,
             avatarUrl: data.avatarUrl ?? null,
             status: data.status,
             otp: data.otp ?? null,
             otpExpiresAt: data.otpExpiresAt ?? null,
-            settings: data.settings ?? {},
-        });
+            setting: data.settings ?? null, // ⚠️ mapping handled here
+        }));
 
-        return this._toDomain(doc);
+        return UserMapper.toDomain(doc);
     }
 
 
@@ -130,7 +113,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
             _id: { $in: userIds }
         });
 
-        return docs.map(doc => this._toDomain(doc));
+        return docs.map(doc => UserMapper.toDomain(doc));
     }
     async findCompanyAdminByCompany(companyId: string): Promise<User | null> {
         const doc = await this.model.findOne({
@@ -139,7 +122,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
             status: "ACTIVE"
         });
 
-        return doc ? this._toDomain(doc) : null;
+        return doc ? UserMapper.toDomain(doc) : null;
     }
 
     async updateProfile(
@@ -185,13 +168,13 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
     }
 
     async countActiveDevelopers(companyId: string): Promise<number> {
-    const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+        const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-    return await this.model.countDocuments({
-        companyId,
-        role: "DEVELOPER",
-        status: "ACTIVE",
-        lastLoginAt: { $gte: last24Hours }
-    });
-}
+        return await this.model.countDocuments({
+            companyId,
+            role: "DEVELOPER",
+            status: "ACTIVE",
+            lastLoginAt: { $gte: last24Hours }
+        });
+    }
 }

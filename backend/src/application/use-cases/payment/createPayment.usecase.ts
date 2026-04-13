@@ -61,8 +61,8 @@ export class CreatePaymentUseCase implements ICreatePaymentUseCase {
         }
 
         console.log("Billing cycle:", data.billingCycle);
-console.log("Plan price month:", plan.pricePerMonth);
-console.log("Plan price year:", plan.pricePerYear);
+        console.log("Plan price month:", plan.pricePerMonth);
+        console.log("Plan price year:", plan.pricePerYear);
 
         const baseAmount =
             data.billingCycle === "MONTHLY"
@@ -107,11 +107,11 @@ console.log("Plan price year:", plan.pricePerYear);
         const receipt = `devsync_${Date.now()}`;
 
         console.log({
-  baseAmount,
-  tax,
-  totalAmount,
-  razorpayAmount: amount
-});
+            baseAmount,
+            tax,
+            totalAmount,
+            razorpayAmount: amount
+        });
         const order = await this._razorpayService.createOrder(
             amount,
             plan.currency,
