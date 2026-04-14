@@ -12,7 +12,7 @@ export interface Meeting {
 
   meetingLink: string | null;
   meetingType: "GOOGLE_MEET" | "ZOOM" | "TEAMS" | "OTHER" | null;
-
+    type: "SPRINT_PLANNING" | "SPRINT_REVIEW" | "STANDUP" | "GENERAL";
   notes: string | null;
   decisions: string | null;
 

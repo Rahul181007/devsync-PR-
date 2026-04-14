@@ -65,14 +65,14 @@ export class GetTimesheetByProjectUseCase implements IGetTimesheetByProjectUseCa
             filtered = filtered.filter((log) => log.userId === query.userId);
         }
 
-       const grouped: Record<
-  string,
-  {
-    totalHours: number;
-    userName: string;
-    tasks: { taskTitle: string; timeSpent: number }[];
-  }
-> = {};
+        const grouped: Record<
+            string,
+            {
+                totalHours: number;
+                userName: string;
+                tasks: { taskTitle: string; timeSpent: number }[];
+            }
+        > = {};
 
         filtered.forEach((log) => {
             console.log("log.date:", log.date);
@@ -82,20 +82,20 @@ export class GetTimesheetByProjectUseCase implements IGetTimesheetByProjectUseCa
 
             const key = `${date}_${log.userId}`;
 
-if (!grouped[key]) {
-  grouped[key] = {
-    totalHours: 0,
-    userName: log.userName,
-    tasks: [],
-  };
-}
+            if (!grouped[key]) {
+                grouped[key] = {
+                    totalHours: 0,
+                    userName: log.userName,
+                    tasks: [],
+                };
+            }
 
-grouped[key].totalHours += log.timeSpent / 60;
+            grouped[key].totalHours += log.timeSpent / 60;
 
-grouped[key].tasks.push({
-  taskTitle: log.taskTitle, 
-  timeSpent: log.timeSpent,
-});
+            grouped[key].tasks.push({
+                taskTitle: log.taskTitle,
+                timeSpent: log.timeSpent,
+            });
         });
         return Object.entries(grouped)
             .sort(([a], [b]) => a.localeCompare(b))

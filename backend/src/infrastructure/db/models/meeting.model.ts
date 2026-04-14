@@ -14,11 +14,12 @@ export interface IMeetingDocument extends Document {
 
     meetingLink: string | null;
     meetingType: "GOOGLE_MEET" | "ZOOM" | "TEAMS" | "OTHER" | null;
-
+    type: "SPRINT_PLANNING" | "SPRINT_REVIEW" | "STANDUP" | "GENERAL";
     notes: string | null;
     decisions: string | null;
 
     status: "SCHEDULED" | "COMPLETED" | "CANCELLED";
+    isReminderSent: boolean,
 
     createdAt: Date;
     updatedAt: Date;
@@ -77,6 +78,12 @@ const MeetingSchema = new Schema<IMeetingDocument>(
             default: null,
         },
 
+        type: {
+            type: String,
+            enum: ["SPRINT_PLANNING", "SPRINT_REVIEW", "STANDUP", "GENERAL"],
+            default: "GENERAL",
+        },
+
         notes: {
             type: String,
             default: null,
@@ -92,13 +99,18 @@ const MeetingSchema = new Schema<IMeetingDocument>(
             enum: ["SCHEDULED", "COMPLETED", "CANCELLED"],
             default: "SCHEDULED",
         },
+
+        isReminderSent: {
+  type: Boolean,
+  default: false,
+},
     },
     { timestamps: true }
 );
 
 
 
-MeetingSchema.index({ projectId: 1, scheduledAt: -1 });  
+MeetingSchema.index({ projectId: 1, scheduledAt: -1 });
 MeetingSchema.index({ sprintId: 1 });
 
 

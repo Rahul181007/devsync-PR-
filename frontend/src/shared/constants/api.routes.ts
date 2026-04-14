@@ -116,6 +116,12 @@ export const API_ROUTES = {
 
     MEETING_BY_ID: (projectId: string, meetingId: string) =>
       `/company/projects/${projectId}/meetings/${meetingId}`,
+    TODAYS_MEETINGS: (projectId: string) =>
+      `/company/projects/${projectId}/meetings/today`,
+    MISSED_MEETINGS:(projectId:string)=>
+        `/company/projects/${projectId}/meetings/missed`,
+            COMPLETED_MEETINGS:(projectId:string)=>
+          `/company/projects/${projectId}/meetings/completed`
   },
 
   DEVELOPER: {
@@ -159,8 +165,15 @@ export const API_ROUTES = {
       `/projects/${projectId}/tasks/${taskId}/worklogs`,
 
     //meeting
-        MEETINGS: (projectId: string) =>
+    MEETINGS: (projectId: string) =>
       `/company/projects/${projectId}/meetings`,
+
+    TODAYS_MEETINGS: (projectId: string) =>
+      `/company/projects/${projectId}/meetings/today`,
+        MISSED_MEETINGS:(projectId:string)=>
+        `/company/projects/${projectId}/meetings/missed`,
+        COMPLETED_MEETINGS:(projectId:string)=>
+          `/company/projects/${projectId}/meetings/completed`
   },
 
   AUTH: {

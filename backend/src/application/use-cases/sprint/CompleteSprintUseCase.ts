@@ -114,7 +114,10 @@ export class CompleteSprintUseCase implements ICompleteSprintUseCase {
 
                 meetingLink: null,
                 meetingType: null,
+                type:"SPRINT_REVIEW"
             });
+
+            
 
             // 🔹 get project members
             const members = await this._projectMemberRepository.findMembersByProject(projectId);

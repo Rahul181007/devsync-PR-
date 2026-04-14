@@ -133,7 +133,33 @@ export class CreateSprintUseCase implements ICreateSprintUseCase {
 
             meetingLink: null,
             meetingType: null,
+            type: "SPRINT_PLANNING",
+            
         });
+
+        const currentDate = new Date(sprint.startDate);
+        while (currentDate <= sprint.endDate) {
+            const day = currentDate.getDay();
+
+            if (day !== 0 && day !== 6) {
+                await this._meetingRepo.create({
+                    projectId: sprint.projectId,
+                    createdBy:userId,
+                    sprintId: sprint.id,
+                    title: "Daily Standup",
+                    description: "Daily team sync meeting",
+                    scheduledAt: setTime(currentDate, 10), // 10 AM
+                    durationMinutes: 15,
+
+                    meetingLink: null,
+                    meetingType: null,
+
+
+                    type: "STANDUP"
+                })
+            }
+            currentDate.setDate(currentDate.getDate()+1)
+        }
 
         const members = await this._projectMemberRepository.findMembersByProject(projectId);
 

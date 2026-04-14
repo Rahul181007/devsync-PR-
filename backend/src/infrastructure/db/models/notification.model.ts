@@ -40,7 +40,8 @@ const NotificationSchema = new Schema<INotificationDocument>(
                 "COMPANY_SUBMITTED_FOR_APPROVAL",
                 "COMPANY_REAPPLIED",
                 "MEETING_CREATED",
-                "SPRINT_REVIEW_SCHEDULED"
+                "SPRINT_REVIEW_SCHEDULED",
+                "MEETING_REMINDER"
             ],
             required: true,
         },

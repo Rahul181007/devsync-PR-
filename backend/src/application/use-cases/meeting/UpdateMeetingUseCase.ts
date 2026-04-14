@@ -75,6 +75,7 @@ export class UpdateMeetingUseCase implements IUpdateMeetingUsecase {
 
             meetingLink: meeting.meetingLink,
             meetingType: meeting.meetingType,
+            type: meeting.type,
 
             notes: meeting.notes,
             decisions: meeting.decisions,

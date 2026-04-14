@@ -18,9 +18,11 @@ export class MeetingMapper {
       doc.durationMinutes ?? null,
       doc.meetingLink ?? null,
       doc.meetingType ?? null,
+       doc.type ?? "GENERAL",
       doc.notes ?? null,
       doc.decisions ?? null,
       doc.status,
+      doc.isReminderSent ?? false,
       doc.createdAt,
       doc.updatedAt
     );
@@ -44,11 +46,13 @@ export class MeetingMapper {
 
       meetingLink: data.meetingLink ?? undefined,
       meetingType: data.meetingType ?? undefined,
+      type: data.type ?? undefined,
 
       notes: "notes" in data ? data.notes ?? undefined : undefined,
       decisions: "decisions" in data ? data.decisions ?? undefined : undefined,
 
       status: "status" in data ? data.status : undefined,
+      isReminderSent: "isReminderSent" in data ? data.isReminderSent : false,
     };
   }
 }

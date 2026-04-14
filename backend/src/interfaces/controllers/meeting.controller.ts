@@ -8,12 +8,18 @@ import { getMeetingsSchema } from "../../application/validators/meeting/getMeeti
 import { IGetMeetingsUseCase } from "../../application/interface/meeting/IGetMeetingsUseCase";
 import { IUpdateMeetingUsecase } from "../../application/interface/meeting/IUpdateMeetingUseCase";
 import { updateMeetingSchema } from "../../application/validators/meeting/updateMeeting.validator";
+import { IGetTodayMeetingsUseCase } from "../../application/interface/meeting/IGetTodayMeetingsUseCase";
+import { IGetMissedMeetingsUseCase } from "../../application/interface/meeting/IGetMissedMeetingsUseCase";
+import { IGetCompletedMeetingsUseCase } from "../../application/interface/meeting/IGetCompletedMeetingUseCase";
 
 export class MeetingController {
     constructor(
         private _createMeetingUseCase: ICreateMeetingUseCase,
         private _getMeetingUseCase: IGetMeetingsUseCase,
-        private _updateMeetingUseCase: IUpdateMeetingUsecase
+        private _updateMeetingUseCase: IUpdateMeetingUsecase,
+        private _getTodayMeetingsUseCase: IGetTodayMeetingsUseCase,
+        private _getMissedMeetingsUseCase:IGetMissedMeetingsUseCase,
+        private _getCompletedMeetingsUseCase:IGetCompletedMeetingsUseCase
     ) { }
 
     createMeeting = async (req: Request, res: Response) => {
@@ -53,7 +59,8 @@ export class MeetingController {
                 projectId: req.params.projectId,
                 page: parsedQuery.page,
                 limit: parsedQuery.limit,
-                sprintId: parsedQuery.sprintId
+                sprintId: parsedQuery.sprintId,
+                type: parsedQuery.type
             })
 
             return res.status(HttpStatus.OK).json({
@@ -80,18 +87,97 @@ export class MeetingController {
                 meetingId: req.params.meetingId
             });
 
-                   const result = await this._updateMeetingUseCase.execute(
+            const result = await this._updateMeetingUseCase.execute(
+                userId,
+                companyId,
+                parsed
+            );
+
+            return res.status(HttpStatus.OK).json({
+                message: "Meeting updated successfully",
+                data: result
+            });
+        } catch (error: unknown) {
+            return handleError(error, res);
+        }
+    }
+
+
+    getTodayMeetings=async(req:Request,res:Response)=>{
+        try {
+            const userId=req.user?.id;
+            const companyId=req.user?.companyId;
+                    if (!userId || !companyId) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+            });
+        }
+        const result = await this._getTodayMeetingsUseCase.execute(
             userId,
             companyId,
-            parsed
+            { projectId: req.params.projectId }
         );
 
         return res.status(HttpStatus.OK).json({
-            message: "Meeting updated successfully",
             data: result
         });
-  } catch (error: unknown) {
+
+    } catch (error: unknown) {
         return handleError(error, res);
     }
     }
+
+
+    getMissedMeetings = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const companyId = req.user?.companyId;
+
+        if (!userId || !companyId) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+            });
+        }
+
+        const result = await this._getMissedMeetingsUseCase.execute(
+            userId,
+            companyId,
+            { projectId: req.params.projectId }
+        );
+
+        return res.status(HttpStatus.OK).json({
+            data: result
+        });
+
+    } catch (error) {
+        return handleError(error, res);
+    }
+}
+
+
+    getCompletedMeetings = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const companyId = req.user?.companyId;
+
+        if (!userId || !companyId) {
+            return res.status(HttpStatus.UNAUTHORIZED).json({
+                message: RESPONSE_MESSAGES.AUTH.UNAUTHORIZED
+            });
+        }
+
+        const result = await this._getCompletedMeetingsUseCase.execute(
+            userId,
+            companyId,
+            { projectId: req.params.projectId }
+        );
+
+        return res.status(HttpStatus.OK).json({
+            data: result
+        });
+
+    } catch (error) {
+        return handleError(error, res);
+    }
+}
 }

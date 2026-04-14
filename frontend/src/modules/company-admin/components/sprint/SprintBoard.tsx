@@ -512,7 +512,7 @@ export const SprintBoard = ({ projectId }: Props) => {
                                                                                     <PriorityBadge priority={task.priority} />
 
                                                                                     {task.assignee && (
-                                                                                        <span className="text-xs text-gray-500 truncate max-w-[80px]">
+                                                                                        <span className="text-xs text-gray-500 truncate max-w-20">
                                                                                             {task.assignee.name}
                                                                                         </span>
                                                                                     )}

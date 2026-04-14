@@ -5,6 +5,7 @@ export interface ListMeetingQuery {
     limit: number;
     projectId: string;
     sprintId?: string | null
+    type?: string;
 }
 
 export interface CreateMeetingData {
@@ -20,6 +21,8 @@ export interface CreateMeetingData {
 
     meetingLink?: string | null;
     meetingType?: "GOOGLE_MEET" | "ZOOM" | "TEAMS" | "OTHER" | null;
+    type?: "SPRINT_PLANNING" | "SPRINT_REVIEW" | "STANDUP" | "GENERAL";
+    isReminderSent?: boolean,
 }
 
 
@@ -33,13 +36,17 @@ export interface IMeetingRepository {
         total: number
     }>
 
-    save(meeting:Meeting):Promise<void>
+    save(meeting: Meeting): Promise<void>
 
-    findByProject(projectId:string):Promise<Meeting[]>;
-    findBySprint(sprintId:string):Promise<Meeting[]>;
+    findByProject(projectId: string): Promise<Meeting[]>;
+    findBySprint(sprintId: string): Promise<Meeting[]>;
 
     updateStatus(
-        meetingId:string,
-        status:"COMPLETED" | "CANCELLED"
-    ):Promise<void>
+        meetingId: string,
+        status: "COMPLETED" | "CANCELLED"
+    ): Promise<void>
+
+    findTodayMeetings(projectId: string): Promise<Meeting[]>;
+    findMissedMeetings(projectId: string): Promise<Meeting[]>;
+    findCompletedMeetings(projectId: string): Promise<Meeting[]>
 }

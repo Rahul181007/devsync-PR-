@@ -16,83 +16,87 @@ import { checkUserStatus } from "../middleware/checkUserStatus.middleware";
 import { meetingController } from "../../di/meeting.di";
 
 
-const router=Router();
+const router = Router();
 
 //project module
-router.post('/company/projects/first',verifyAccessToken,requireRole(Role.COMPANY_ADMIN),projectController.createFirstProject)
-router.get('/company/projects',verifyAccessToken,checkUserStatus,projectController.listProjects);
-router.get('/company/projects/:projectId',verifyAccessToken,checkUserStatus,projectController.getProjectDetail)
-router.patch('/company/projects/:projectId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.updateProject);
-router.delete('/company/projects/:projectId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.deleteProject);
-router.post('/company/projects',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.createProject);
-router.post ('/company/projects/:projectId/members',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.addProjectMember);
-router.delete('/company/projects/:projectId/members/:memberId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),projectController.removeProjectMember)
+router.post('/company/projects/first', verifyAccessToken, requireRole(Role.COMPANY_ADMIN), projectController.createFirstProject)
+router.get('/company/projects', verifyAccessToken, checkUserStatus, projectController.listProjects);
+router.get('/company/projects/:projectId', verifyAccessToken, checkUserStatus, projectController.getProjectDetail)
+router.patch('/company/projects/:projectId', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), projectController.updateProject);
+router.delete('/company/projects/:projectId', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), projectController.deleteProject);
+router.post('/company/projects', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), projectController.createProject);
+router.post('/company/projects/:projectId/members', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), projectController.addProjectMember);
+router.delete('/company/projects/:projectId/members/:memberId', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), projectController.removeProjectMember)
 
 //task module
-router.post("/company/projects/:projectId/tasks",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.createTask)
-router.get("/company/projects/:projectId/tasks",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.getProjectTasks)
-router.get('/company/projects/:projectId/tasks/:taskId',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.getTaskDetail);
-router.patch("/company/projects/:projectId/tasks/:taskId/status",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.updateTaskStatus)
+router.post("/company/projects/:projectId/tasks", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), taskController.createTask)
+router.get("/company/projects/:projectId/tasks", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), taskController.getProjectTasks)
+router.get('/company/projects/:projectId/tasks/:taskId', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), taskController.getTaskDetail);
+router.patch("/company/projects/:projectId/tasks/:taskId/status", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), taskController.updateTaskStatus)
 
-router.get("/developer/projects/:projectId/tasks",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),taskController.getDeveloperTask);
-router.get("/developer/projects/:projectId/tasks/:taskId",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),taskController.getDeveloperTaskDetail)
-router.patch("/developer/projects/:projectId/tasks/:taskId/status",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),taskController.updateDeveloperTaskUseCase);
-router.patch("/developer/projects/:projectId/tasks/:taskId/submit",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),taskController.submitTask)
+router.get("/developer/projects/:projectId/tasks", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), taskController.getDeveloperTask);
+router.get("/developer/projects/:projectId/tasks/:taskId", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), taskController.getDeveloperTaskDetail)
+router.patch("/developer/projects/:projectId/tasks/:taskId/status", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), taskController.updateDeveloperTaskUseCase);
+router.patch("/developer/projects/:projectId/tasks/:taskId/submit", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), taskController.submitTask)
 
 
 
-router.patch("/company/projects/:projectId/tasks/:taskId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),taskController.updateTask);
+router.patch("/company/projects/:projectId/tasks/:taskId", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), taskController.updateTask);
 
-router.post("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,checkUserStatus,taskCommentController.addComment)
-router.get("/projects/:projectId/tasks/:taskId/comments",verifyAccessToken,checkUserStatus,taskCommentController.getComments)
+router.post("/projects/:projectId/tasks/:taskId/comments", verifyAccessToken, checkUserStatus, taskCommentController.addComment)
+router.get("/projects/:projectId/tasks/:taskId/comments", verifyAccessToken, checkUserStatus, taskCommentController.getComments)
 
-router.post("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,checkUserStatus,upload.single("file"), taskAttachmentController.uploadAttachment);
-router.get("/projects/:projectId/tasks/:taskId/attachments",verifyAccessToken,checkUserStatus,taskAttachmentController.getAttachments);
+router.post("/projects/:projectId/tasks/:taskId/attachments", verifyAccessToken, checkUserStatus, upload.single("file"), taskAttachmentController.uploadAttachment);
+router.get("/projects/:projectId/tasks/:taskId/attachments", verifyAccessToken, checkUserStatus, taskAttachmentController.getAttachments);
 
 
 //sprint-module
 
-router.post("/company/projects/:projectId/sprints",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.createSprint)
-router.get("/company/projects/:projectId/sprints",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.getProjectSprints);
-router.get("/company/projects/:projectId/sprints/:sprintId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.getSprintDetail);
-router.patch("/company/projects/:projectId/sprints/:sprintId/activate",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.activateSprint)
-router.patch("/company/projects/:projectId/sprints/:sprintId/complete",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.completeSprint)
-router.patch("/company/projects/:projectId/sprints/:sprintId/plan",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),sprintController.planSprint)
+router.post("/company/projects/:projectId/sprints", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.createSprint)
+router.get("/company/projects/:projectId/sprints", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.getProjectSprints);
+router.get("/company/projects/:projectId/sprints/:sprintId", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.getSprintDetail);
+router.patch("/company/projects/:projectId/sprints/:sprintId/activate", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.activateSprint)
+router.patch("/company/projects/:projectId/sprints/:sprintId/complete", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.completeSprint)
+router.patch("/company/projects/:projectId/sprints/:sprintId/plan", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), sprintController.planSprint)
 
 
 //standup-module-developer
-router.post ('/developer/projects/:projectId/standups',verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),standupController.createStandup)
-router.get("/developer/projects/:projectId/standups",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),standupController.getMyCurrentSprintStandups)
-router.put('/developer/projects/:projectId/standups',verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),standupController.updateStandup)
+router.post('/developer/projects/:projectId/standups', verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), standupController.createStandup)
+router.get("/developer/projects/:projectId/standups", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), standupController.getMyCurrentSprintStandups)
+router.put('/developer/projects/:projectId/standups', verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), standupController.updateStandup)
 
 
 //standup-module- companyadmin
-router.get('/company/projects/:projectId/standups/today',verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),standupController.getSprintTodaySummary);
-router.get("/company/projects/:projectId/standups/history",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),standupController.getSprintHistorySummary);
-router.get( "/company/projects/:projectId/standups/:standupId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),standupController.getStandupDetail)
+router.get('/company/projects/:projectId/standups/today', verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), standupController.getSprintTodaySummary);
+router.get("/company/projects/:projectId/standups/history", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), standupController.getSprintHistorySummary);
+router.get("/company/projects/:projectId/standups/:standupId", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), standupController.getStandupDetail)
 
 
 //chat module
-router.get('/projects/:projectId/chat',verifyAccessToken,checkUserStatus,chatController.getProjectMessage);
-router.post("/projects/:projectId/chat",verifyAccessToken,checkUserStatus,upload.single("file"),chatController.sendMessage)
+router.get('/projects/:projectId/chat', verifyAccessToken, checkUserStatus, chatController.getProjectMessage);
+router.post("/projects/:projectId/chat", verifyAccessToken, checkUserStatus, upload.single("file"), chatController.sendMessage)
 // ai module
-router.get("/projects/:projectId/ai-summary",verifyAccessToken,checkUserStatus,aiController.getProjectAISummary);
+router.get("/projects/:projectId/ai-summary", verifyAccessToken, checkUserStatus, aiController.getProjectAISummary);
 
 
 // worklog module
 
-router.post("/developer/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.createWorklog);
-router.patch("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.updateWorklog);
+router.post("/developer/projects/:projectId/tasks/:taskId/worklogs", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), worklogController.createWorklog);
+router.patch("/developer/projects/:projectId/worklogs/:worklogId", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), worklogController.updateWorklog);
 
-router.delete("/developer/projects/:projectId/worklogs/:worklogId",verifyAccessToken,checkUserStatus,requireRole(Role.DEVELOPER),worklogController.deleteWorklog);
-router.get("/projects/:projectId/tasks/:taskId/worklogs",verifyAccessToken,checkUserStatus,worklogController.getByTask);
+router.delete("/developer/projects/:projectId/worklogs/:worklogId", verifyAccessToken, checkUserStatus, requireRole(Role.DEVELOPER), worklogController.deleteWorklog);
+router.get("/projects/:projectId/tasks/:taskId/worklogs", verifyAccessToken, checkUserStatus, worklogController.getByTask);
 
 // Admin → project timesheet
-router.get("/company/projects/:projectId/worklogs",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),worklogController.getByProject);
-router.get("/company/projects/:projectId/timesheet",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),worklogController.getTimesheetByProject)
+router.get("/company/projects/:projectId/worklogs", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), worklogController.getByProject);
+router.get("/company/projects/:projectId/timesheet", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), worklogController.getTimesheetByProject)
 
 //meeting
-router.post("/company/projects/:projectId/meetings",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),meetingController.createMeeting);
-router.get("/company/projects/:projectId/meetings",verifyAccessToken,checkUserStatus,meetingController.getMeetings);
-router.patch("/company/projects/:projectId/meetings/:meetingId",verifyAccessToken,checkUserStatus,requireRole(Role.COMPANY_ADMIN),meetingController.updateMeeting);
+router.post("/company/projects/:projectId/meetings", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), meetingController.createMeeting);
+router.get("/company/projects/:projectId/meetings/today", verifyAccessToken, checkUserStatus, meetingController.getTodayMeetings);
+router.get("/company/projects/:projectId/meetings/missed", verifyAccessToken, checkUserStatus, meetingController.getMissedMeetings);
+router.get("/company/projects/:projectId/meetings/completed",verifyAccessToken,checkUserStatus,meetingController.getCompletedMeetings)
+router.get("/company/projects/:projectId/meetings", verifyAccessToken, checkUserStatus, meetingController.getMeetings);
+router.patch("/company/projects/:projectId/meetings/:meetingId", verifyAccessToken, checkUserStatus, requireRole(Role.COMPANY_ADMIN), meetingController.updateMeeting);
+
 export default router;

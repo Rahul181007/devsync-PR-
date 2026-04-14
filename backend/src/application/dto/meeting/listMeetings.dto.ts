@@ -3,4 +3,5 @@ export interface ListMeetingsDTO {
     page: number;
     limit: number;
     sprintId?: string | null;
+    type?: string;
 }
