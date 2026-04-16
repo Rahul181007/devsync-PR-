@@ -39,6 +39,9 @@ export class LoginSuperAdminUseCase implements ILoginSuperAdminUseCase {
         // generate tokens
         const accessToken = Tokenutilits.generateAccessToken(payload);
         const refreshToken = Tokenutilits.generateRefreshToken({ sub: superAdmin.id, role: superAdmin.role })
+
+        console.log(accessToken);
+        console.log(refreshToken)
         // return clean data not whole entity
         return {
             id: superAdmin.id,
