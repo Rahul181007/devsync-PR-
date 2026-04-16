@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
-// import { verifySocketToken } from "./socketAuth.middleware";
+import { verifySocketToken } from "./socketAuth.middleware";
 import { joinProjectChatUseCase, sendMessageUseCase } from "../../di/chat.di";
 import { registerChatSocket } from "./chat.socket";
 import { env } from "../../config/env";
@@ -21,7 +21,7 @@ export const initSocketServer = (httpServer: HttpServer) => {
     },
     transports: ["websocket", "polling"],
   })
-  // io.use(verifySocketToken)
+  io.use(verifySocketToken)
 
 
   registerChatSocket(io, sendMessageUseCase, joinProjectChatUseCase);
