@@ -16,7 +16,7 @@ export class AuthController {
         private _refreshTokenUseCase: IRefreshTokenUseCase,
         private _getAuthMeUseCase: IGetAuthMeUseCase,
 
-        
+
     ) { }
 
     loginSuperAdmin = async (req: Request, res: Response) => {
@@ -30,8 +30,8 @@ export class AuthController {
             // storing accesstoken
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
-                secure: false,
+                sameSite: "none",
+                secure: true,
                 path: "/",
             });
 
@@ -55,7 +55,7 @@ export class AuthController {
         }
     }
 
-  
+
     refreshToken = async (req: Request, res: Response) => {
         try {
             logger.info(`Refresh token is recieved (superadmin)`)
@@ -70,10 +70,10 @@ export class AuthController {
             const result = await this._refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
-               res.cookie("accessToken", result.accessToken, {
+            res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
-                secure: false,
+                sameSite: "none",
+                secure: true,
                 path: "/",
             });
             return res.status(HttpStatus.OK).json({
@@ -110,12 +110,12 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         logger.info(' user logout requested');
-        res.clearCookie("accessToken", {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: false,
-            path: "/",
-        });
+res.clearCookie("accessToken", {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+  path: "/",
+});
         res.clearCookie('refresh_token', superAdminCookieOptions);
         res.clearCookie('refresh_token', userCookieOptions);
 
