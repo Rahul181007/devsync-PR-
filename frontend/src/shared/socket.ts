@@ -7,6 +7,7 @@ export const connectSocket = (): Socket => {
   if (!socket) {
     socket = io(import.meta.env.VITE_SOCKET_URL, {
       withCredentials: true,
+      transports: ["websocket", "polling"],
     });
   }
 

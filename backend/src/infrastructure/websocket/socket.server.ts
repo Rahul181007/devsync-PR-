@@ -13,9 +13,13 @@ import { setSocketInstance } from "./socket.instance";
 export const initSocketServer=(httpServer:HttpServer)=>{
     const io=new Server(httpServer,{
   cors: {
-    origin: env.FRONTEND_URL, 
+          origin: [
+        "http://localhost:5173",
+        env.FRONTEND_URL
+      ],
     credentials: true,
   },
+   transports: ["websocket", "polling"], 
     })
     io.use(verifySocketToken)
 
