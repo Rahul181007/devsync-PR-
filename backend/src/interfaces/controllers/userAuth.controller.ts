@@ -22,30 +22,29 @@ export class UserAuthController {
         private _loginUserUseCase: ILoginUserUseCase,
         private _refreshTokenUseCase: IRefreshTokenUseCase,
         private _signupUseCase: ISignupUseCase,
-        private _googleSignupUseCase:IGoogleSignupUseCase,
+        private _googleSignupUseCase: IGoogleSignupUseCase,
         private _verifySignupOtpUseCase: IVerifySignupOtpUseCase,
         private _googleLoginUseCase: IGoogleLoginUseCase,
-        private _resendSignupOtpUseCase:IResendSignupOtpUseCase
+        private _resendSignupOtpUseCase: IResendSignupOtpUseCase
 
     ) { }
 
     login = async (req: Request, res: Response) => {
         try {
             const parsed = loginSchema.parse(req.body);
-            
+
             logger.info(`User1 login attempted ${parsed.email}`);
             const result = await this._loginUserUseCase.execute(parsed);
 
             logger.info(`user login successful ${result.email}`)
 
             if (result.requiresOnboarding) {
-
                 res.cookie("accessToken", result.accessToken, {
                     httpOnly: true,
-                    sameSite: "lax",
-                    secure: false,
+                    sameSite: "none",
+                    secure: true,
                     path: "/",
-                })
+                });
                 res.cookie(
                     'refresh_token',
                     result.refreshToken,
@@ -61,12 +60,12 @@ export class UserAuthController {
 
 
             if (result.waitingForApproval) {
-                res.cookie('accessToken', result.accessToken, {
+                res.cookie("accessToken", result.accessToken, {
                     httpOnly: true,
-                    sameSite: "lax",
-                    secure: false,
+                    sameSite: "none",
+                    secure: true,
                     path: "/",
-                })
+                });
                 res.cookie(
                     'refresh_token',
                     result.refreshToken,
@@ -81,10 +80,10 @@ export class UserAuthController {
             }
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
-                secure: false,
+                sameSite: "none",
+                secure: true,
                 path: "/",
-            })
+            });
 
 
             res.cookie(
@@ -107,13 +106,13 @@ export class UserAuthController {
             logger.info(`User signup attempted ${req.body.email}`);
 
             const parsed = signupSchema.parse(req.body);
-            const result=await this._signupUseCase.execute(parsed);
+            const result = await this._signupUseCase.execute(parsed);
 
             logger.info(`User signup successful ${parsed.email}`);
 
             return res.status(HttpStatus.CREATED).json({
                 message: RESPONSE_MESSAGES.AUTH.USER_CREATED,
-                data:result
+                data: result
             })
         } catch (error: unknown) {
             return handleError(error, res)
@@ -122,26 +121,26 @@ export class UserAuthController {
     googleSignupUseCase = async (req: Request, res: Response) => {
         try {
             const { idToken } = req.body;
-            const result=await this._googleSignupUseCase.execute(idToken)
+            const result = await this._googleSignupUseCase.execute(idToken)
             res.status(HttpStatus.OK).json({
                 message: "OTP sent successfully. Please verify to continue",
-                data:result
+                data: result
             })
         } catch (error: unknown) {
             return handleError(error, res)
         }
     }
 
-    resendSignUpOtp=async(req:Request,res:Response)=>{
-      try {
-        const {email}=req.body
-        console.log(email)
+    resendSignUpOtp = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body
+            console.log(email)
 
-        await this._resendSignupOtpUseCase.execute(email);
-        return res.status(HttpStatus.OK).json({mmessage:"otp is sended"})
-      } catch (error:unknown) {
-        return handleError(error,res)
-      }
+            await this._resendSignupOtpUseCase.execute(email);
+            return res.status(HttpStatus.OK).json({ mmessage: "otp is sended" })
+        } catch (error: unknown) {
+            return handleError(error, res)
+        }
     }
 
     verifySignupOtp = async (req: Request, res: Response) => {
@@ -166,15 +165,15 @@ export class UserAuthController {
                 return
             }
 
-            const result =await this._googleLoginUseCase.execute(idToken);
-            res.cookie('accessToken',result.accessToken,{
-                httpOnly:true,
-                sameSite:'lax',
-                secure:false,
-                path:'/'
-            })
+            const result = await this._googleLoginUseCase.execute(idToken);
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+                path: "/",
+            });
 
-            res.cookie('refresh_token',result.refreshToken,userCookieOptions)
+            res.cookie('refresh_token', result.refreshToken, userCookieOptions)
 
 
 
