@@ -28,12 +28,12 @@ export class AuthController {
             logger.info(`SuperAdmin login successful: ${result.email}`)
 
             // storing accesstoken
-res.cookie("accessToken", result.accessToken, {
-  httpOnly: true,
-  sameSite: "lax",
-  secure: false,
-  path: "/",
-});
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+                path: "/",
+            });
 
             res.cookie(
                 "refresh_token",
@@ -70,12 +70,12 @@ res.cookie("accessToken", result.accessToken, {
             const result = await this._refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
-res.cookie("accessToken", result.accessToken, {
-  httpOnly: true,
-  sameSite: "lax",
-  secure: false,
-  path: "/",
-});
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true,
+                path: "/",
+            });
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.TOKEN_REFRESHED,
                 accessToken: result.accessToken,
