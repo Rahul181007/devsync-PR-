@@ -68,7 +68,7 @@ export const SprintBoard = ({ projectId }: Props) => {
     const [selectedTask, setSelectedTask] = useState<TaskListItem | null>(null);
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
-    
+
     useEffect(() => {
         dispatch(getProjectSprints(projectId));
     }, [dispatch, projectId]);
@@ -104,11 +104,11 @@ export const SprintBoard = ({ projectId }: Props) => {
     const handleCompleteSprint = () => {
         if (!selectedSprint) return;
 
-const unfinishedTasks = sprintTasks.filter(
-  (task) =>
-    (task.type === "TASK" || task.type === "BUG") &&
-    task.status !== "COMPLETED"
-);
+        const unfinishedTasks = sprintTasks.filter(
+            (task) =>
+                (task.type === "TASK" || task.type === "BUG") &&
+                task.status !== "COMPLETED"
+        );
 
         if (unfinishedTasks.length > 0) {
             setUnfinishedCount(unfinishedTasks.length);
@@ -282,12 +282,81 @@ const unfinishedTasks = sprintTasks.filter(
                                         </span>
                                     </div>
 
+                                    {/* Duration Section - Professional */}
+                                    <div className="flex items-center gap-3 text-sm bg-linear-to-r from-gray-50 to-white border border-gray-200 px-4 py-2.5 rounded-xl shadow-sm w-fit">
+                                        <div className="flex items-center gap-2">
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span className="font-semibold text-gray-700">Duration</span>
+                                        </div>
+                                        <div className="h-4 w-px bg-gray-300"></div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] text-gray-400 uppercase tracking-wider">Start</span>
+                                                <span className="text-sm font-medium text-gray-800">
+                                                    {new Date(selectedSprint.startDate).toLocaleDateString(undefined, {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    })}
+                                                </span>
+                                            </div>
+                                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                            </svg>
+                                            <div className="flex flex-col">
+                                                <span className="text-[10px] text-gray-400 uppercase tracking-wider">End</span>
+                                                <span className="text-sm font-medium text-gray-800">
+                                                    {new Date(selectedSprint.endDate).toLocaleDateString(undefined, {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        {/* Optional: Show remaining days if sprint is active */}
+                                        {selectedSprint.status === "ACTIVE" && new Date(selectedSprint.endDate) > new Date() && (
+                                            <>
+                                                <div className="h-4 w-px bg-gray-300"></div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span className="text-sm font-medium text-orange-600">
+                                                        {Math.ceil((new Date(selectedSprint.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days left
+                                                    </span>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* Goal Section - Professional */}
                                     {selectedSprint.goal && (
-                                        <div className="flex items-start gap-2">
-                                            <span className="text-xs font-medium text-gray-400 uppercase tracking-wider mt-0.5">Goal:</span>
-                                            <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2 flex-1">
-                                                {selectedSprint.goal}
-                                            </p>
+                                        <div className="group relative overflow-hidden">
+                                            <div className="absolute inset-0 bg-linear-to-r from-blue-500/5 to-purple-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                            <div className="relative flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200">
+                                                {/* Icon with gradient background */}
+                                                <div className="shrink-0">
+                                                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                                                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+
+                                                {/* Content */}
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Sprint Goal</span>
+                                                        <div className="h-1 w-8 bg-linear-to-r from-blue-500 to-indigo-600 rounded-full"></div>
+                                                    </div>
+                                                    <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                                                        {selectedSprint.goal}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
 
@@ -420,15 +489,30 @@ const unfinishedTasks = sprintTasks.filter(
                                                                         filteredTasks.map((task) => (
                                                                             <div
                                                                                 onClick={() => handleOpenTask(task)}
-                                                                                className="relative bg-white p-3 rounded-lg shadow-sm border cursor-pointer hover:shadow-md transition"
+                                                                                className="relative bg-white p-3 rounded-xl border border-gray-200 cursor-pointer hover:shadow-md hover:border-blue-300 transition group"
                                                                             >
-                                                                                <p className="text-sm font-medium mb-2">{task.title}</p>
-                                                                                <p className="text-sm font-medium mb-2">{task.code}</p>
-                                                                                <div className="flex justify-between items-center">
+                                                                                {/* Title */}
+                                                                                <p className="text-sm font-medium text-gray-800 mb-1 line-clamp-2">
+                                                                                    {task.title}
+                                                                                </p>
+
+                                                                                {/* Code + Type */}
+                                                                                <div className="flex items-center justify-between text-xs mb-2">
+                                                                                    <span className="text-gray-400 font-mono">
+                                                                                        {task.code.split("-").pop()}
+                                                                                    </span>
+
+                                                                                    <span className="text-[10px] px-2 py-0.5 rounded bg-gray-100 text-gray-600">
+                                                                                        {task.type}
+                                                                                    </span>
+                                                                                </div>
+
+                                                                                {/* Bottom row */}
+                                                                                <div className="flex justify-between items-center mt-2">
                                                                                     <PriorityBadge priority={task.priority} />
 
                                                                                     {task.assignee && (
-                                                                                        <span className="text-xs text-gray-500">
+                                                                                        <span className="text-xs text-gray-500 truncate max-w-20">
                                                                                             {task.assignee.name}
                                                                                         </span>
                                                                                     )}

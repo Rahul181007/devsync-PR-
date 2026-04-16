@@ -131,6 +131,42 @@ export class UpdateTaskUseCase implements IupdateTaskUseCase {
             }
         }
 
+        // ✅ Parent validation (ADD HERE)
+        if (data.parentId !== undefined) {
+            if (data.parentId === null) {
+                task.parentId = null;
+            } else {
+                const parentTask = await this._taskRepo.findById(data.parentId);
+
+                if (!parentTask || parentTask.projectId !== projectId) {
+                    throw new AppError(
+                        RESPONSE_MESSAGES.TASK.NOT_FOUND,
+                        HttpStatus.NOT_FOUND
+                    );
+                }
+
+                const finalType = data.type ?? task.type;
+
+                if (finalType === "EPIC") {
+                    throw new AppError("Epic cannot have parent", HttpStatus.BAD_REQUEST);
+                }
+
+                if (finalType === "STORY" && parentTask.type !== "EPIC") {
+                    throw new AppError("Story must belong to Epic", HttpStatus.BAD_REQUEST);
+                }
+
+                if (finalType === "TASK" && parentTask.type !== "STORY") {
+                    throw new AppError("Task must belong to Story", HttpStatus.BAD_REQUEST);
+                }
+
+                if (finalType === "BUG" && parentTask.type !== "STORY") {
+                    throw new AppError("Bug must belong to Story", HttpStatus.BAD_REQUEST);
+                }
+
+                task.parentId = parentTask.id;
+            }
+        }
+
 
         if (data.title) task.title = data.title.trim();
         if (data.description) task.description = data.description.trim();

@@ -37,14 +37,14 @@ export const CreateTaskModal = ({
   }>({});
 
   useEffect(() => {
-  if (!isOpen) {
-    setTitle("");
-    setDescription("");
-    setParentId(null);
-    setStoryPoints("");
-    setErrors({});
-  }
-}, [isOpen]);
+    if (!isOpen) {
+      setTitle("");
+      setDescription("");
+      setParentId(null);
+      setStoryPoints("");
+      setErrors({});
+    }
+  }, [isOpen]);
 
   const parentTypeMap = {
     STORY: "EPIC",
@@ -122,11 +122,11 @@ export const CreateTaskModal = ({
     }
   };
 
- const isFormValid =
-  title.trim() &&
-  description.trim() &&
-  (type === "STORY" ? storyPoints : true) &&
-  (type === "TASK" || type === "BUG" ? parentId : true);
+  const isFormValid =
+    title.trim() &&
+    description.trim() &&
+    (type === "STORY" ? storyPoints : true) &&
+    (type === "TASK" || type === "BUG" ? parentId : true);
 
   const priorityOptions = [
     { value: "LOW", label: "Low", color: "text-green-600 bg-green-50 border-green-200" },
@@ -266,7 +266,11 @@ export const CreateTaskModal = ({
                 <option value="">Select parent {requiredParentType}</option>
                 {parentTasks.map((task) => (
                   <option key={task.id} value={task.id}>
-                    {task.code} — {task.title.length > 30 ? task.title.substring(0, 30) + '...' : task.title}
+                    [{task.type}] {task.code} — {
+                      task.title.length > 30
+                        ? task.title.substring(0, 30) + '...'
+                        : task.title
+                    }
                   </option>
                 ))}
               </select>

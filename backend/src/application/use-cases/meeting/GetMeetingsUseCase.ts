@@ -60,6 +60,10 @@ export class GetMeetingsUseCase implements IGetMeetingsUseCase {
             query.sprintId = data.sprintId;
         }
 
+        if (data.type && data.type !== "ALL") {
+            query.type = data.type;
+        }
+
         const { items, total } = await this._meetingRepo.findAll(query);
 
         return {
@@ -76,6 +80,7 @@ export class GetMeetingsUseCase implements IGetMeetingsUseCase {
 
                 meetingLink: meeting.meetingLink,
                 meetingType: meeting.meetingType,
+                type: meeting.type,
 
                 notes: meeting.notes,
                 decisions: meeting.decisions,

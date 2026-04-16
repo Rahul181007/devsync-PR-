@@ -1,7 +1,8 @@
 import { Standup } from "../../domain/entities/standup.entity";
 import { CreateStandupInput, IStandupRepository } from "../../domain/repositories/standup.repository";
 import { toUTCDateOnly } from "../../shared/utils/date.util";
-import { IStandupDocument, StandupModel } from "../db/models/standup.model";
+import { StandupModel } from "../db/models/standup.model";
+import { StandupMapper } from "../mappers/standup/standup.mapper";
 
 
 type StandupQuery = {
@@ -15,36 +16,11 @@ type StandupQuery = {
 
 
 export class StandupRepository implements IStandupRepository {
-  private _toDomain(doc: IStandupDocument): Standup {
-    return new Standup(
-      doc._id.toString(),
-      doc.projectId.toString(),
-      doc.companyId.toString(),
-      doc.sprintId.toString(),
-      doc.userId.toString(),
-      doc.standupDate,
-      doc.yesterday,
-      doc.today,
-      doc.blockers ?? null,
-      doc.mood,
-      doc.createdAt,
-      doc.updatedAt
-    )
-  }
+
 
   async create(data: CreateStandupInput): Promise<Standup> {
-    const doc = await StandupModel.create({
-      projectId: data.projectId,
-      companyId: data.companyId,
-      sprintId: data.sprintId,
-      userId: data.userId,
-      standupDate: data.standupDate,
-      yesterday: data.yesterday,
-      today: data.today,
-      blockers: data.blockers ?? undefined,
-      mood: data.mood
-    })
-    return this._toDomain(doc)
+    const doc = await StandupModel.create(StandupMapper.toDocument(data))
+    return StandupMapper.toDomain(doc)
   }
 
 
@@ -68,13 +44,13 @@ export class StandupRepository implements IStandupRepository {
       }
     });
 
-    return doc ? this._toDomain(doc) : null;
+    return doc ? StandupMapper.toDomain(doc) : null;
   }
 
   async findBySprint(sprintId: string): Promise<Standup[]> {
     const docs = await StandupModel.find({ sprintId }).sort({ standupDate: -1 })
 
-    return docs.map(doc => this._toDomain(doc))
+    return docs.map(doc => StandupMapper.toDomain(doc))
   }
 
   async findByUserWithFilters(
@@ -109,7 +85,7 @@ export class StandupRepository implements IStandupRepository {
       .sort({ standupDate: -1 })
       .lean();
 
-    return docs.map(doc => this._toDomain(doc));
+    return docs.map(doc => StandupMapper.toDomain(doc));
   }
 
 
@@ -117,12 +93,7 @@ export class StandupRepository implements IStandupRepository {
   async update(standup: Standup): Promise<Standup> {
     const doc = await StandupModel.findByIdAndUpdate(
       standup.id,
-      {
-        yesterday: standup.yesterday,
-        today: standup.today,
-        blockers: standup.blockers,
-        mood: standup.mood
-      },
+      StandupMapper.toDocument(standup),
       { new: true }
     );
 
@@ -130,32 +101,32 @@ export class StandupRepository implements IStandupRepository {
       throw new Error("Standup not found");
     }
 
-    return this._toDomain(doc);
+    return StandupMapper.toDomain(doc);
   }
 
-async findBySprintAndDate(
-  sprintId: string,
-  date: Date
-): Promise<Standup[]> {
+  async findBySprintAndDate(
+    sprintId: string,
+    date: Date
+  ): Promise<Standup[]> {
 
-  const start = toUTCDateOnly(date);
-  const end = new Date(start);
-  end.setUTCDate(end.getUTCDate() + 1);
+    const start = toUTCDateOnly(date);
+    const end = new Date(start);
+    end.setUTCDate(end.getUTCDate() + 1);
 
-  const docs = await StandupModel.find({
-    sprintId,
-    standupDate: {
-      $gte: start,
-      $lt: end
-    }
-  });
+    const docs = await StandupModel.find({
+      sprintId,
+      standupDate: {
+        $gte: start,
+        $lt: end
+      }
+    });
 
-  return docs.map(doc => this._toDomain(doc));
-}
+    return docs.map(doc => StandupMapper.toDomain(doc));
+  }
 
   async findById(id: string): Promise<Standup | null> {
     const doc = await StandupModel.findById(id);
     if (!doc) return null;
-    return this._toDomain(doc);
+    return StandupMapper.toDomain(doc);
   }
 }

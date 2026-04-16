@@ -67,6 +67,7 @@ export class CreateMeetingUseCase implements ICreateMeetingUseCase {
 
             meetingLink: data.meetingLink ?? null,
             meetingType: data.meetingType ?? null,
+            type: data.type ?? "GENERAL",
         });
 
         // 🔹 get project members
@@ -117,6 +118,7 @@ export class CreateMeetingUseCase implements ICreateMeetingUseCase {
 
             meetingLink: meeting.meetingLink,
             meetingType: meeting.meetingType,
+            type:meeting.type,
 
             notes: meeting.notes,
             decisions: meeting.decisions,

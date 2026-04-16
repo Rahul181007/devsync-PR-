@@ -11,6 +11,8 @@ import {
   DocumentTextIcon,
   CalendarIcon,
   XMarkIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 
@@ -27,6 +29,11 @@ interface TimesheetGrouped {
       taskTitle: string;
       timeSpent: number;
     }[];
+    meetings: {
+      title: string;
+      duration: number;
+    }[];
+    unloggedHours: number;
   }[];
 }
 
@@ -40,6 +47,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
   const [endDate, setEndDate] = useState<string>("");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [expandedUsers, setExpandedUsers] = useState<Set<string>>(new Set());
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -107,6 +115,8 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
       userName: item.userName,
       hours: item.totalHours,
       tasks: item.tasks || [],
+      meetings: item.meetings || [],
+      unloggedHours: item.unloggedHours || 0,
     });
 
     return acc;
@@ -127,6 +137,16 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
     (sum, item) => sum + item.totalHours,
     0
   );
+
+  const toggleUserExpand = (userKey: string) => {
+    const newExpanded = new Set(expandedUsers);
+    if (newExpanded.has(userKey)) {
+      newExpanded.delete(userKey);
+    } else {
+      newExpanded.add(userKey);
+    }
+    setExpandedUsers(newExpanded);
+  };
 
   return (
     <div className="space-y-6">
@@ -613,18 +633,18 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
         )
       )}
 
-      {/* Enhanced Modal */}
+      {/* Enhanced Modal - Improved for multiple developers */}
       {selectedDate && timesheetMap[selectedDate] && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200"
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200 p-4"
           onClick={() => setSelectedDate(null)}
         >
-          <div 
-            className="bg-white rounded-2xl shadow-2xl w-[500px] max-h-[85vh] overflow-hidden animate-in zoom-in-95 duration-200"
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-linear-to-r from-blue-50 to-white">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-linear-to-r from-blue-50 to-white sticky top-0 z-10">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-xl">
                   <CalendarIcon className="w-5 h-5 text-blue-600" />
@@ -638,9 +658,15 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
                       year: "numeric",
                     })}
                   </h2>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Total: {timesheetMap[selectedDate].totalHours.toFixed(1)} hours
-                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <p className="text-xs text-gray-500">
+                      Total: {timesheetMap[selectedDate].totalHours.toFixed(1)} hours
+                    </p>
+                    <span className="text-xs text-gray-300">•</span>
+                    <p className="text-xs text-gray-500">
+                      {timesheetMap[selectedDate].entries.length} developer{timesheetMap[selectedDate].entries.length > 1 ? "s" : ""}
+                    </p>
+                  </div>
                 </div>
               </div>
               <button
@@ -652,7 +678,7 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(85vh-120px)]">
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               {timesheetMap[selectedDate].entries.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="p-3 bg-gray-100 rounded-full inline-flex mb-3">
@@ -662,79 +688,150 @@ export const ProjectWorklogTab = ({ projectId }: Props) => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {timesheetMap[selectedDate].entries.map((entry, idx) => (
-                    <div 
-                      key={idx} 
-                      className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-semibold text-white">
-                              {entry.userName?.charAt(0).toUpperCase() || "U"}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900">
-                              {entry.userName || "Unknown User"}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {entry.hours.toFixed(1)} hours logged
-                            </p>
-                          </div>
-                        </div>
-                        <div className="px-2 py-1 bg-blue-100 rounded-lg">
-                          <span className="text-xs font-semibold text-blue-700">
-                            {entry.hours.toFixed(1)}h
-                          </span>
-                        </div>
-                      </div>
+                  {timesheetMap[selectedDate].entries.map((entry, idx) => {
+                    const userKey = `${entry.userName}-${idx}`;
+                    const isExpanded = expandedUsers.has(userKey);
+                    const hasTasks = entry.tasks && entry.tasks.length > 0;
+                    const hasMeetings = entry.meetings && entry.meetings.length > 0;
+                    const hasContent = hasTasks || hasMeetings;
 
-                      {entry.tasks.length > 0 && (
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Tasks
-                          </p>
-                          <div className="space-y-1.5">
-                            {entry.tasks.map((task, taskIdx) => (
-                              <div 
-                                key={taskIdx} 
-                                className="flex items-start gap-2 text-sm p-2 bg-white rounded-lg"
-                              >
-                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
-                                <div className="flex-1">
-                                  <p className="text-gray-700">{task.taskTitle}</p>
-                                  <p className="text-xs text-gray-400 mt-0.5">
-                                    {(task.timeSpent / 60).toFixed(1)} hours
-                                  </p>
+                    return (
+                      <div
+                        key={idx}
+                        className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+                      >
+                        {/* User Header - Always Visible */}
+                        <div
+                          className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => toggleUserExpand(userKey)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                              <span className="text-sm font-semibold text-white">
+                                {entry.userName?.charAt(0).toUpperCase() || "U"}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900">
+                                {entry.userName || "Unknown User"}
+                              </p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-xs text-gray-500">
+                                  {entry.hours.toFixed(1)}h worked
+                                </span>
+                                <span className="text-xs text-gray-300">•</span>
+                                <span className="text-xs text-gray-400">
+                                  {entry.unloggedHours.toFixed(1)}h unlogged
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="px-2.5 py-1 bg-blue-100 rounded-lg">
+                              <span className="text-xs font-semibold text-blue-700">
+                                {entry.hours.toFixed(1)}h
+                              </span>
+                            </div>
+                            {hasContent && (
+                              <button className="p-1 rounded-full hover:bg-gray-200 transition-colors">
+                                {isExpanded ? (
+                                  <ChevronUpIcon className="w-4 h-4 text-gray-500" />
+                                ) : (
+                                  <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Expandable Content */}
+                        {isExpanded && hasContent && (
+                          <div className="px-4 pb-4 space-y-3 border-t border-gray-200 pt-3">
+                            {/* Tasks Section */}
+                            {hasTasks && (
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                                  <DocumentTextIcon className="w-3.5 h-3.5" />
+                                  Tasks
+                                </p>
+                                <div className="space-y-2">
+                                  {entry.tasks.map((task, taskIdx) => (
+                                    <div
+                                      key={taskIdx}
+                                      className="flex items-start gap-3 text-sm p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+                                    >
+                                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-1.5"></div>
+                                      <div className="flex-1">
+                                        <p className="text-gray-700 font-medium">{task.taskTitle}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                          {(task.timeSpent / 60).toFixed(1)} hours
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                            )}
 
-                      {entry.tasks.length === 0 && (
-                        <p className="text-sm text-gray-400 italic">No tasks logged</p>
-                      )}
-                    </div>
-                  ))}
+                            {/* Meetings Section */}
+                            {hasMeetings && (
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                                  <UserIcon className="w-3.5 h-3.5" />
+                                  Meetings
+                                </p>
+                                <div className="space-y-2">
+                                  {entry.meetings.map((meeting, meetingIdx) => (
+                                    <div
+                                      key={meetingIdx}
+                                      className="flex items-start gap-3 text-sm p-3 bg-green-50 rounded-lg border border-green-100"
+                                    >
+                                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
+                                      <div className="flex-1">
+                                        <p className="text-gray-700 font-medium">{meeting.title}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">
+                                          {(meeting.duration / 60).toFixed(1)} hours
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* No Content Message */}
+                        {!hasContent && (
+                          <div className="px-4 pb-4 pt-0">
+                            <p className="text-xs text-gray-400 italic bg-white rounded-lg p-2 text-center">
+                              No tasks or meetings logged
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-200 sticky bottom-0">
+              <div className="text-xs text-gray-500">
+                {timesheetMap[selectedDate].entries.length} developer{timesheetMap[selectedDate].entries.length > 1 ? "s" : ""} •{" "}
+                {timesheetMap[selectedDate].entries.reduce((sum, e) => sum + e.tasks.length, 0)} task{timesheetMap[selectedDate].entries.reduce((sum, e) => sum + e.tasks.length, 0) !== 1 ? "s" : ""}
+              </div>
               <button
                 onClick={() => setSelectedDate(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
               >
                 Close
               </button>
             </div>
           </div>
         </div>
-     )}
+      )}
     </div>
   );
 };

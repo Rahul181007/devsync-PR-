@@ -12,6 +12,7 @@ export type NotificationType =
   |"COMPANY_REAPPLIED"
   |"MEETING_CREATED"
   |"SPRINT_REVIEW_SCHEDULED"
+  |"MEETING_REMINDER"
   ;
 
 

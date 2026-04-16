@@ -6,40 +6,37 @@ import { HttpStatus } from "../../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../../shared/constants/responseMessages";
 import { AppError } from "../../../shared/errors/AppError";
 import { SignupDTO } from "../../dto/auth/signup.dto";
-import { Role } from "../../../shared/constants/roleenum";
+import { UserMapper } from "../../mapper/user.mapper";
 
-export class SignupUseCase implements ISignupUseCase{
+export class SignupUseCase implements ISignupUseCase {
     constructor(
-        private _userRepo:IUserRepository,
-        private _passwordHasher:IPasswordHasher,
-        private _emailService:IMailService
-    ){}
+        private _userRepo: IUserRepository,
+        private _passwordHasher: IPasswordHasher,
+        private _emailService: IMailService
+    ) { }
 
-    async execute(data:SignupDTO):Promise<{email:string}>{
-        const user=await this._userRepo.findByEmail(data.email);
+    async execute(data: SignupDTO): Promise<{ email: string }> {
+        const user = await this._userRepo.findByEmail(data.email);
 
-        if(user){
-            throw new AppError(RESPONSE_MESSAGES.AUTH.USER_ALREADY_EXISTS,HttpStatus.CONFLICT)
+        if (user) {
+            throw new AppError(RESPONSE_MESSAGES.AUTH.USER_ALREADY_EXISTS, HttpStatus.CONFLICT)
         }
 
-        const passwordHash=await this._passwordHasher.hash(data.password);
-             const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
-       await this._userRepo.create({
-        name:data.name,
-        email:data.email,
-        passwordHash:passwordHash,
-        role:Role.COMPANY_ADMIN,
-        authProvider:'LOCAL',
-        status:'PENDING_VERIFICATION',
-        companyId:null,
-        otp,
-        otpExpiresAt
-       })
-       await this._emailService.sendSignupOtp(data.email,otp)
+        const passwordHash = await this._passwordHasher.hash(data.password);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-       return {
-        email:data.email
-       }
+        const newUser = UserMapper.toDomainSignup(
+            data,
+            passwordHash,
+            otp,
+            otpExpiresAt
+        );
+        await this._userRepo.create(newUser)
+        await this._emailService.sendSignupOtp(data.email, otp)
+
+        return {
+            email: data.email
+        }
     }
 }

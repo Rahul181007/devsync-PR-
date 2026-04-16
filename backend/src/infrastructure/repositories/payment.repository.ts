@@ -1,23 +1,10 @@
 import { Payment } from "../../domain/entities/payment.entity";
 import { IPaymentRepository } from "../../domain/repositories/payment.repository";
-import { IPaymentDocument, PaymentModel } from "../db/models/payment.model";
+import { PaymentModel } from "../db/models/payment.model";
+import { PaymentMapper } from "../mappers/payment/payment.mapper";
 
 export class PaymentRepository implements IPaymentRepository {
-    private _toDomain(doc: IPaymentDocument): Payment {
-        return new Payment(
-            doc._id.toString(),
-            doc.companyId.toString(),
-            doc.planId.toString(),
-            doc.billingCycle,
-            doc.orderId,
-            doc.paymentId,
-            doc.amount,
-            doc.currency,
-            doc.status,
-            doc.createdAt,
-            doc.updatedAt
-        )
-    }
+
 
     async create(data: {
         companyId: string;
@@ -30,24 +17,15 @@ export class PaymentRepository implements IPaymentRepository {
         status: "PENDING" | "SUCCESS" | "FAILED";
     }): Promise<Payment> {
 
-        const doc = await PaymentModel.create({
-            companyId: data.companyId,
-            planId: data.planId,
-            billingCycle: data.billingCycle,
-            orderId: data.orderId,
-            paymentId: data.paymentId,
-            amount: data.amount,
-            currency: data.currency,
-            status: data.status
-        })
+        const doc = await PaymentModel.create(PaymentMapper.toDocument(data))
 
-        return this._toDomain(doc)
+        return PaymentMapper.toDomain(doc)
     }
 
     async findByOrderId(orderId: string): Promise<Payment | null> {
         const doc = await PaymentModel.findOne({ orderId });
         if (!doc) return null;
-        return this._toDomain(doc)
+        return PaymentMapper.toDomain(doc)
     }
 
     async markSuccess(orderId: string, paymentId: string): Promise<void> {
@@ -61,7 +39,7 @@ export class PaymentRepository implements IPaymentRepository {
     async findByCompanyId(companyId: string): Promise<Payment[]> {
         const docs = await PaymentModel.find({ companyId }).sort({ createdAt: -1 })
 
-        return docs.map((doc) => this._toDomain(doc))
+        return docs.map((doc) => PaymentMapper.toDomain(doc))
     }
 
     async findPendingPayment(
@@ -79,7 +57,7 @@ export class PaymentRepository implements IPaymentRepository {
 
         if (!doc) return null;
 
-        return this._toDomain(doc);
+        return PaymentMapper.toDomain(doc);
     }
 }
 

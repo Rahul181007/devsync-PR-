@@ -4,8 +4,8 @@ import { fetchDevelopers } from "../../store/developer.slice";
 import { createProject } from "../../store/project.slice";
 import { toast } from "react-hot-toast";
 import { projectWithMembersSchema } from "../../validator/cretaeProject.validator";
-import { validateZod } from "../../../../shared/utiils/validateZod";
 import InputField from "../../../../shared/components/InputField";
+import { useFormValidation } from "../../../../shared/hooks/useFormValidation";
 interface CreateProjectModalProps {
   open: boolean;
   onClose: () => void;
@@ -20,19 +20,65 @@ const CreateProjectModal = ({
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector(state => state.project)
   const { items: developers } = useAppSelector(state => state.companyAdminDevelopers)
-
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState('')
   const [selectMembers, setSelectMembers] = useState<string[]>([])
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const form = useFormValidation(
+    {
+      name: "",
+      description: "",
+      startDate: "",
+      endDate: "",
+      members: [] as { userId: string }[],
+    },
+    projectWithMembersSchema,
+    async (vals) => {
+      const result = await dispatch(
+        createProject({
+          name: vals.name,
+          description: vals.description || undefined,
+          startDate: vals.startDate || undefined,
+          endDate: vals.endDate || undefined,
+          members: selectMembers.map((id) => ({ userId: id }))
+        })
+      );
+
+      if (createProject.fulfilled.match(result)) {
+        toast.success("Project created successfully");
+        onCreated?.();
+        onClose();
+
+
+        setSelectMembers([]);
+      }
+
+      if (createProject.rejected.match(result)) {
+        toast.error(result.payload as string || "Failed");
+      }
+    }
+  );
+
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    reset
+  } = form;
 
   useEffect(() => {
     if (open) {
       dispatch(fetchDevelopers({ page: 1, limit: 100 }))
     }
   }, [dispatch, open])
+
+const handleClose = () => {
+  reset();              
+  setSelectMembers([]); 
+  onClose();
+};
+
 
   if (!open) return null;
   const toggleMember = (id: string) => {
@@ -44,54 +90,7 @@ const CreateProjectModal = ({
   }
 
 
-  const handleSubmit = async () => {
-    const validation = validateZod(projectWithMembersSchema, {
-      name,
-      description,
-      startDate,
-      endDate,
-      members: selectMembers.map((id) => ({ userId: id })),
-    });
 
-    if (!validation.success) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    setErrors({});
-
-    const result = await dispatch(
-      createProject({
-        name,
-        description: description || undefined,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        members: selectMembers.map((id) => ({
-          userId: id
-        }))
-      })
-    );
-
-
-    if (createProject.fulfilled.match(result)) {
-      toast.success("Project created successfully");
-
-      onCreated?.();
-      onClose();
-
-      // Reset form
-      setName("");
-      setDescription("");
-      setStartDate("");
-      setEndDate("");
-      setSelectMembers([]);
-    }
-
-
-    if (createProject.rejected.match(result)) {
-      toast.error(result.payload as string || "Failed to create project");
-    }
-  };
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md shadow-2xl">
@@ -102,7 +101,7 @@ const CreateProjectModal = ({
               Create New Project
             </h2>
             <button
-              onClick={onClose}
+               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,13 +124,10 @@ const CreateProjectModal = ({
 
 
             <InputField
-              value={name}
-              onChange={(val) => {
-                setName(val);
-                setErrors((prev) => ({ ...prev, name: "" }));
-              }}
-              error={errors.name}
-              placeholder="e.g., Website Redesign"
+              value={values.name}
+              onChange={(val) => handleChange("name", val)}
+              onBlur={() => handleBlur("name")}
+              error={touched.name ? errors.name : ""}
             />
 
 
@@ -143,8 +139,9 @@ const CreateProjectModal = ({
               Description
             </label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={values.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              onBlur={() => handleBlur("description")}
               rows={3}
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400 resize-none"
               placeholder="Describe the project objectives..."
@@ -160,11 +157,12 @@ const CreateProjectModal = ({
               <div className="relative">
                 <input
                   type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  value={values.startDate}
+                  onChange={(e) => handleChange("startDate", e.target.value)}
+                  onBlur={() => handleBlur("startDate")}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all scheme-light"
                 />
-                {errors.startDate && (
+                {touched.startDate && errors.startDate && (
                   <p className="text-xs text-red-500 mt-1">{errors.startDate}</p>
                 )}
                 <svg className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,11 +178,12 @@ const CreateProjectModal = ({
               <div className="relative">
                 <input
                   type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
+                  value={values.endDate}
+                  onChange={(e) => handleChange("endDate", e.target.value)}
+                  onBlur={() => handleBlur("endDate")}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all scheme-light"
                 />
-                {errors.endDate && (
+                {touched.endDate && errors.endDate && (
                   <p className="text-xs text-red-500 mt-1">{errors.endDate}</p>
                 )}
                 <svg className="absolute right-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,8 +249,10 @@ const CreateProjectModal = ({
             Cancel
           </button>
           <button
-            disabled={loading || !name.trim()}
-            onClick={handleSubmit}
+            disabled={loading}
+            onClick={
+              handleSubmit
+        }
             className="px-5 py-2.5 text-sm font-medium text-white bg-linear-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 shadow-sm"
           >
             {loading ? (

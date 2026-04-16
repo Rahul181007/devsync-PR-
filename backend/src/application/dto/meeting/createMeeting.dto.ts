@@ -10,4 +10,5 @@ export interface CreateMeetingDTO {
 
     meetingLink?: string;
     meetingType?: "GOOGLE_MEET" | "ZOOM" | "TEAMS" | "OTHER";
+     type?: "SPRINT_PLANNING" | "SPRINT_REVIEW" | "STANDUP" | "GENERAL";
 }

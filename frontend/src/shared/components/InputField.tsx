@@ -6,6 +6,7 @@ interface InputFieldProps {
   onChange: (value: string) => void;
   error?: string;
   placeholder?: string;
+  onBlur?: () => void;
   type?: string;
 }
 
@@ -15,6 +16,7 @@ const InputField: React.FC<InputFieldProps> = ({
   onChange,
   error,
   placeholder,
+  onBlur,
   type = "text",
 }) => {
   return (
@@ -26,6 +28,7 @@ const InputField: React.FC<InputFieldProps> = ({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         className={`w-full rounded-lg px-4 py-2.5 text-sm transition-all border ${
           error
             ? "border-red-500 focus:ring-red-500/20"

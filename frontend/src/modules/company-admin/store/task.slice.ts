@@ -90,7 +90,7 @@ export const createTask = createAsyncThunk<
             parentId?: string | null;
             assigneeId?: string | null;
             dueDate?: string | null
-            estimatedTime?: number|null;
+            estimatedTime?: number | null;
             storyPoints?: number | null;
         }
     },
@@ -117,9 +117,10 @@ export const updateTask = createAsyncThunk<
             type?: TaskType
             priority?: TaskPriority
             dueDate?: string | null
-            estimatedTime?:number|null
+            estimatedTime?: number | null
             storyPoints?: number | null;
-            assigneeId?: string | null 
+            assigneeId?: string | null
+            parentId?: string | null;
         }
     },
     { rejectValue: string }
@@ -127,7 +128,7 @@ export const updateTask = createAsyncThunk<
     "task/updateTask",
     async ({ projectId, taskId, data }, { dispatch, rejectWithValue }) => {
         try {
-            console.log("task",data)
+            console.log("task", data)
             await taskApi.updateTask(projectId, taskId, data)
 
             dispatch(getProjectTasks(projectId))

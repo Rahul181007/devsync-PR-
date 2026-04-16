@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { initSocketServer } from './infrastructure/websocket/socket.server';
 import { AppError } from './shared/errors/AppError';
+import { startMeetingReminderJob } from './infrastructure/jobs/meetingReminder.job';
 
 const app=express()
 
@@ -53,6 +54,7 @@ app.set("io",io)
 connectDB().then(() => {
   httpServer.listen(env.PORT, () => {
     console.log(`Server running on port ${env.PORT}`);
+    startMeetingReminderJob();
   });
 });
 

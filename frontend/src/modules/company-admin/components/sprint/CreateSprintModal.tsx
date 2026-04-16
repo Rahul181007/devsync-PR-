@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+
 import { useAppDispatch } from "../../../../store/hook";
 import { createSprint } from "../../store/sprint.slice";
 import toast from "react-hot-toast";
 import InputField from "../../../../shared/components/InputField";
+import { createSprintSchema } from "../../validator/sprint.validator";
+import { useFormValidation } from "../../../../shared/hooks/useFormValidation";
 
 interface Props {
     isOpen: boolean;
@@ -16,85 +18,64 @@ export const CreateSprintModal = ({
     projectId
 }: Props) => {
     const dispatch = useAppDispatch();
-    const [name, setName] = useState("");
-    const [goal, setGoal] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<{
-        name?: string;
-        startDate?: string;
-        endDate?: string;
-    }>({});
 
-    useEffect(() => {
-        if (!isOpen) {
-            setName("");
-            setGoal("");
-            setStartDate("");
-            setEndDate("");
-            setErrors({});
-        }
-    }, [isOpen]);
-    if (!isOpen) return null;
+   
 
-    const handleSubmit = async () => {
-        const newErrors: typeof errors = {};
-        if (!name.trim()) {
-            newErrors.name = "Sprint name is required";
-        }
 
-        if (!startDate) {
-            newErrors.startDate = "Start date is required";
-        }
 
-        if (!endDate) {
-            newErrors.endDate = "End date is required";
-        }
-
-        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-            newErrors.endDate = "End date must be after start date";
-        }
-
-        setErrors(newErrors);
-
-        if (Object.keys(newErrors).length > 0) return;
-
-        setIsSubmitting(true);
-        try {
+    const formHook = useFormValidation(
+        {
+            name: "",
+            goal: "",
+            startDate: "",
+            endDate: "",
+        },
+        createSprintSchema,
+        async (vals) => {
             const result = await dispatch(
                 createSprint({
                     projectId,
                     data: {
-                        name,
-                        goal: goal || null,
-                        startDate,
-                        endDate
-                    }
+                        name: vals.name,
+                        goal: vals.goal || null,
+                        startDate: vals.startDate,
+                        endDate: vals.endDate,
+                    },
                 })
             );
 
             if (createSprint.fulfilled.match(result)) {
                 toast.success("Sprint created successfully");
-                // Reset form
-                setName("");
-                setGoal("");
-                setStartDate("");
-                setEndDate("");
-                onClose();
+                onClose(); 
             }
 
             if (createSprint.rejected.match(result)) {
                 toast.error(result.payload as string);
             }
-        } finally {
-            setIsSubmitting(false);
         }
+    );
+
+    const {
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        reset
+    } = formHook;
+
+    const handleClose = () => {
+        reset();
+        onClose();
     };
 
+    if (!isOpen) return null;
+
+  
 
 
-    const isFormValid = name.trim() && startDate && endDate;
+   
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -125,15 +106,14 @@ export const CreateSprintModal = ({
                             <span className="text-red-500">*</span>
                         </label>
                         <InputField
-                            value={name}
-                            onChange={(value) => {
-                                setName(value);
-                                setErrors((prev) => ({ ...prev, name: undefined }));
-                            }}
+                            value={values.name}
+                            onChange={(val) => handleChange("name", val)}
+                            onBlur={() => handleBlur("name")}
+                            error={touched.name ? errors.name : ""}
                             placeholder="e.g., Sprint 1, Q1 Planning"
-                            error={errors.name}
+
                         />
-                        {!name.trim() && name.length > 0 && (
+                        {!values.name.trim() && values.name.length > 0 && (
                             <p className="text-xs text-red-500 mt-1">Sprint name is required</p>
                         )}
                     </div>
@@ -146,8 +126,9 @@ export const CreateSprintModal = ({
                         </label>
                         <textarea
                             placeholder="What is the main objective of this sprint?"
-                            value={goal}
-                            onChange={(e) => setGoal(e.target.value)}
+                            value={values.goal}
+                            onChange={(e) => handleChange("goal", e.target.value)}
+                            onBlur={() => handleBlur("goal")}
                             rows={3}
                             className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors resize-none"
                         />
@@ -164,12 +145,10 @@ export const CreateSprintModal = ({
                             <div className="relative">
                                 <InputField
                                     type="date"
-                                    value={startDate}
-                                    onChange={(value) => {
-                                        setStartDate(value);
-                                        setErrors((prev) => ({ ...prev, startDate: undefined }));
-                                    }}
-                                    error={errors.startDate}
+                                    value={values.startDate}
+                                    onChange={(val) => handleChange("startDate", val)}
+                                    onBlur={() => handleBlur("startDate")}
+                                    error={touched.startDate ? errors.startDate : ""}
                                 />
                             </div>
                         </div>
@@ -183,27 +162,25 @@ export const CreateSprintModal = ({
                             <div className="relative">
                                 <InputField
                                     type="date"
-                                    value={endDate}
-                                    onChange={(value) => {
-                                        setEndDate(value);
-                                        setErrors((prev) => ({ ...prev, startDate: undefined }));
-                                    }}
-                                    error={errors.endDate}
+                                    value={values.endDate}
+                                    onChange={(val) => handleChange("endDate", val)}
+                                    onBlur={() => handleBlur("endDate")}
+                                    error={touched.endDate ? errors.endDate : ""}
                                 />
                             </div>
                         </div>
                     </div>
 
                     {/* Date Preview */}
-                    {startDate && endDate && (
+                    {values.startDate && values.endDate && !errors.endDate && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                             <p className="text-xs text-blue-700 flex items-center gap-2">
                                 <span className="font-medium">Sprint duration:</span>
                                 <span>
-                                    {new Date(startDate).toLocaleDateString('en-US', {
+                                    {new Date(values.startDate).toLocaleDateString('en-US', {
                                         month: 'short',
                                         day: 'numeric'
-                                    })} - {new Date(endDate).toLocaleDateString('en-US', {
+                                    })} - {new Date(values.endDate).toLocaleDateString('en-US', {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric'
@@ -217,29 +194,18 @@ export const CreateSprintModal = ({
                 {/* Form Footer with Actions */}
                 <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 flex justify-end gap-3">
                     <button
-                        onClick={onClose}
-                        disabled={isSubmitting}
+                        onClick={handleClose}
+                        
                         className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancel
                     </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={!isFormValid || isSubmitting}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 flex items-center gap-2"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Creating...
-                            </>
-                        ) : (
-                            'Create Sprint'
-                        )}
-                    </button>
+<button
+  onClick={handleSubmit}
+  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow flex items-center gap-2"
+>
+  Create Sprint
+</button>
                 </div>
             </div>
         </div>
