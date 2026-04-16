@@ -1,4 +1,6 @@
-import { useState } from "react";
+
+import { submitTaskSchema } from "../../validator/submitTask.validator";
+import { useFormValidation } from "../../../../shared/hooks/useFormValidation";
 
 interface SubmitTaskModalProps {
   isOpen: boolean;
@@ -15,36 +17,42 @@ const SubmitTaskModal = ({
   onClose,
   onSubmit,
 }: SubmitTaskModalProps) => {
-  const [summary, setSummary] = useState("");
-  const [workDone, setWorkDone] = useState("");
-  const [blockers, setBlockers] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!isOpen) return null;
+  const formHook = useFormValidation(
+    {
+      summary: "",
+      workDone: "",
+      blockers: "",
+    },
+    submitTaskSchema,
+    async (vals) => {
+      onSubmit({
+        summary: vals.summary,
+        workDone: vals.workDone,
+        blockers: vals.blockers,
+      });
 
-  const handleSubmit = () => {
-    if (!summary.trim() || !workDone.trim()) {
-      alert("Summary and work done are required");
-      return;
+      onClose();
     }
+  );
 
-    setIsSubmitting(true);
-    
-    onSubmit({
-      summary,
-      workDone,
-      blockers: blockers.trim() || undefined,
-    });
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    reset
+  } = formHook;
 
-    // Reset form
-    setSummary("");
-    setWorkDone("");
-    setBlockers("");
-    setIsSubmitting(false);
+  const handleClose = () => {
+    reset();
     onClose();
   };
+  if (!isOpen) return null;
 
-  const isFormValid = summary.trim() && workDone.trim();
+ 
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -78,14 +86,15 @@ const SubmitTaskModal = ({
               <span className="text-xs text-gray-400 ml-auto">Brief overview</span>
             </label>
             <input
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
+              value={values.summary}
+              onChange={(e) => handleChange("summary", e.target.value)}
+              onBlur={() => handleBlur("summary")}
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
               placeholder="e.g., Implemented user authentication, fixed navigation bug..."
               autoFocus
             />
-            {!summary.trim() && summary.length > 0 && (
-              <p className="text-xs text-red-500 mt-1">Summary is required</p>
+            {touched.summary && errors.summary && (
+              <p className="text-xs text-red-500 mt-1">{errors.summary}</p>
             )}
           </div>
 
@@ -97,14 +106,15 @@ const SubmitTaskModal = ({
               <span className="text-xs text-gray-400 ml-auto">Detailed description</span>
             </label>
             <textarea
-              value={workDone}
-              onChange={(e) => setWorkDone(e.target.value)}
+              value={values.workDone}
+              onChange={(e) => handleChange("workDone", e.target.value)}
+              onBlur={() => handleBlur("workDone")}
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors resize-none"
               rows={4}
               placeholder="Explain what you accomplished, including key changes, features, or fixes..."
             />
-            {!workDone.trim() && workDone.length > 0 && (
-              <p className="text-xs text-red-500 mt-1">Work done description is required</p>
+            {touched.workDone && errors.workDone && (
+              <p className="text-xs text-red-500 mt-1">{errors.workDone}</p>
             )}
           </div>
 
@@ -115,8 +125,9 @@ const SubmitTaskModal = ({
               <span className="text-xs text-gray-400 ml-auto">Optional</span>
             </label>
             <textarea
-              value={blockers}
-              onChange={(e) => setBlockers(e.target.value)}
+              value={values.blockers}
+              onChange={(e) => handleChange("blockers", e.target.value)}
+              onBlur={() => handleBlur("blockers")}
               className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors resize-none"
               rows={2}
               placeholder="Any challenges or blockers you encountered? (optional)"
@@ -142,28 +153,18 @@ const SubmitTaskModal = ({
         {/* Footer with Actions */}
         <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 flex justify-end gap-3">
           <button
-            onClick={onClose}
-            disabled={isSubmitting}
+            onClick={handleClose}
+
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-white hover:border-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!isFormValid || isSubmitting}
+
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 flex items-center gap-2"
           >
-            {isSubmitting ? (
-              <>
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Submitting...
-              </>
-            ) : (
-              'Submit Task'
-            )}
+            Submit Task
           </button>
         </div>
       </div>

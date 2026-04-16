@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const projectSchema = z.object({
+export const baseProjectSchema = z.object({
   name: z.string().min(3, "Project name must be at least 3 characters"),
 
   description: z.string().optional(),
@@ -28,10 +28,14 @@ export const projectSchema = z.object({
 );
 
 // extend for modal
-export const projectWithMembersSchema = projectSchema.safeExtend({
+export const projectWithMembersSchema = baseProjectSchema.safeExtend({
   members: z.array(
     z.object({
       userId: z.string().min(1),
     })
   ).optional(),
+});
+
+export const projectEditSchema = baseProjectSchema.safeExtend({
+  status: z.enum(["ACTIVE", "ARCHIVED", "COMPLETED"]),
 });

@@ -3,7 +3,9 @@ import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { updateWorklog } from "../../store/worklog.slice";
 import toast from "react-hot-toast";
 import type { WorklogItem } from "../../types/worklog.types";
-import { useState,useMemo } from "react";
+import {  useEffect, useMemo } from "react";
+import { createWorklogSchema } from "../../validator/worklog.validator";
+import { useFormValidation } from "../../../../shared/hooks/useFormValidation";
 
 interface Props {
   isOpen: boolean;
@@ -25,13 +27,59 @@ export const EditWorklogModal = ({
   const dispatch = useAppDispatch();
   const { worklogs } = useAppSelector((state) => state.devWorklog);
 
-const [timeSpent, setTimeSpent] = useState<string>(
-  () => (worklog.timeSpent / 60).toString()
-);
+  const formHook = useFormValidation(
+    {
+      timeSpent: (worklog.timeSpent / 60).toString(), // ✅ important
+      description: worklog.description || "",
+    },
+    createWorklogSchema,
+    async (vals) => {
+      const result = await dispatch(
+        updateWorklog({
+          projectId,
+          taskId,
+          worklogId: worklog.id,
+          data: {
+            timeSpent: Number(vals.timeSpent) * 60,
+            description: vals.description,
+          },
+        })
+      );
 
-const [description, setDescription] = useState(
-  () => worklog.description || ""
-);
+      if (updateWorklog.fulfilled.match(result)) {
+        toast.success("Worklog updated");
+        onClose(); // ✅ no TDZ
+      }
+
+      if (updateWorklog.rejected.match(result)) {
+        toast.error(result.payload as string);
+      }
+    }
+  );
+
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    reset
+  } = formHook;
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  useEffect(() => {
+  formHook.setValues({
+    timeSpent: (worklog.timeSpent / 60).toString(),
+    description: worklog.description || "",
+  });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [worklog]);
 
   const totalLogged = useMemo(() => {
     return worklogs
@@ -44,33 +92,7 @@ const [description, setDescription] = useState(
 
   const toHours = (min: number) => (min / 60).toFixed(1);
 
-  const handleUpdate = async () => {
-    if (!timeSpent || Number(timeSpent) <= 0) {
-      return toast.error("Enter valid time");
-    }
-
-    const result = await dispatch(
-      updateWorklog({
-        projectId,
-        taskId,
-        worklogId: worklog.id,
-        data: {
-          timeSpent: Number(timeSpent) * 60,
-          description,
-        },
-      })
-    );
-
-    if (updateWorklog.fulfilled.match(result)) {
-      toast.success("Worklog updated");
-      onClose();
-    }
-
-    if (updateWorklog.rejected.match(result)) {
-      toast.error(result.payload as string);
-    }
-  };
-
+ 
   if (!isOpen) return null;
 
   return (
@@ -115,18 +137,23 @@ const [description, setDescription] = useState(
             <label className="text-xs">Time (hours)</label>
             <input
               type="number"
-              value={timeSpent}
-              onChange={(e) => setTimeSpent(e.target.value)}
+              value={values.timeSpent}
+              onChange={(e) => handleChange("timeSpent", e.target.value)}
+              onBlur={() => handleBlur("timeSpent")}
               className="w-full border px-3 py-2 rounded"
             />
+            {touched.timeSpent && errors.timeSpent && (
+              <p className="text-xs text-red-500 mt-1">{errors.timeSpent}</p>
+            )}
           </div>
 
           {/* Description */}
           <div>
             <label className="text-xs">Description</label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={values.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              onBlur={() => handleBlur("description")}
               className="w-full border px-3 py-2 rounded"
             />
           </div>
@@ -134,12 +161,12 @@ const [description, setDescription] = useState(
 
         {/* Footer */}
         <div className="flex justify-end gap-2 p-4 border-t">
-          <button onClick={onClose} className="border px-4 py-2 rounded">
+          <button onClick={handleClose} className="border px-4 py-2 rounded">
             Cancel
           </button>
 
           <button
-            onClick={handleUpdate}
+            onClick={handleSubmit}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Update

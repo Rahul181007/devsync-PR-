@@ -7,4 +7,11 @@ export interface TimesheetProjectItemDTO {
     taskTitle: string;
     timeSpent: number;
   }[];
+
+    meetings: {          
+    title: string;
+    duration: number;
+  }[];
+
+  unloggedHours: number;
 }

@@ -1,7 +1,9 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store/hook";
 import { createWorklog } from "../../store/worklog.slice";
 import toast from "react-hot-toast";
+import { createWorklogSchema } from "../../validator/worklog.validator";
+import { useFormValidation } from "../../../../shared/hooks/useFormValidation";
 
 interface Props {
   isOpen: boolean;
@@ -22,14 +24,54 @@ export const CreateWorklogModal = ({
 
   const { worklogs } = useAppSelector((state) => state.devWorklog);
 
-  const [timeSpent, setTimeSpent] = useState<string>("");
-  const [description, setDescription] = useState("");
+  const formHook = useFormValidation(
+    {
+      timeSpent: "",
+      description: "",
+    },
+    createWorklogSchema,
+    async (vals) => {
+      const result = await dispatch(
+        createWorklog({
+          projectId,
+          taskId,
+          data: {
+            timeSpent: Number(vals.timeSpent) * 60,
+            description: vals.description,
+          },
+        })
+      );
 
+      if (createWorklog.fulfilled.match(result)) {
+        toast.success("Worklog added");
+        onClose();
+      }
+
+      if (createWorklog.rejected.match(result)) {
+        toast.error(result.payload as string);
+      }
+    }
+  );
+
+
+  const {
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    reset
+  } = formHook;
 
   const totalLogged = useMemo(() => {
     return worklogs.reduce((sum, log) => sum + log.timeSpent, 0);
   }, [worklogs]);
 
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
 
   const remaining =
     estimatedTime != null ? estimatedTime - totalLogged : null;
@@ -37,35 +79,7 @@ export const CreateWorklogModal = ({
   // Convert minutes → hours
   const toHours = (min: number) => (min / 60).toFixed(1);
 
-  const handleSubmit = async () => {
-    if (!timeSpent || Number(timeSpent) <= 0) {
-      return toast.error("Enter valid time");
-    }
 
-    const result = await dispatch(
-      createWorklog({
-        projectId,
-        taskId,
-        data: {
-          timeSpent: Number(timeSpent) * 60, // convert hours → minutes
-          description,
-        },
-      })
-    );
-
-    if (createWorklog.fulfilled.match(result)) {
-      toast.success("Worklog added");
-      onClose();
-      setTimeSpent("");
-      setDescription("");
-    }
-
-    if (createWorklog.rejected.match(result)) {
-      toast.error(result.payload as string);
-    }
-  };
-
-  
   if (!isOpen) return null;
 
   return (
@@ -103,19 +117,16 @@ export const CreateWorklogModal = ({
                   <p className="text-xl font-bold text-purple-700">{toHours(estimatedTime)}h</p>
                 </div>
 
-                <div className={`bg-linear-to-br rounded-lg p-3 text-center border ${
-                  remaining != null && remaining < 0
-                    ? "from-red-50 to-red-100/50 border-red-200/50"
-                    : "from-green-50 to-green-100/50 border-green-200/50"
-                }`}>
-                  <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${
-                    remaining != null && remaining < 0 ? "text-red-600" : "text-green-600"
+                <div className={`bg-linear-to-br rounded-lg p-3 text-center border ${remaining != null && remaining < 0
+                  ? "from-red-50 to-red-100/50 border-red-200/50"
+                  : "from-green-50 to-green-100/50 border-green-200/50"
                   }`}>
+                  <p className={`text-xs font-medium uppercase tracking-wider mb-1 ${remaining != null && remaining < 0 ? "text-red-600" : "text-green-600"
+                    }`}>
                     Remaining
                   </p>
-                  <p className={`text-xl font-bold ${
-                    remaining != null && remaining < 0 ? "text-red-700" : "text-green-700"
-                  }`}>
+                  <p className={`text-xl font-bold ${remaining != null && remaining < 0 ? "text-red-700" : "text-green-700"
+                    }`}>
                     {remaining != null ? toHours(remaining) : "-"}h
                   </p>
                 </div>
@@ -133,11 +144,15 @@ export const CreateWorklogModal = ({
                 type="number"
                 min="0"
                 step="0.5"
-                placeholder="0"
-                value={timeSpent}
-                onChange={(e) => setTimeSpent(e.target.value)}
+                value={values.timeSpent}
+                onChange={(e) => handleChange("timeSpent", e.target.value)}
+                onBlur={() => handleBlur("timeSpent")}
                 className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-12"
               />
+
+              {touched.timeSpent && errors.timeSpent && (
+                <p className="text-xs text-red-500 mt-1">{errors.timeSpent}</p>
+              )}
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
                 hours
               </span>
@@ -154,8 +169,9 @@ export const CreateWorklogModal = ({
             </label>
             <textarea
               placeholder="What did you work on? Be specific..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={values.description}
+              onChange={(e) => handleChange("description", e.target.value)}
+              onBlur={() => handleBlur("description")}
               className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
               rows={3}
             />
@@ -168,7 +184,7 @@ export const CreateWorklogModal = ({
         {/* Footer Buttons */}
         <div className="flex justify-end gap-3 px-5 py-4 border-t border-gray-100 bg-gray-50/50 rounded-b-xl">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all"
           >
             Cancel

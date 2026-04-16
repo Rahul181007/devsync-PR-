@@ -49,7 +49,7 @@ export class UserRepository extends BaseRepository<IUserDocument> implements IUs
             status: data.status,
             otp: data.otp ?? null,
             otpExpiresAt: data.otpExpiresAt ?? null,
-            setting: data.settings ?? null, // ⚠️ mapping handled here
+            setting: data.settings ?? null, 
         }));
 
         return UserMapper.toDomain(doc);

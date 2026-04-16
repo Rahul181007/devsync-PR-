@@ -10,6 +10,7 @@ import { GetTimesheetByProjectUseCase } from "../application/use-cases/worklog/g
 import { GetWorklogsByProjectUseCase } from "../application/use-cases/worklog/getWorklogByProject.usecase";
 import { GetWorklogsByTaskUseCase } from "../application/use-cases/worklog/getWorklogbyTask.usecasde";
 import { UpdateWorklogUseCase } from "../application/use-cases/worklog/updateWorklogUseCase";
+import { MeetingRepository } from "../infrastructure/repositories/meeting.repository";
 import { ProjectRepository } from "../infrastructure/repositories/project.repository";
 import { ProjectMemberRepository } from "../infrastructure/repositories/projectMember.repository";
 import { TaskRepository } from "../infrastructure/repositories/task.repository";
@@ -22,6 +23,7 @@ const taskRepository = new TaskRepository();
 const projectRepository = new ProjectRepository();
 const userRepository = new UserRepository();
 const projectMemberRepository = new ProjectMemberRepository();
+const meetingRepo=new MeetingRepository()
 
 const createWorklogUseCase:ICreateWorklogUseCase = new CreateWorklogUseCase(worklogRepository,taskRepository,projectMemberRepository,projectRepository,userRepository);
 
@@ -60,7 +62,9 @@ const getTimesheetByProjectUsecase:IGetTimesheetByProjectUseCase=new GetTimeshee
   worklogRepository,
   projectMemberRepository,
   projectRepository,
-  userRepository
+  userRepository,
+  meetingRepo
+
 )
 
 export const worklogController = new WorklogController(

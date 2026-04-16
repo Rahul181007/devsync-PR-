@@ -6,8 +6,8 @@ import { ROUTES } from "../../../../shared/constants/routes";
 import OnboardingLayout from "../../components/OnboardingLayout";
 import { CalendarDaysIcon, DocumentTextIcon, HashtagIcon } from "@heroicons/react/24/outline";
 import { validateZod } from "../../../../shared/utiils/validateZod";
-import { projectSchema } from "../../validator/cretaeProject.validator";
 import InputField from "../../../../shared/components/InputField";
+import { baseProjectSchema } from "../../validator/cretaeProject.validator";
 
 const CreateProjectPage = () => {
   const dispatch = useAppDispatch();
@@ -21,7 +21,7 @@ const CreateProjectPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async () => {
-    const validation = validateZod(projectSchema, {
+    const validation = validateZod(baseProjectSchema, {
       name,
       description,
       startDate,
