@@ -1,7 +1,7 @@
 export const superAdminCookieOptions = {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'none' as const,
+   httpOnly: true,
+  secure: false,
+  sameSite: 'lax' as const,
   path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000
 };

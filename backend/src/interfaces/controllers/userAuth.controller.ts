@@ -41,8 +41,8 @@ export class UserAuthController {
             if (result.requiresOnboarding) {
                 res.cookie("accessToken", result.accessToken, {
                     httpOnly: true,
-                    sameSite: "none",
-                    secure: true,
+                    sameSite: "lax",
+                    secure: false,
                     path: "/",
                 });
                 res.cookie(
@@ -62,8 +62,8 @@ export class UserAuthController {
             if (result.waitingForApproval) {
                 res.cookie("accessToken", result.accessToken, {
                     httpOnly: true,
-                    sameSite: "none",
-                    secure: true,
+                    sameSite: "lax",
+                    secure: false,
                     path: "/",
                 });
                 res.cookie(
@@ -80,8 +80,8 @@ export class UserAuthController {
             }
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "none",
-                secure: true,
+                sameSite: "lax",
+                secure: false,
                 path: "/",
             });
 
@@ -168,8 +168,8 @@ export class UserAuthController {
             const result = await this._googleLoginUseCase.execute(idToken);
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "none",
-                secure: true,
+                sameSite: "lax",
+                secure: false,
                 path: "/",
             });
 
