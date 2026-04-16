@@ -110,12 +110,12 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         logger.info(' user logout requested');
-res.clearCookie("accessToken", {
-  httpOnly: true,
-  sameSite: "none",
-  secure: true,
-  path: "/",
-});
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+            path: "/",
+        });
         res.clearCookie('refresh_token', superAdminCookieOptions);
         res.clearCookie('refresh_token', userCookieOptions);
 
