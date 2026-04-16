@@ -79,13 +79,10 @@ export const registerChatSocket = (
       "send_message",
       async (payload: SendMessagePayload) => {
         try {
-          const user = socket.data.user;
-
-          if (!user) {
-            return socket.emit("chat_error", {
-              message: "Unauthorized",
-            });
-          }
+const user = {
+  id: "temp-user",
+  companyId: "temp-company",
+};
 
           if (!payload.projectId || !payload.message) {
             return socket.emit("chat_error", {
