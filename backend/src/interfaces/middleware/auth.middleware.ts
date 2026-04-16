@@ -21,7 +21,7 @@ export const verifyAccessToken = (
     req.user = {
         id:decoded.sub,
         role:decoded.role,
-        companyId:decoded.companyId,
+        companyId:decoded.companyId ?? null,
         onboarding: decoded.onboarding??false
     };
     next();
