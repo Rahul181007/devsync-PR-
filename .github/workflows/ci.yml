@@ -39,47 +39,61 @@ jobs:
       - run: npm install
       - run: npm run build
 
-  deploy:   # ✅ INSIDE jobs
+  deploy:
     runs-on: ubuntu-latest
     needs: [backend, frontend]
 
     steps:
       - uses: actions/checkout@v4
 
-      # 🔧 Build frontend in GitHub
+      # 🔧 Build frontend
       - name: Build Frontend
         working-directory: frontend
         run: |
           npm install
           npm run build
 
-      # 📦 Copy dist to EC2
-      - name: Copy frontend to EC2
+      # 📦 ZIP frontend (IMPORTANT)
+      - name: Zip frontend
+        run: |
+          cd frontend
+          zip -r dist.zip dist
+
+      # 🚀 FAST COPY (single file)
+      - name: Copy zip to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "frontend/dist/*"
-          target: "/home/ubuntu/frontend-build"
+          source: "frontend/dist.zip"
+          target: "/home/ubuntu/"
+          timeout: 120s
+          command_timeout: 10m
 
-      # 🚀 SSH deploy
+      # 🚀 DEPLOY
       - name: Deploy Backend + Frontend
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          timeout: 120s
+          command_timeout: 10m
           script: |
-            echo "📦 Pull backend"
+            echo "📦 Backend"
             cd ~/devsync-PR-/backend
             git pull
             npm install
             npm run build
             pm2 restart backend
 
+            echo "📦 Frontend unzip"
+            cd /home/ubuntu
+            unzip -o dist.zip
+
             echo "🚀 Deploy frontend"
             sudo rm -rf /var/www/html/*
-            sudo cp -r /home/ubuntu/frontend-build/* /var/www/html/
+            sudo cp -r dist/* /var/www/html/
 
             sudo systemctl restart nginx
