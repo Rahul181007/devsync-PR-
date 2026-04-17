@@ -5,7 +5,7 @@ import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
 import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
-import { userCookieOptions } from "../../config/userCookieOptions";
+
 import { signupSchema } from "../../application/validators/auth/signup.validator";
 import { IGoogleLoginUseCase } from "../../application/interface/auth/IGoogleLoginUseCase";
 import { IGoogleSignupUseCase } from "../../application/interface/auth/IGoogleSignupUseCase";
@@ -14,6 +14,7 @@ import { IRefreshTokenUseCase } from "../../application/interface/auth/IRefreshT
 import { ISignupUseCase } from "../../application/interface/auth/ISignupUseCase";
 import { IVerifySignupOtpUseCase } from "../../application/interface/auth/IVerifySignupOtpUseCase";
 import { IResendSignupOtpUseCase } from "../../application/interface/auth/IResendSignupOtpUseCase";
+import { cookieOptions } from "../../config/cookieOptions";
 
 
 
@@ -39,17 +40,11 @@ export class UserAuthController {
             logger.info(`user login successful ${result.email}`)
 
             if (result.requiresOnboarding) {
-                res.cookie("accessToken", result.accessToken, {
-                    httpOnly: true,
-                    sameSite: "none",
-                    secure: true,
-                    path: "/",
+                res.cookie("accessToken", result.accessToken, cookieOptions);
+                res.cookie("refresh_token", result.refreshToken, {
+                    ...cookieOptions,
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
                 });
-                res.cookie(
-                    'refresh_token',
-                    result.refreshToken,
-                    userCookieOptions
-                )
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
@@ -60,17 +55,11 @@ export class UserAuthController {
 
 
             if (result.waitingForApproval) {
-                res.cookie("accessToken", result.accessToken, {
-                    httpOnly: true,
-                    sameSite: "none",
-                    secure: true,
-                    path: "/",
+                res.cookie("accessToken", result.accessToken, cookieOptions);
+                res.cookie("refresh_token", result.refreshToken, {
+                    ...cookieOptions,
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
                 });
-                res.cookie(
-                    'refresh_token',
-                    result.refreshToken,
-                    userCookieOptions
-                )
 
                 return res.status(HttpStatus.OK).json({
                     message: RESPONSE_MESSAGES.AUTH.ONBOARDING_REQUIRED,
@@ -78,19 +67,11 @@ export class UserAuthController {
                 });
 
             }
-            res.cookie("accessToken", result.accessToken, {
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-                path: "/",
+            res.cookie("accessToken", result.accessToken, cookieOptions);
+            res.cookie("refresh_token", result.refreshToken, {
+                ...cookieOptions,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
-
-
-            res.cookie(
-                'refresh_token',
-                result.refreshToken,
-                userCookieOptions
-            )
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
                 data: result
@@ -166,14 +147,11 @@ export class UserAuthController {
             }
 
             const result = await this._googleLoginUseCase.execute(idToken);
-            res.cookie("accessToken", result.accessToken, {
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-                path: "/",
+            res.cookie("accessToken", result.accessToken, cookieOptions);
+            res.cookie("refresh_token", result.refreshToken, {
+                ...cookieOptions,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
             });
-
-            res.cookie('refresh_token', result.refreshToken, userCookieOptions)
 
 
 

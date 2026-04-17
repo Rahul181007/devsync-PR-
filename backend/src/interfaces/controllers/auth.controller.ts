@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import { loginSchema } from "../../application/validators/auth/login.validator";
-import { superAdminCookieOptions } from "../../config/superAdminCookieOption";
-import { userCookieOptions } from "../../config/userCookieOptions";
 import { logger } from "../../shared/logger/logger";
 import { handleError } from "../../shared/utils/handleError";
 import { HttpStatus } from "../../shared/constants/httpStatus";
@@ -10,6 +8,7 @@ import { RESPONSE_MESSAGES } from "../../shared/constants/responseMessages";
 import { IGetAuthMeUseCase } from "../../application/interface/auth/IGetAuthMeUseCase";
 import { ILoginSuperAdminUseCase } from "../../application/interface/auth/ILoginSuperAdminUseCase";
 import { IRefreshTokenUseCase } from "../../application/interface/auth/IRefreshTokenUseCase";
+import { cookieOptions } from "../../config/cookieOptions";
 
 export class AuthController {
     constructor(private _loginSuperAdminUseCase: ILoginSuperAdminUseCase,
@@ -28,18 +27,12 @@ export class AuthController {
             logger.info(`SuperAdmin login successful: ${result.email}`)
 
             // storing accesstoken
-            res.cookie("accessToken", result.accessToken, {
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-                path: "/",
-            });
+            res.cookie("accessToken", result.accessToken, cookieOptions);
 
-            res.cookie(
-                "refresh_token",
-                result.refreshToken,
-                superAdminCookieOptions
-            );
+            res.cookie("refresh_token", result.refreshToken, {
+                ...cookieOptions,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            });
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.LOGIN_SUCCESS,
                 data: {
@@ -70,12 +63,7 @@ export class AuthController {
             const result = await this._refreshTokenUseCase.execute(refreshToken);
 
             logger.info(`Acccess token refreshed for user :${result.user.id}`)
-            res.cookie("accessToken", result.accessToken, {
-                httpOnly: true,
-                sameSite: "none",
-                secure: true,
-                path: "/",
-            });
+            res.cookie("accessToken", result.accessToken, cookieOptions);
             return res.status(HttpStatus.OK).json({
                 message: RESPONSE_MESSAGES.AUTH.TOKEN_REFRESHED,
                 accessToken: result.accessToken,
@@ -110,14 +98,8 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         logger.info(' user logout requested');
-        res.clearCookie("accessToken", {
-            httpOnly: true,
-            sameSite: "none",
-            secure: true,
-            path: "/",
-        });
-        res.clearCookie('refresh_token', superAdminCookieOptions);
-        res.clearCookie('refresh_token', userCookieOptions);
+res.clearCookie("accessToken", cookieOptions);
+res.clearCookie("refresh_token", cookieOptions);
 
         logger.info('user logged out successfully')
         return res.status(HttpStatus.OK).json({ message: RESPONSE_MESSAGES.AUTH.LOGOUT_SUCCESS })
