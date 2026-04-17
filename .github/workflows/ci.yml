@@ -39,36 +39,47 @@ jobs:
       - run: npm install
       - run: npm run build
 
-  deploy:
+  deploy:   # ✅ INSIDE jobs
     runs-on: ubuntu-latest
     needs: [backend, frontend]
 
     steps:
-      - name: Deploy Backend + Frontend to EC2
+      - uses: actions/checkout@v4
+
+      # 🔧 Build frontend in GitHub
+      - name: Build Frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      # 📦 Copy dist to EC2
+      - name: Copy frontend to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "frontend/dist/*"
+          target: "/home/ubuntu/frontend-build"
+
+      # 🚀 SSH deploy
+      - name: Deploy Backend + Frontend
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "📦 Pull latest code"
-            cd ~/devsync-PR-
+            echo "📦 Pull backend"
+            cd ~/devsync-PR-/backend
             git pull
-
-            echo "🔧 Backend setup"
-            cd backend
             npm install
             npm run build
             pm2 restart backend
 
-            echo "🎨 Frontend build"
-            cd ../frontend
-            npm install
-            npm run build
-
-            echo "🚀 Deploy frontend to nginx"
+            echo "🚀 Deploy frontend"
             sudo rm -rf /var/www/html/*
-            sudo cp -r dist/* /var/www/html/
+            sudo cp -r /home/ubuntu/frontend-build/* /var/www/html/
 
-            echo "🔁 Restart nginx"
             sudo systemctl restart nginx
