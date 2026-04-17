@@ -32,8 +32,10 @@ const DeveloperLayout = () => {
       <div className="flex-1 flex flex-col">
         <TopBar onMenuClick={openSidebar} />
 
-        <main className="flex-1 bg-gray-50 p-4 md:p-6 overflow-y-auto">
-          <Outlet />
+        <main className="flex-1 bg-gray-50 overflow-y-auto overflow-x-hidden">
+          <div className="w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
 

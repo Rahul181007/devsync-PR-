@@ -82,9 +82,9 @@ const ChangePassword = () => {
     <>
       {/* Main Card - Always Visible */}
       <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl shadow-md">
+            <div className="p-3 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl shadow-md flex-shrink-0">
               <KeyRound className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -92,12 +92,12 @@ const ChangePassword = () => {
               <p className="text-sm text-gray-500 mt-1">
                 Keep your account secure by regularly updating your password
               </p>
-              <div className="flex items-center gap-2 mt-3">
+              <div className="flex flex-wrap items-center gap-2 mt-3">
                 <div className="flex items-center gap-1 text-xs text-gray-400">
                   <Shield className="w-3 h-3" />
                   <span>Strong passwords recommended</span>
                 </div>
-                <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                <div className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block"></div>
                 <div className="flex items-center gap-1 text-xs text-gray-400">
                   <Clock className="w-3 h-3" />
                   <span>Update every 90 days</span>
@@ -108,7 +108,7 @@ const ChangePassword = () => {
           
           <button
             onClick={handleOpen}
-            className="bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2.5 rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
+            className="bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 sm:px-6 py-2.5 rounded-xl text-sm font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap sm:w-auto w-full"
           >
             <KeyRound className="w-4 h-4" />
             <span>Change Password</span>
@@ -119,12 +119,12 @@ const ChangePassword = () => {
         <div className="mt-6 pt-6 border-t border-gray-200/80">
           <div className="bg-blue-50/50 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <div className="p-1.5 bg-blue-100 rounded-lg">
+              <div className="p-1.5 bg-blue-100 rounded-lg flex-shrink-0">
                 <Info className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-blue-800">Security Tips</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                   <div className="flex items-center gap-2 text-xs text-blue-700">
                     <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
                     <span>Use at least 8 characters</span>

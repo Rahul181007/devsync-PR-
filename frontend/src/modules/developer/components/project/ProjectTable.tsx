@@ -1,3 +1,4 @@
+import { Table } from "../../../../shared/components/table";
 import type { Project } from "../../types/project.types";
 
 interface ProjectTableProps {
@@ -23,77 +24,57 @@ export const ProjectTable = ({
   onView,
 }: ProjectTableProps) => {
   return (
-    <div className="bg-white rounded-xl shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Project
-              </th>
-              <th  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Start Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                End Date
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="bg-white divide-y divide-gray-200">
-            {projects.map((project) => (
-              <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 font-medium">
-                  {project.name}
-                </td>
-
-                <td className="px-6 py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                      project.status
-                    )}`}
-                  >
-                    {project.status}
-                  </span>
-                </td>
-
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {project.startDate
-                    ? new Date(project.startDate).toLocaleDateString()
-                    : "-"}
-                </td>
-
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  {project.endDate
-                    ? new Date(project.endDate).toLocaleDateString()
-                    : "-"}
-                </td>
-
-                <td className="px-6 py-4 text-right">
-                  <button
-                    onClick={() => onView(project.id)}
-                    className="text-blue-600 hover:text-blue-800"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {projects.length === 0 && (
-        <div className="py-10 text-center text-gray-500">
-          No projects assigned.
-        </div>
-      )}
-    </div>
+   <Table<Project>
+      title="My Projects"
+      data={projects}
+      emptyText="No projects assigned"
+      columns={[
+        {
+          header: "Project",
+          render: (project) => (
+            <div className="font-medium text-gray-900">
+              {project.name}
+            </div>
+          ),
+        },
+        {
+          header: "Status",
+          render: (project) => (
+            <span
+              className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
+                project.status
+              )}`}
+            >
+              {project.status}
+            </span>
+          ),
+        },
+        {
+          header: "Start Date",
+          render: (project) =>
+            project.startDate
+              ? new Date(project.startDate).toLocaleDateString()
+              : "-",
+        },
+        {
+          header: "End Date",
+          render: (project) =>
+            project.endDate
+              ? new Date(project.endDate).toLocaleDateString()
+              : "-",
+        },
+        {
+          header: "Action",
+          render: (project) => (
+            <button
+              onClick={() => onView(project.id)}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              View
+            </button>
+          ),
+        },
+      ]}
+    />
   );
 };
