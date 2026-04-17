@@ -102,7 +102,7 @@ const TaskSchema = new Schema<ITaskDocument>(
             type: Number,
             enum: [1, 2, 3, 5, 8, 13],
             validate: {
-                validator: function (value: number | undefined) {
+                validator: function (value: number | null) {
                     const doc = this as unknown as ITaskDocument;
 
                     if (doc.type === "STORY") {
