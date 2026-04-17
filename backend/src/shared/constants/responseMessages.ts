@@ -19,7 +19,7 @@ export const RESPONSE_MESSAGES = {
         ALREADY_BLOCKED: "User is already blocked",
         ALREADY_ACTIVE: "User is already active",
         TARGET_NOT_COMPANY_ADMIN: "Target user is not a company admin",
-        LOGIN_SUCCESS: "Login Successful",
+        LOGIN_SUCCESS: "Login Successful-ci/cd working",
         TOKEN_REFRESHED: 'New token generated',
         LOGOUT_SUCCESS: 'Logged out successfully',
         USER_ID: 'User id is required',
