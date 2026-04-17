@@ -6,6 +6,7 @@ import AppRouter from "./router/AppRouter";
 import { bootstrapAuth } from "./modules/auth/auth.slice";
 import { connectSocket } from "./shared/socket";
 import { addRealtimeNotification } from "./modules/notification/store/notification.slice";
+import Spinner from "./shared/components/LoadingSpinner";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -29,8 +30,11 @@ const App = () => {
 
   if (!isAuthChecked) {
     return (
-      <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        Loading...
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-sm font-medium text-gray-600">Loading dashboard...</p>
+        </div>
       </div>
     );
   }

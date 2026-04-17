@@ -44,15 +44,31 @@ jobs:
     needs: [backend, frontend]
 
     steps:
-      - name: Deploy Backend to EC2
+      - name: Deploy Backend + Frontend to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/devsync-PR-/backend
+            echo "📦 Pull latest code"
+            cd ~/devsync-PR-
             git pull
+
+            echo "🔧 Backend setup"
+            cd backend
             npm install
             npm run build
             pm2 restart backend
+
+            echo "🎨 Frontend build"
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo "🚀 Deploy frontend to nginx"
+            sudo rm -rf /var/www/html/*
+            sudo cp -r dist/* /var/www/html/
+
+            echo "🔁 Restart nginx"
+            sudo systemctl restart nginx

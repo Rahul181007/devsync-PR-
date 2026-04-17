@@ -84,7 +84,7 @@ const ChangePassword = () => {
       <div className="bg-white border border-gray-200/80 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl shadow-md flex-shrink-0">
+            <div className="p-3 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl shadow-md shrink-0">
               <KeyRound className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -119,7 +119,7 @@ const ChangePassword = () => {
         <div className="mt-6 pt-6 border-t border-gray-200/80">
           <div className="bg-blue-50/50 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <div className="p-1.5 bg-blue-100 rounded-lg flex-shrink-0">
+              <div className="p-1.5 bg-blue-100 rounded-lg shrink-0">
                 <Info className="w-4 h-4 text-blue-600" />
               </div>
               <div className="flex-1">
