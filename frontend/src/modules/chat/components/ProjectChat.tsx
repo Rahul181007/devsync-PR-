@@ -105,7 +105,10 @@ const handleSend = (message: string, file?: File | null) => {
   return;
 }
   if (!file) {
+ console.log("FINAL MESSAGE:", message); 
 
+ console.log("SOCKET:", socketRef.current);
+console.log("EMITTING:", message);
     socketRef.current?.emit("send_message", {
       projectId,
       message,

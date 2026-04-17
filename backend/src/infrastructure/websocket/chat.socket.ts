@@ -87,6 +87,8 @@ export const registerChatSocket = (
             });
           }
 
+          console.log(payload.message ,"jhdkjshkjfhd")
+
           if (!payload.projectId || !payload.message) {
             return socket.emit("chat_error", {
               message: "Invalid payload",

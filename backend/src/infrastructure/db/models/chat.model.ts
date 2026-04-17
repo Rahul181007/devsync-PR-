@@ -49,11 +49,11 @@ const ChatMessageSchema = new Schema<IChatMessageDocument>(
             default: null,
         },
 
-        attachmentType: {
-            type: String,
-            enum: ["image", "file"],
-            default: null,
-        },
+attachmentType: {
+  type: String,
+  enum: ["image", "file", null],
+  default: null,
+},
 
         fileName: {
             type: String,
