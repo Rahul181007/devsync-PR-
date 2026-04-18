@@ -1,58 +1,64 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 jobs:
-  backend:
+  build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - run: npm install
-      - run: npm run build
+      # 🔹 Backend Build
+      - name: Install Backend
+        run: |
+          cd backend
+          npm install
+          npm run build
 
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - run: npm install
-      - run: npm run build
+      # 🔹 Frontend Build
+      - name: Install Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [backend, frontend]
+    needs: build
 
     steps:
-      - name: Deploy Backend to EC2
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/devsync-PR-/backend
-            git pull
+            cd ~/devsync-PR-
+
+            echo "📥 Pull latest code"
+            git pull origin main
+
+            echo "📦 Backend setup"
+            cd backend
             npm install
             npm run build
-            pm2 restart backend
+
+            echo "♻️ Restart backend"
+            pm2 restart backend || pm2 start dist/server.js --name backend
+
+            echo "🌐 Frontend setup"
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo "✅ Deployment finished"
