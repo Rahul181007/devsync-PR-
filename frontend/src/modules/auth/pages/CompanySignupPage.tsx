@@ -32,7 +32,7 @@ const CompanySignupPage = () => {
   }, [otpSent, navigate]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // ⛔ prevent page reload
+    e.preventDefault(); 
     setLocalError(null);
 
     // custom validation

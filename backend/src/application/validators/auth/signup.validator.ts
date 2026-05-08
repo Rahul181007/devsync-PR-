@@ -1,6 +1,22 @@
-import {z} from 'zod';
-export const signupSchema=z.object({
-    name:z.string().trim().min(4,'Name must be at least 2 characters'),
-    email:z.string().email(),
-    password:z.string().min(8,'password must be atleast 8 characters')
-})
+import { z } from "zod";
+
+export const signupSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name is too long"),
+
+  email: z
+    .string()
+    .trim()
+    .email("Please enter a valid email address"),
+
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
+      "Password must contain uppercase, lowercase, number and special character"
+    ),
+});
