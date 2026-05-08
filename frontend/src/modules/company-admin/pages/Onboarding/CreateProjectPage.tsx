@@ -122,6 +122,11 @@ const CreateProjectPage = () => {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
+              {errors.startDate && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.startDate}
+                </p>
+              )}
             </div>
           </div>
 
@@ -139,6 +144,12 @@ const CreateProjectPage = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
+
+              {errors.endDate && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.endDate}
+                </p>
+              )}
             </div>
           </div>
         </div>
