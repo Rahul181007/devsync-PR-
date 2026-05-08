@@ -55,6 +55,15 @@ export class CreateWorkspaceUseCase implements ICreateWorkspaceUseCase {
 
         const slug = this._generateSlug(data.name)
 
+        const existingByName = await this._companyRepo.findByName(normalizedName);
+        if(existingByName){
+            throw new AppError(RESPONSE_MESSAGES.COMPANY.NAME_ALREADY_EXISTS, HttpStatus.CONFLICT)
+        }
+        const existingByDomain = await this._companyRepo.findByDomain(normalizedDomain!);
+        if(normalizedDomain && existingByDomain){
+            throw new AppError(RESPONSE_MESSAGES.COMPANY.DOMAIN_ALREADY_EXISTS, HttpStatus.CONFLICT)
+        }
+
         const newCompany = await this._companyRepo.create({
             name: normalizedName,
             domain: normalizedDomain,

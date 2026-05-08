@@ -31,6 +31,20 @@ export class UpdateCompanyLogoFromSettingsUseCase implements IUpdateCompanyLogoF
             );
         }
 
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!allowedMimeTypes.includes(data.file.mimetype)) {
+            throw new AppError(
+                "Only image files are allowed",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
         const logoUrl = await this._fileStorage.upload({
             file: data.file.buffer,
             folder: `companies/${user.companyId}/branding`,

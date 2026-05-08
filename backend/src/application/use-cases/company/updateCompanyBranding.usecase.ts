@@ -6,16 +6,16 @@ import { AppError } from "../../../shared/errors/AppError";
 import { UpdateCompanyBrandingInput } from "../../dto/company/updateBranding.dto";
 import { IUpdateCompanyBrandingUseCase } from "../../interface/company/IUpdateCompanyBrandingUseCase";
 
-export class UpdateCompanyBrandingUseCase implements IUpdateCompanyBrandingUseCase{
+export class UpdateCompanyBrandingUseCase implements IUpdateCompanyBrandingUseCase {
     constructor(
-        private _companyRepo:ICompanyRepository,
-        private _fileStorage:IFileStorage
-    ){}
+        private _companyRepo: ICompanyRepository,
+        private _fileStorage: IFileStorage
+    ) { }
 
-    async execute(companyId:string,data:UpdateCompanyBrandingInput):Promise<void>{
-        const company=await this._companyRepo.findById(companyId);
+    async execute(companyId: string, data: UpdateCompanyBrandingInput): Promise<void> {
+        const company = await this._companyRepo.findById(companyId);
 
-        if(!company){
+        if (!company) {
             throw new AppError(
                 RESPONSE_MESSAGES.COMPANY.NOT_FOUND,
                 HttpStatus.NOT_FOUND
@@ -23,39 +23,58 @@ export class UpdateCompanyBrandingUseCase implements IUpdateCompanyBrandingUseCa
         }
 
 
-        let logoUrl=company.logoUrl
-        let uploadedLogoUrl:string|undefined;
+        let logoUrl = company.logoUrl
+        let uploadedLogoUrl: string | undefined;
 
         try {
-            if(data.logoFile){
-                uploadedLogoUrl=await this._fileStorage.upload({
-                    file:data.logoFile,
-                    folder:`companies/${companyId}/branding`,
+            if (data.logoFile) {
+
+                const allowedMimeTypes = [
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp"
+                ];
+
+                if (
+                    !data.logoMimeType ||
+                    !allowedMimeTypes.includes(data.logoMimeType)
+                ) {
+                    throw new AppError(
+                        "Only image files are allowed",
+                        HttpStatus.BAD_REQUEST
+                    );
+                }
+
+                uploadedLogoUrl = await this._fileStorage.upload({
+                    file: data.logoFile,
+                    folder: `companies/${companyId}/branding`,
                     contentType: data.logoMimeType ?? "image/jpeg",
-                })
-                logoUrl=uploadedLogoUrl
+                });
+
+                logoUrl = uploadedLogoUrl;
             }
 
-            await this._companyRepo.updateBranding(companyId,{
-                ...(logoUrl!==undefined && {logoUrl}),
-                ...(data.themeColor!==undefined && {themeColor:data.themeColor})
+            await this._companyRepo.updateBranding(companyId, {
+                ...(logoUrl !== undefined && { logoUrl }),
+                ...(data.themeColor !== undefined && { themeColor: data.themeColor })
             })
-             
-            if(company.onboardingStep==='BRANDING'){
-                await this._companyRepo.updateOnboardingStep(companyId,'PROJECT')
+
+            if (company.onboardingStep === 'BRANDING') {
+                await this._companyRepo.updateOnboardingStep(companyId, 'PROJECT')
             }
 
-            if(data.logoFile && company.logoUrl){
+            if (data.logoFile && company.logoUrl) {
                 await this._fileStorage.delete(company.logoUrl)
             }
         } catch (error) {
-            if(uploadedLogoUrl){
+            if (uploadedLogoUrl) {
                 await this._fileStorage.delete(uploadedLogoUrl)
             }
             throw error
         }
-       
+
     }
 
-    
+
 }

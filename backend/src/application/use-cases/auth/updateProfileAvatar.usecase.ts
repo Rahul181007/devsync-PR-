@@ -7,51 +7,65 @@ import { AppError } from "../../../shared/errors/AppError";
 import { UpdateProfileAvatarResponseDTO } from "../../dto/auth/updateProfileAvatarResponse.dto";
 import { IUpdateProfileAvatarUseCase } from "../../interface/auth/IUpdateProfileAvatarUseCase";
 
-export class UpdateProfileAvatarUseCase implements IUpdateProfileAvatarUseCase{
+export class UpdateProfileAvatarUseCase implements IUpdateProfileAvatarUseCase {
     constructor(
-        private _userRepo:IUserRepository,
-        private _superAdminRepo:ISuperAdminRepository,
-        private _fileStorage:IFileStorage
-    ){}
+        private _userRepo: IUserRepository,
+        private _superAdminRepo: ISuperAdminRepository,
+        private _fileStorage: IFileStorage
+    ) { }
 
     async execute(userId: string, file: { buffer: Buffer; mimetype: string; originalname: string; }): Promise<UpdateProfileAvatarResponseDTO> {
-        const fileUrl=await this._fileStorage.upload({
-            file:file.buffer,
-            folder:"avatars",
-            contentType:file.mimetype
+
+        const allowedMimeTypes = [
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+            throw new AppError(
+                "Only image files are allowed",
+                HttpStatus.BAD_REQUEST
+            );
+        }
+        const fileUrl = await this._fileStorage.upload({
+            file: file.buffer,
+            folder: "avatars",
+            contentType: file.mimetype
         })
 
-        const user=await this._userRepo.findById(userId);
+        const user = await this._userRepo.findById(userId);
 
-        if(user){
-            const updated=await this._userRepo.updateProfile(userId,{
-                avatarUrl:fileUrl
+        if (user) {
+            const updated = await this._userRepo.updateProfile(userId, {
+                avatarUrl: fileUrl
             })
 
             return {
-                message:RESPONSE_MESSAGES.USER.PROFILE_UPDATED,
-                name:updated.name,
-                avatarUrl:updated.avatarUrl
+                message: RESPONSE_MESSAGES.USER.PROFILE_UPDATED,
+                name: updated.name,
+                avatarUrl: updated.avatarUrl
             }
         }
 
-        const superAdmin=await this._superAdminRepo.findById(userId);
+        const superAdmin = await this._superAdminRepo.findById(userId);
 
-        if(!superAdmin){
+        if (!superAdmin) {
             throw new AppError(
                 RESPONSE_MESSAGES.AUTH.ACCOUNT_NOT_FOUND,
                 HttpStatus.NOT_FOUND
             )
         }
 
-        const updated=await this._superAdminRepo.updateProfile(userId,{
-            avatarUrl:fileUrl
+        const updated = await this._superAdminRepo.updateProfile(userId, {
+            avatarUrl: fileUrl
         });
 
-        return {           
-                message:RESPONSE_MESSAGES.USER.PROFILE_UPDATED,
-                name:updated.name,
-                avatarUrl:updated.avatarUrl            
+        return {
+            message: RESPONSE_MESSAGES.USER.PROFILE_UPDATED,
+            name: updated.name,
+            avatarUrl: updated.avatarUrl
         }
     }
 }

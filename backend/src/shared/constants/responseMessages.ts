@@ -55,6 +55,7 @@ export const RESPONSE_MESSAGES = {
         REJECTION_REASON: '"Rejection reason is required"',
         REJECTED: 'Rejected',
         REAPPLIED: 'Reapplied',
+        NAME_ALREADY_EXISTS: 'Company name already exists'
 
     },
 
