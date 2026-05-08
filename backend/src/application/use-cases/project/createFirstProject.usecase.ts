@@ -48,6 +48,23 @@ export class CreateFirstProjectUseCase implements ICreateFirstProjectUseCase {
     if(existing){
         throw new AppError(RESPONSE_MESSAGES.PROJECT.ALREADY_EXISTS,HttpStatus.CONFLICT)
     }
+
+    if (!data.startDate || !data.endDate) {
+    throw new AppError(
+        "Start date and end date are required",
+        HttpStatus.BAD_REQUEST
+    );
+}
+
+const startDate = new Date(data.startDate);
+const endDate = new Date(data.endDate);
+
+if (endDate < startDate) {
+    throw new AppError(
+        "Project end date cannot be earlier than start date",
+        HttpStatus.BAD_REQUEST
+    );
+}
     const project =await this._projectRepo.create({
         companyId,
         name:data.name,
