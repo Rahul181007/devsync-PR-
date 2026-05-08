@@ -90,6 +90,8 @@ Managing projects across teams without a structured system leads to poor communi
 DevSync follows **Clean Architecture** principles across both frontend and backend.
 
 ### 🔹 Backend
+
+```text
 src/
 ├── application
 ├── domain
@@ -98,9 +100,11 @@ src/
 ├── di
 ├── config
 ├── shared
-
+```
 
 ### 🔹 Frontend
+
+```text
 src/
 ├── core
 ├── modules
@@ -108,6 +112,7 @@ src/
 ├── store
 ├── router
 ├── assets
+```
 
 
 ### ✅ Benefits
@@ -162,25 +167,41 @@ src/
 ## ⚙️ Installation
 
 ### 1️⃣ Clone the repository
+
 ```bash
 git clone https://github.com/Rahul181007/devsync-PR-.git
 cd devsync-PR-
+```
 
+---
 
-2️⃣ Setup Backend
+### 2️⃣ Setup Backend
+
+```bash
 cd backend
 npm install
+```
 
-Create .env file:
+Create `.env` file:
+
+```env
 PORT=5000
 MONGO_URI=your_mongo_uri
 JWT_SECRET=your_secret
+```
 
 Run backend:
+
+```bash
 npm run dev
+```
 
+---
 
-3️⃣ Setup Frontend
+### 3️⃣ Setup Frontend
+
+```bash
 cd frontend
 npm install
 npm run dev
+```
