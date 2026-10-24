@@ -8,16 +8,12 @@ export class S3FileStorage implements IFileStorage {
 
     constructor() {
         this._s3 = new S3Client({
-            region: env.AWS_REGION,
-            credentials: {
-                accessKeyId: env.AWS_ACCESS_KEY_ID,
-                secretAccessKey: env.AWS_SECRET_ACCESS_KEY
-            }
-        })
+            region: env.AWS_REGION
+        });
     }
 
     async upload(
-        data: { file: Buffer; folder: string ,contentType:string}
+        data: { file: Buffer; folder: string, contentType: string }
     ): Promise<string> {
         const key = `${data.folder}/${randomUUID()}`;
 
